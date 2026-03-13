@@ -3,14 +3,14 @@ lab:
     title: 'Configure MFA and phishing resistant login with Passkeys'
     description: 'Configure multifactor authentication and phishing-resistant passkey sign-in in Microsoft Entra.'
     level: 300
-    duration: 30
+    duration: 20
 ---
 
-# Configure MFA, Passkeys, and Identity Protection
+# Configure MFA and phishing resistant login with Passkeys
 
-In this exercise you will configure Multifactor Authentication (MFA) registration, require MFA via Conditional Access, enable phishing-resistant sign-in using Passkeys (FIDO2), apply User and Sign-in risk policies, create a Terms of Use policy, and explore Continuous Access Evaluation — all within Microsoft Entra.
+In this exercise you will configure Multifactor Authentication (MFA) registration, require MFA via Conditional Access, and enable phishing-resistant sign-in using Passkeys (FIDO2).
 
-This exercise should take approximately **30** minutes to complete.
+This exercise should take approximately **20** minutes to complete.
 
 ## Before you start
 
