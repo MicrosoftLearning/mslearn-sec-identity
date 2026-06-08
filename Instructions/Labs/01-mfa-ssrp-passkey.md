@@ -101,8 +101,8 @@ You are now logged in, and you have MFA configured.  You will not be required to
 Your company is starting to launch a series of cloud applications that have access to customer data, and other important resources.  Users will need to connect to Microsoft Entra and Azure portals to get them set up.  You want to ensure that users connect using MFA secured account.
 
 1. Sign into https://entra.microsoft.com with you **Administrator** account, if you are not already.
-2. Open **Protection** from the menu on the left.
-3. Select **Conditional Access** from the newly opened menu.
+2. In the **Entra ID** menu on the left.
+3. Select **Conditional Access** menu.
 4. Select the **+ Create new policy** from the top of the page.
 5. **Create a Conditional Access Policy** with the following values:
 
@@ -123,7 +123,7 @@ Your company is starting to launch a series of cloud applications that have acce
 |Target resources: | |
 | | 1) Choose the **No target resources selected** item |
 | | 2) Mark the **Select resources** item |
-| | 3) Choose **None** under the **Select** section |
+| | 3) Choose **None** under the **Select specific resources** section |
 | | 4) From the menu that open choose **Microsoft Admin Portals** |
 | | 5) Use the **Select** button to confirm your choices |
 | Network | Skip |
@@ -164,8 +164,8 @@ Your company is starting to launch a series of cloud applications that have acce
 You have MFA registration completed and have started to require MFA for login.  However, you are hearing that your company's MFA protection could be even better.  You can strengthen your MFA requirements to make users log in with Phishing resistant MFA.
 
 1. If not already logged in, connect to https://entra.microsoft.com with your **Administrator** account.
-2. Select **Identity** then select **Protection** from the menu on the left.
-3. From the Protection portion of the menu on the left choose **Authentication methods**.
+2. Return **Entra ID** menu on the left.
+3. From the menu select **Authentication methods**.
 3. Select **Policies** from the newly opened screen.
 4. Select **Passkey (FIDO2)**.
 5. Use the slider to **Enable** to Passkey (FIDO2) authentication method.
@@ -175,19 +175,19 @@ You have now made the phishing resistant option to use Passkeys available in you
 
 ### Subtask 1 - Use Authentication methods to create a Passkey (FIDO2) strong authentication
 
-1. From the **Protection** portion of the menu on the left choose **Authentication methods**.
+1. Look for the **Manage** portion of the menu in **Authentication methods**.
 2. Select **Authentication strengths**.
 3. Choose **+ New authentication strength** from the top of the dialog.
 4. Enter a name and description:
 
 | Field | Value |
 | :--- | :--- |
-| Name | `Ignite phishing resistant MFA` |
+| Name | `SC500 phishing resistant MFA` |
 | Description | `Lab created authentication strength forcing users to log in with phishing resistant MFA.` |
 
 5. Mark **Passkeys (FIDO2)**, in the list.
 6. Select the **Advanced options** item under **Passkeys (FIDO2)**.
-7. Mark the **Microsoft Authenticator (preview)** item.
+7. Mark the **Microsoft Authenticator** item.
 8. Select **Save**.
 9. Select **Next**.  This opens the **New authentication strength** dialog for Review.
 10. Select **Create**.
@@ -196,13 +196,13 @@ You have created a new Authentication strength that can be used with Conditional
 
 ### Subtask 2 - Add Authentication strength to your Conditional Access policy
 
-1. Open the **Protection** portion of the menu, then choose **Conditional Access**.
+1. From the **Entra ID** menu, select **Conditional Access**.
 2. Select **Policies** from the screen that opens.
 3. Choose the **Require MFA for portals** policy we created earlier.
 4. Under **Access controls** in the Grant section select the **1 control selected** item.
 4. **Unmark** the **Require multifactor authentication**.
 5. **Mark** the **Require authentication strength**.
-6. Use the dropdown to select the **Ignite Phishing resistant MFA** strength you created in the previous task.
+6. Use the dropdown to select the **SC500 Phishing resistant MFA** strength you created in the previous task.
 
     > **Note**: If the new authentication strength does not show up in the dropdown. Go to the upper-right corner and sign-out of the admin portal. Then close your browser, wait a minute. Then you can open the browser, and connect to `https://entra.microsoft.com` and log in as Administrator.  Start at Subtask 2 again.  It takes a few minutes for the new authentication strength to show up.
 
@@ -228,7 +228,7 @@ At this point, you have set up a policy using Conditional Access to require user
 
 - **Note** - You will be prompted to build out your Passkey.
 
-7.	Select **Next** on the **Create your passkey in Microsoft Authenticator** screen.
+7.	Select **Other** the select **Select **Next** on the **Create your passkey in Microsoft Authenticator** screen.
 
     > **Note**: Many Microsoft Authentication apps are not enabled to CREATE a Passkey.  To be safe we are going to use the Bluetooth method. When the **Complete the setup in Microsoft Authenticator** dialog appears, we will select "Having trouble?".
 
