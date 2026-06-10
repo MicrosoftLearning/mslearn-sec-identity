@@ -228,7 +228,7 @@ At this point, you have set up a policy using Conditional Access to require user
 
 - **Note** - You will be prompted to build out your Passkey.
 
-7.	Select **Other** the select **Select **Next** on the **Create your passkey in Microsoft Authenticator** screen.
+7.	Select **Other Options** the select **Passkey in Microsoft Authenticator** screen.
 
     > **Note**: Many Microsoft Authentication apps are not enabled to CREATE a Passkey.  To be safe we are going to use the Bluetooth method. When the **Complete the setup in Microsoft Authenticator** dialog appears, we will select "Having trouble?".
 
