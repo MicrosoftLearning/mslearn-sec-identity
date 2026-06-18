@@ -36,7 +36,7 @@ This exercise should take approximately **45** minutes to complete.
 
 In this section, you assign the Conditional Access Administrator role to **sc500-user01** as an eligible assignment. An eligible assignment means the user does not hold the role permanently — they must request and activate it each time they need it.
 
-1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) using your **Global Administrator** credentials.
+1. Sign in to the Microsoft Entra admin center at `https://entra.microsoft.com` using your **Administrator** credentials.
 
 1. In the left navigation, expand **Identity governance** and select **Privileged Identity Management**.
 

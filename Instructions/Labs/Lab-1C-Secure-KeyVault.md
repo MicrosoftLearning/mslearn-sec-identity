@@ -39,13 +39,13 @@ Azure Key Vault supports two permission models: **Vault access policies** (the l
 
 > **Note**: The Key Vault name must be globally unique across all Azure subscriptions. The name `sc500-kv-@lab.LabInstance.Id` uses your lab instance ID to ensure uniqueness. This name is referenced throughout the lab — if you use a different name, substitute it wherever `sc500-kv-@lab.LabInstance.Id` appears.
 
-1. Sign in to the [Azure portal](https://portal.azure.com) using your **Global Administrator** credentials.
+1. Sign in to the **Azure portal** using `https://portal.azure.com` using your **Global Administrator** credentials.
 
-1. In the search bar, search for and select **Key vaults**.
+2. In the search bar, search for and select **Key vaults**.
 
-1. Select **+ Create**.
+3. Select **+ Create**.
 
-1. On the **Basics** tab, configure the following:
+4. On the **Basics** tab, configure the following:
 
     | Setting | Value |
     |---------|-------|
@@ -55,29 +55,29 @@ Azure Key Vault supports two permission models: **Vault access policies** (the l
     | **Region** | East US |
     | **Pricing tier** | Standard |
 
-1. Select the **Access configuration** tab.
+5. Select the **Access configuration** tab.
 
-1. Under **Permission model**, select **Azure role-based access control (RBAC)**.
+6. Under **Permission model**, select **Azure role-based access control (RBAC)**.
 
     > **Note**: The RBAC authorization model is selected at vault creation and cannot be changed without deleting and recreating the vault. If the vault is created with the legacy access policies model, the role assignment steps in this lab will not apply.
 
-1. Select **Review + create**, then select **Create**.
+7. Select **Review + create**, then select **Create**.
 
     Wait for the deployment to complete. This typically takes less than one minute.
 
-1. Select **Go to resource** to open the vault.
+8. Select **Go to resource** to open the vault.
 
-1. On the Key Vault **Overview** page, locate the **Vault URI** field. Copy this value and save it — it follows the format `https://sc500-kv-<your-lab-id>.vault.azure.net/`. You will use it in a later section.
+9. On the Key Vault **Overview** page, locate the **Vault URI** field. Copy this value and save it — it follows the format `https://sc500-kv-<your-lab-id>.vault.azure.net/`. You will use it in a later section.
 
-1. In the left menu, under **Settings**, select **Properties**.
+10. In the left menu, under **Settings**, select **Properties**.
 
-1. Locate **Soft-delete** and confirm it shows **Soft delete is enabled for this vault**.
+11. Locate **Soft-delete** and confirm it shows **Soft delete is enabled for this vault**.
 
     > **Note**: Soft delete is enabled by default on all new Key Vault instances and cannot be disabled once set. It retains deleted secrets, keys, and certificates in a recoverable state for a configurable retention period (default: 90 days), protecting against accidental or malicious deletion.
 
-1. Locate **Purge protection** and confirm it shows **Disabled**.
+12. Locate **Purge protection** and confirm it shows **Disabled**.
 
-1. Select **Enable purge protection**, then select **Save**.
+13. Select **Enable purge protection**, then select **Save**.
 
     > **Note**: Purge protection prevents permanent deletion of the vault or its objects during the soft-delete retention period, even by users with the Key Vault Contributor role. This is a one-way operation and cannot be reversed after it is enabled. In production environments, purge protection is recommended for any vault storing critical secrets or keys.
 

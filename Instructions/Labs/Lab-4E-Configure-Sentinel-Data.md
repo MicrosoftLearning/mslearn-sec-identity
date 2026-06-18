@@ -31,27 +31,39 @@ This exercise should take approximately **45** minutes to complete.
 
 ---
 
-## Review Workspace Baseline
+## Review / Create a Workspace for use in Microsoft Sentinel
 
-1. Sign in to the [Azure portal](https://portal.azure.com) with your Global Administrator account.
+1. Sign in to the **Azure portal** `https://portal.azure.com` with your Administrator account.
+
+2. Open **Microsoft Sentinel**.
+
+3. Select workspace **sc500-lab4e-sentinel**.
+
+4. Review the workspace overview and confirm the current baseline state (connectors and incidents).
+
+---
+
+## Add a Microsoft Sentinel instance to a Workspace
+
+1. If you are not already in Azure Portal, log in.
 
 1. Open **Microsoft Sentinel**.
 
-1. Select workspace **sc500-lab4e-sentinel**.
+1. Select **Create** to add **Microsoft Sentinel** to your workspace.
 
-1. Review the workspace overview and confirm the current baseline state (connectors and incidents).
+1. Select **sc500-lab4e-sentinel**, then select **Add**.
 
 ---
 
 ## Connect Microsoft Defender XDR
 
-1. In Sentinel, open **Data connectors**.
+1. In the **Microsoft Sentinel** menu, expand the **Configuration** section. Then open **Data connectors**.
 
 1. Search for and select **Microsoft Defender XDR**.
 
 1. Open the connector page and select **Open connector page**.
 
-1. Complete the connection workflow.
+1. Complete the connection workflow if requested. By default XDR should be connected automatically.
 
 1. Enable bi-directional incident synchronization if presented in connector options.
 
