@@ -44,17 +44,17 @@ In this section, you assign the Conditional Access Administrator role to **sc500
 
 1. Select **Assignments**, then select **Add assignments**.
 
-1. On the **Add assignments** page, configure the following:
+1. On the **+ Add assignments** page, configure the following:
 
     | Setting | Value |
     |---------|-------|
     | **Select role** | Conditional Access Administrator |
-    | **Select members** | sc500-user01 |
-    | **Assignment type** | Eligible |
+    | **Select members** | Adele Vance |
+    | **Assignment type** | Eligible (after using the Next button) |
 
 1. Select **Next**, then select **Assign** to save the assignment.
 
-1. On the **Assignments** page, confirm that **sc500-user01** appears under the **Eligible assignments** tab with the role **Conditional Access Administrator**.
+1. On the **Assignments** page, confirm that **Adele Vance** appears under the **Eligible assignments** tab with the role **Conditional Access Administrator**.
 
     > **Note**: An eligible assignment does not grant access — it only enables the user to request activation. No access is active at this point.
 
@@ -77,10 +77,11 @@ PIM role settings control how the activation process works: how long the activat
     | **Activation maximum duration** | 1 hour |
     | **On activation, require** | Justification |
     | **Require approval to activate** | Enabled |
+    | **Other settings** | Leave at default value |
 
 1. Under **Select approvers**, select **+ Select members**.
 
-1. Search for and select **sc500-approver**, then choose **Select**.
+1. Search for and select **MOD Administrator**, then choose **Select**.
 
 1. Select **Update** to save the role settings.
 
@@ -97,28 +98,28 @@ Now you will sign in as **sc500-user01** and submit a role activation request. T
 
 1. Open a new **InPrivate** or **Private** browser window.
 
-1. Navigate to [https://entra.microsoft.com](https://entra.microsoft.com) and sign in as **sc500-user01** using the credentials from the **Resources** tab.
+1. Navigate to the Entra Admin Center using `https://entra.microsoft.com` and sign in as **Adele Vance** using the credentials from the **Resources** tab.
 
-1. In the left navigation, expand **Identity governance** and select **Privileged Identity Management**.
+2. In the left navigation, expand **Identity governance** and select **Privileged Identity Management**.
 
-1. Under **Tasks**, select **My roles**.
+3. Under **Tasks**, select **My roles**.
 
-1. Select the **Microsoft Entra roles** tab.
+4. Select the **Microsoft Entra roles** tab.
 
-1. Under **Eligible assignments**, find **Conditional Access Administrator** and select **Activate**.
+5. Under **Eligible assignments**, find **Conditional Access Administrator** and select **Activate**.
 
-1. On the **Activate** pane, configure the following:
+6. On the **Activate** pane, configure the following:
 
     | Setting | Value |
     |---------|-------|
     | **Duration** | 1 hour |
-    | **Justification** | Reviewing and updating Conditional Access policies as part of a scheduled security review. |
+    | **Justification** | `Reviewing and updating Conditional Access policies as part of a scheduled security review.` |
 
-1. Select **Activate**.
+7. Select **Activate**.
 
     You will see a confirmation that the request is pending approval. The role is not yet active — it requires approval from **sc500-approver** before access is granted.
 
-1. Leave this browser window open — you will return to it after approving the request.
+8. Leave this browser window open — you will return to it after approving the request.
 
 ---
 
@@ -126,45 +127,46 @@ Now you will sign in as **sc500-user01** and submit a role activation request. T
 
 You will now switch to the **sc500-approver** account and approve the pending activation request.
 
-1. Open a second **InPrivate** or **Private** browser window (separate from the sc500-user01 window).
+1. Return to your primary browser window (MOD Administrator is current logged in).
 
-1. Navigate to [https://entra.microsoft.com](https://entra.microsoft.com) and sign in as **sc500-approver** using the credentials from the **Resources** tab.
+1. Navigate to the Microsoft Entra Admin Center.
 
 1. In the left navigation, expand **Identity governance** and select **Privileged Identity Management**.
 
 1. Under **Tasks**, select **Approve requests**.
 
-1. Select the **Microsoft Entra roles** tab.
+1. Select the **Microsoft Entra roles** menu item.
 
-1. Find the pending request from **sc500-user01** for the **Conditional Access Administrator** role.
+1. Find the pending request from **Adele Vance** for the **Conditional Access Administrator** role.
 
-1. Select the request to open it, then select **Approve**.
+1. Add a mark in the box next to the request, then select **Approve**.
 
-1. In the **Justification** field, enter:
-
-    ```input
-    Approved for scheduled security review task.
+1. In the **Justification** field, enter: `Approved for scheduled security review task.`
     ```
 
-1. Select **Confirm**.
+1. Select **Submit**.
 
-    You should see the request status change to **Approved**.
+    You should see an approval message pop-up.
 
-1. You can now close this browser window.
+1. You can now minimize this browser window.
 
 ---
 
 ## Verify the activated role
 
-Return to the **sc500-user01** browser window and verify that the role activation succeeded and grants the expected access.
+Return to the **Adele Vance** browser window and verify that the role activation succeeded and grants the expected access.
 
-1. In the **sc500-user01** browser window, refresh the page.
+1. In the **Adele Vance** browser window, refresh the page.
 
 1. In **Privileged Identity Management > My roles > Microsoft Entra roles**, select the **Active assignments** tab.
 
 1. Confirm that **Conditional Access Administrator** appears with a status of **Active** and an expiration time approximately 1 hour from now.
 
-1. In the left navigation, expand **Protection** and select **Conditional Access**.
+## Test the activation in Conditional Access
+
+1. Look at the menu on the left.
+
+1. In the left navigation, find the **Entra ID** section and select **Conditional Access**.
 
 1. Select **+ Create New policy** to open the policy creation pane.
 
@@ -172,15 +174,20 @@ Return to the **sc500-user01** browser window and verify that the role activatio
 
 1. Select **X** to close the policy pane without saving — creating a policy is not required for this verification step.
 
+
+
+
+
+# ROBERTS - The following steps don't work in Skillable / ALH without an Azure subscription attached. Putting on hold.
 ---
 
 ## Enable system-assigned managed identity
 
 A managed identity is an identity automatically managed by Microsoft Entra ID, used by applications and services to authenticate to other Azure resources without storing credentials. In this task, you will enable a system-assigned managed identity on a pre-provisioned App Service.
 
-1. Switch back to your **Global Administrator** browser window (or open a new browser and sign in with your Global Administrator credentials).
+1. Switch back to your **Mod Administrator** browser window (or open a new browser and sign in with your MOD Administrator credentials).
 
-1. Navigate to the [Azure portal](https://portal.azure.com).
+1. Navigate to the Azure portal at `https://portal.azure.com`.
 
 1. In the search bar, search for and select **App Services**.
 
