@@ -26,7 +26,7 @@ In this lab, you will:
 
 This exercise should take approximately **45** minutes to complete.
 
-> **Note**: This lab uses two accounts: your **Global Administrator** account (your primary lab credentials) and **sc500-user02** (the Conditional Access policy target). Credentials for both accounts are in the **Resources** tab of your lab environment. MFA for sc500-user02 is pre-registered — the TOTP code or authenticator details are also in the **Resources** tab.
+> **Note**: This lab uses two accounts: your **MOD Administrator** account (your primary lab credentials) and **sc500-user02** (the Conditional Access policy target). Credentials for both accounts are in the **Resources** tab of your lab environment. MFA for sc500-user02 is pre-registered — the TOTP code or authenticator details are also in the **Resources** tab.
 
 ---
 
@@ -34,37 +34,31 @@ This exercise should take approximately **45** minutes to complete.
 
 Conditional Access policies are built from two parts: assignments (who and what the policy applies to) and access controls (what happens when the conditions are met). You will create a policy that targets a specific user and requires MFA when that user accesses the Azure portal.
 
-1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) using your **Global Administrator** credentials.
+1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using your *Administrator** credentials.
 
-1. In the left navigation, expand **Protection** and select **Conditional Access**.
+1. In the left navigation, expand **Entra ID** and select **Conditional Access**.
 
-1. On the **Conditional Access | Policies** page, select **+ New policy**.
+1. Select **Policies** from the menu, then select **+ New policy**.
 
-1. In the **Name** field, enter:
+1. In the **Name** field, enter: `sc500-require-mfa-portal`
 
-    ```input
-    sc500-require-mfa-portal
-    ```
-
-1. Under **Assignments**, select **0 users or agents (Preview) selected**.
+1. Under **Assignments**, select **0 users or agents selected**.
 
 1. On the opened page, choose **Select users and groups**, then mark the **Users and groups** checkbox.
 
-1. Select **Select**, search for and select **sc500-user02**, then select **Select** to confirm.
+1. Select **Select**, search for and select **Adele Vance**, then select **Select** to confirm.
 
     > **Note**: Limiting the policy to a single named user lets you validate behavior without affecting administrators or other users. In production, you would expand the scope after confirming the policy works as expected.
 
 1. Under **Assignments**, in the **Target resources** select **No target resources selected** item.
 
-1. On the **Target resources** pane, set the target to **Resources (formerly cloud apps)**, then select **Select resources**.
+1. On the **Target resources** pane, set the target to **All resources (formerly all cloud apps)**, then select **Select resources**.
 
 1. Under **Select specific resources** select the **None** link.
 
 1. Select **Select**, search for **Office 365**, mark the checkbox, then select **Select** to confirm.
 
-    > **Note**: The **Microsoft Azure Management** app covers the Azure portal, Azure CLI, Azure PowerShell, and the Azure mobile app — any interface that calls Azure Resource Manager APIs.
-
-1. Under **Access controls**, select **Grant**.
+1. Find the **Access controls** section.
 
 1. On the **Grant** section, select the **0 controls selected** item.
 
@@ -88,7 +82,7 @@ Report-only mode records what a policy would do without blocking or requiring an
 
     | Setting | Value |
     |---------|-------|
-    | **Select identity type - Users** | sc500-user02 |
+    | **Select identity type - Users** | use the **Edit user** to select **Adele Vance** |
     | **Select target type - Cloud apps** | Microsoft Forms |
     | **Sign-in conditions - Device Platform** | Windows |
     | **Sign-in conditions - Client App | Browser |
@@ -96,7 +90,7 @@ Report-only mode records what a policy would do without blocking or requiring an
 
 1. Scroll down to the bottom of the page.
 
-1. Select **What If** to run the simulation.
+1. Select **What If** to run the simulation. Then **scroll to the bottom of the page**.
 
 1. Under **Policies that will apply**, confirm that **sc500-require-mfa-portal** appears with a **Grant** control of **Require multifactor authentication**.
 
@@ -122,9 +116,9 @@ The simulation confirmed the policy is correctly configured. You will now switch
 
 1. Open a new **InPrivate** or **Private** browser window.
 
-1. Navigate to [https://forms.microsoft.com](https://forms.microsoft.com).
+1. Navigate to Microsoft Forms at `https://forms.microsoft.com`.
 
-1. Sign in using the **sc500-user02** credentials from the **Resources** tab.
+1. Sign in using the **Adele Vance** credentials from the **Resources** tab.
 
 1. After entering the password, confirm that an MFA prompt appears. This confirms the Conditional Access policy is active and enforcing step-up authentication for this user.
 
@@ -152,15 +146,15 @@ The AI platform team needs a registered application identity in Entra ID so thei
 
     | Setting | Value |
     |---------|-------|
-    | **Name** | sc500-ai-platform-app |
-    | **Supported account types** | Accounts in this organizational directory only |
-    | **Redirect URI** | Leave blank |
+    | Name | **`sc500-ai-platform-app`** |
+    | Supported account types | **Single tenant only - Contoso** |
+    | Redirect URI | Leave blank |
 
 1. Select **Register**.
 
     Entra ID creates the registration and opens the **Overview** page for **sc500-ai-platform-app**.
 
-1. On the **Overview** page, locate the **Application (client) ID** field and copy the value. Record this ID — you will submit it as proof of task completion.
+1. On the **Overview** page, locate the **Application (client) ID** field and copy the value. This value is what you would use when granting access to the application.
 
     > **Note**: The Application (client) ID is the unique identifier for this registration in Entra ID. Applications use it alongside a client secret or certificate when authenticating against Entra ID during OAuth flows.
 
@@ -172,7 +166,7 @@ The AI platform team needs a registered application identity in Entra ID so thei
 
 1. Select **Delegated permissions**.
 
-1. In the search box, search for **User.Read**.
+1. In the search box, search for **`User.Read`**.
 
 1. Expand **User**, select **User.ReadBasic.All**, then select **Add permissions**.
 
@@ -182,7 +176,7 @@ The AI platform team needs a registered application identity in Entra ID so thei
 
     > **Note**: If a **Grant admin consent** button is visible and the status shows **Not granted**, your tenant requires admin consent for all permissions. Select **Grant admin consent for [your tenant]** and confirm. Your instructor will explain this tenant-wide setting if it applies.
 
-1. Return to the **Overview** page and confirm the **Application (client) ID** is recorded. This is your proof of task completion for this lab.
+1. Return to the **Overview** page and confirm the **Application (client) ID** is recorded.
 
 ---
 
@@ -203,4 +197,3 @@ If you want to clean up before the session ends:
 1. Select **sc500-require-mfa-portal**, select **Delete**, and confirm.
 1. Navigate to **Applications** → **App registrations**.
 1. Select **sc500-ai-platform-app**, select **Delete**, and confirm.
-2. 
