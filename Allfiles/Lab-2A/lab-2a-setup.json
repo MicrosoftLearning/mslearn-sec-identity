@@ -9,13 +9,17 @@
         "description": "Azure region for all resources."
       }
     },
-    "storageAccountName": {
+    "labInstanceId": {
       "type": "string",
-      "defaultValue": "sc500lab2astorage",
+      "minLength": 1,
+      "maxLength": 6,
       "metadata": {
-        "description": "Storage account name. Must be globally unique, 3-24 characters, lowercase alphanumeric only (no hyphens). Add a short unique suffix if the default name is already taken (e.g. sc500lab2astorage42)."
+        "description": "The Skillable lab instance ID. Used to generate globally unique storage account name. Typically a numeric string (e.g. 123456)."
       }
     }
+  },
+  "variables": {
+    "storageAccountName": "[concat('sc500lab2a', parameters('labInstanceId'))]"
   },
   "resources": [
     {
@@ -40,7 +44,7 @@
         },
         "parameters": {
           "location": { "value": "[parameters('location')]" },
-          "storageAccountName": { "value": "[parameters('storageAccountName')]" }
+          "storageAccountName": { "value": "[variables('storageAccountName')]" }
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -118,5 +122,23 @@
         }
       }
     }
-  ]
+  ],
+  "outputs": {
+    "resourceGroupName": {
+      "type": "string",
+      "value": "sc500-lab2a-rg"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "value": "[variables('storageAccountName')]"
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "value": "sc500-lab2a-vnet"
+    },
+    "logAnalyticsWorkspaceName": {
+      "type": "string",
+      "value": "sc500-lab2a-log"
+    }
+  }
 }
