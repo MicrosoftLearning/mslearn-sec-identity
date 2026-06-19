@@ -1,0 +1,122 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for all resources."
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "sc500lab2astorage",
+      "metadata": {
+        "description": "Storage account name. Must be globally unique, 3-24 characters, lowercase alphanumeric only (no hyphens). Add a short unique suffix if the default name is already taken (e.g. sc500lab2astorage42)."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "sc500-lab2a-rg",
+      "location": "[parameters('location')]",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "sc500-lab2a-resources",
+      "resourceGroup": "sc500-lab2a-rg",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/resourceGroups', 'sc500-lab2a-rg')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "parameters": {
+          "location": { "value": "[parameters('location')]" },
+          "storageAccountName": { "value": "[parameters('storageAccountName')]" }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "location": { "type": "string" },
+            "storageAccountName": { "type": "string" }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-01-01",
+              "name": "[parameters('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "sku": { "name": "Standard_LRS" },
+              "kind": "StorageV2",
+              "properties": {
+                "accessTier": "Hot",
+                "allowBlobPublicAccess": false,
+                "minimumTlsVersion": "TLS1_2",
+                "supportsHttpsTrafficOnly": true,
+                "networkAcls": {
+                  "defaultAction": "Allow",
+                  "bypass": "AzureServices,Logging,Metrics"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-01-01",
+              "name": "[concat(parameters('storageAccountName'), '/default/training-data')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+              ],
+              "properties": {
+                "publicAccess": "None"
+              }
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2023-05-01",
+              "name": "sc500-lab2a-vnet",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [ "10.1.0.0/16" ]
+                },
+                "subnets": [
+                  {
+                    "name": "default",
+                    "properties": {
+                      "addressPrefix": "10.1.0.0/24",
+                      "serviceEndpoints": [
+                        {
+                          "service": "Microsoft.Storage",
+                          "locations": [ "*" ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "sc500-lab2a-log",
+              "location": "[parameters('location')]",
+              "properties": {
+                "sku": { "name": "PerGB2018" },
+                "retentionInDays": 30
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

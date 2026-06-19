@@ -36,7 +36,7 @@ A **stored access policy** centralizes the permissions and lifetime of one or mo
 
 You will create a stored access policy on the `training-data` container that grants read access for 24 hours, then generate a SAS token that references the policy.
 
-1. Sign in to the [Azure portal](https://portal.azure.com) using your **Global Administrator** credentials.
+1. Sign in to the Azure portal at `https://portal.azure.com` using your **User-1** credentials.
 
 1. In the search bar, search for and select **Storage accounts**.
 
