@@ -40,7 +40,7 @@ You will create a stored access policy on the `training-data` container that gra
 
 1. In the search bar, search for and select **Storage accounts**.
 
-1. Select **sc500lab2astorage**.
+1. Select **sc500lab2a@lab.LabInstance.Id**.
 
 1. In the left menu, under **Data storage**, select **Containers**.
 
@@ -56,7 +56,7 @@ You will create a stored access policy on the `training-data` container that gra
 
     | Setting | Value |
     |---------|-------|
-    | **Identifier** | sc500-training-read |
+    | **Identifier** | `sc500-training-read` |
     | **Permissions** | Select **Read** only |
     | **Start time** | Leave at the current date and time |
     | **Expiry time** | Set to 24 hours from now |
@@ -81,9 +81,9 @@ You will create a stored access policy on the `training-data` container that gra
 
 1. Select **Generate SAS token and URL**.
 
-1. Copy the **SAS token** value (not the SAS URL) and save it to a text file — you will need it in the next section. The SAS token is the query string only, beginning with `sv=` or `si=`. It does not include the `https://` prefix or the container path.
+1. Copy the **SAS token** value (not the SAS URL) and save it to a text file — you will need it in the next section. The SAS token is the query string only, beginning with **sv=** or **si=**. It does not include the **https://** prefix or the container path.
 
-    > **Note**: This SAS token is backed by the `sc500-training-read` stored access policy. If the policy is deleted or its permissions are revoked, this token becomes immediately invalid — without needing to rotate the storage account key.
+    > **Note**: This SAS token is backed by the **sc500-training-read** stored access policy. If the policy is deleted or its permissions are revoked, this token becomes immediately invalid — without needing to rotate the storage account key.
 
 ---
 
@@ -113,7 +113,7 @@ Before restricting the storage account to a virtual network, verify that the SAS
 
     ```bash
     curl -s -w "\n--- HTTP Status: %{http_code} ---" \
-      "https://sc500lab2astorage.blob.core.windows.net/training-data/sample-1.json?${SAS_TOKEN}"
+      "https://sc500lab2a@lab.LabInstance.Id.blob.core.windows.net/training-data/sample-1.json?${SAS_TOKEN}"
     ```
 
     Confirm that the response ends with `--- HTTP Status: 200 ---` and the body contains the JSON content of the file. This confirms the SAS token is valid and the storage account currently allows read access from all networks.
@@ -126,7 +126,7 @@ Before restricting the storage account to a virtual network, verify that the SAS
 
 You will now change the storage account from **Allow all networks** to **Selected networks**, adding the pre-provisioned `sc500-lab2a-vnet` subnet as the only authorized network. You will then disable the **Allow Azure services** exception, which otherwise creates a bypass for any Azure-hosted service regardless of network membership.
 
-1. In the left menu for `sc500lab2astorage`, under **Security + networking**, select **Networking**.
+1. In the left menu for **sc500lab2a@lab.LabInstance.Id**, under **Security + networking**, select **Networking**.
 
 1. Select the **Public Access** tab, then select **Manage**.
 
@@ -148,9 +148,11 @@ You will now change the storage account from **Allow all networks** to **Selecte
 
 1. Select **Add**.
 
-1. Under **Exceptions**, clear the checkbox for **Allow Azure services on the trusted services list to access this storage account**.
+1. Under **Exceptions**, clear the checkbox for **Allow trusted Microsoft services to access this resource**.
 
-    > **Note**: The **Allow Azure services** exception grants implicit data-plane access to a broad set of Microsoft services — including Azure Backup, Azure Site Recovery, and Azure Monitor — regardless of network membership. Disabling it closes a potential bypass that could allow exfiltration via a misconfigured Azure service in the same tenant. In production environments, evaluate whether any Azure services legitimately need this bypass before removing it.
+    > **Note**: Leave the **Allow read access to storage logging from any network** and **Allow read access to storage metrics from any network** checkboxes enabled — these exceptions allow Azure Monitor and diagnostic logging to function even with the VNet firewall active, and align with the `Logging` and `Metrics` bypass settings in the storage account's network configuration.
+
+    > **Note**: The **Allow trusted Microsoft services** exception grants implicit data-plane access to a broad set of Microsoft services — including Azure Backup, Azure Site Recovery, and Azure Monitor — regardless of network membership. Disabling it closes a potential bypass that could allow exfiltration via a misconfigured Azure service in the same tenant. In production environments, evaluate whether any Azure services legitimately need this bypass before removing it.
 
 1. Select **Save** to apply the network restriction.
 
@@ -176,14 +178,14 @@ With the VNet-only restriction applied, verify that Cloud Shell — which runs o
 
     ```bash
     curl -s -w "\n--- HTTP Status: %{http_code} ---" \
-      "https://sc500lab2astorage.blob.core.windows.net/training-data/sample-1.json?${SAS_TOKEN}"
+      "https://sc500lab2a@lab.LabInstance.Id.blob.core.windows.net/training-data/sample-1.json?${SAS_TOKEN}"
     ```
 
     Confirm that the response body contains `<Code>AuthorizationFailure</Code>` and the response ends with `--- HTTP Status: 403 ---`. `AuthorizationFailure` is the error code Azure Storage returns when a request is blocked by the network firewall — the SAS token is valid, but the request origin (Cloud Shell's IP) is not in the authorized network list. This confirms the firewall is active.
 
 1. Close the Cloud Shell.
 
-1. In the left menu for `sc500lab2astorage`, select **Storage browser**.
+1. In the left menu for `sc500lab2a@lab.LabInstance.Id`, select **Storage browser**.
 
 1. Select **Blob containers**, then select **training-data**.
 
@@ -195,7 +197,7 @@ With the VNet-only restriction applied, verify that Cloud Shell — which runs o
 
 ## Enable Defender for Storage
 
-Defender for Storage provides threat detection for your storage account — detecting anomalous access patterns, malware uploads, and data exfiltration attempts. You will enable it at the resource level on `sc500lab2astorage`.
+Defender for Storage provides threat detection for your storage account — detecting anomalous access patterns, malware uploads, and data exfiltration attempts. You will enable it at the resource level on `sc500lab2a@lab.LabInstance.Id`.
 
 Defender for Storage's malware scanning feature uses Azure Event Grid to route scan results. The Event Grid resource provider must be registered in your subscription before enabling Defender for Storage, or the enablement will partially fail.
 
@@ -217,9 +219,9 @@ Defender for Storage's malware scanning feature uses Azure Event Grid to route s
 
 1. Close the Cloud Shell.
 
-1. In the left menu for `sc500lab2astorage`, under **Security + networking**, select **Microsoft Defender for Cloud**.
+1. In the left menu for `sc500lab2a@lab.LabInstance.Id`, under **Security + networking**, select **Microsoft Defender for Cloud**.
 
-1. Select **Enable Microsoft Defender for Storage on this storage account**.
+1. Select **Enable for Storage on this storage account**.
 
     > **Note**: Defender for Storage can also be enabled at the subscription level from **Microsoft Defender for Cloud** → **Environment settings** → your subscription → **Storage**. Subscription-level enablement automatically protects all current and future storage accounts in the subscription without requiring per-resource configuration — the recommended approach for production environments. Resource-level enablement, used here, limits protection to a single account and is useful when cost control or selective coverage is required. After enabling at the resource level, the subscription-level **Environment settings** page will still show Defender for Storage as **Off** — this is expected. The subscription plan and resource-level overrides are independent. Confirm protection status on the storage account's own **Microsoft Defender for Cloud** blade, not at the subscription level.
 
@@ -231,9 +233,9 @@ Defender for Storage's malware scanning feature uses Azure Event Grid to route s
 
 Diagnostic logs capture management-plane operations on the storage account — including configuration changes, access policy modifications, and Defender for Storage alerts — and forward them to a Log Analytics workspace for retention and querying.
 
-1. In the left menu for `sc500lab2astorage`, under **Monitoring**, select **Diagnostic settings**.
+1. In the left menu for **sc500lab2a@lab.LabInstance.Id**, under **Monitoring**, select **Diagnostic settings**.
 
-    The page shows diagnostic settings for the storage account and its sub-services. `StorageRead`, `StorageWrite`, and `StorageDelete` are blob-level log categories, so you need to configure settings at the blob sub-service level.
+    The page shows diagnostic settings for the storage account and its sub-services. **StorageRead**, **StorageWrite**, and **StorageDelete** are blob-level log categories, so you need to configure settings at the blob sub-service level.
 
 1. Under the resource list, select **blob**.
 
@@ -243,7 +245,7 @@ Diagnostic logs capture management-plane operations on the storage account — i
 
     | Setting | Value |
     |---------|-------|
-    | **Diagnostic setting name** | sc500-storage-diag |
+    | **Diagnostic setting name** | `sc500-storage-diag` |
     | **Logs** | Select **StorageRead**, **StorageWrite**, and **StorageDelete** |
     | **Destination** | Select **Send to Log Analytics workspace** |
     | **Subscription** | Your lab subscription |

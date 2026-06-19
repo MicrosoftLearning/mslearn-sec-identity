@@ -11,10 +11,11 @@
     },
     "labInstanceId": {
       "type": "string",
+      "defaultValue": "@lab.LabInstance.Id",
       "minLength": 1,
-      "maxLength": 6,
+      "maxLength": 10,
       "metadata": {
-        "description": "The Skillable lab instance ID. Used to generate globally unique storage account name. Typically a numeric string (e.g. 123456)."
+        "description": "The Skillable lab instance ID. Used to generate globally unique storage account name. Auto-populated by Skillable using @lab.LabInstance.Id variable."
       }
     }
   },
