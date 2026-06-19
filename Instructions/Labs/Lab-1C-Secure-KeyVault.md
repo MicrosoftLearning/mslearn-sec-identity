@@ -29,7 +29,7 @@ In this lab, you will:
 
 This exercise should take approximately **60** minutes to complete.
 
-> **Note**: This lab uses two accounts: your **Global Administrator** account (your primary lab credentials) and **sc500-user03** (used to verify that role-based access boundaries are enforced at the data plane). Credentials for both accounts are in the **Resources** tab of your lab environment.
+> **Note**: This lab uses two accounts: your **User-1** account (your primary lab credentials and Administrator) and **User-2** (used to verify that role-based access boundaries are enforced at the data plane). Credentials for both accounts are in the **Resources** tab of your lab environment.
 
 ---
 
@@ -67,7 +67,7 @@ Azure Key Vault supports two permission models: **Vault access policies** (the l
 
 8. Select **Go to resource** to open the vault.
 
-9. On the Key Vault **Overview** page, locate the **Vault URI** field. Copy this value and save it — it follows the format `https://sc500-kv-<your-lab-id>.vault.azure.net/`. You will use it in a later section.
+9. On the Key Vault **Overview** page, locate the **Vault URI** field. Copy this value and save it — it follows the format `https://sc500-kv-<your-lab-id>.vault.azure.net/`. You will use it in a later section. NOTEPAD in Windows is a great tool for saving this information.
 
 10. In the left menu, under **Settings**, select **Properties**.
 
@@ -85,7 +85,7 @@ Azure Key Vault supports two permission models: **Vault access policies** (the l
 
 ## Configure access using Azure RBAC
 
-With the vault created, you will assign four RBAC roles following the principle of least privilege. Rather than granting a broad administrator role to your Global Administrator account, you will assign two targeted roles: **Key Vault Secrets Officer** (to create and manage secrets) and **Key Vault Crypto Officer** (to create and manage keys). You will then grant the **Key Vault Secrets User** role to the App Service managed identity (which will retrieve secrets at runtime), and the **Key Vault Reader** role to `sc500-user03` (which you will use to verify that management-plane access does not grant data-plane access to secret values).
+With the vault created, you will assign four RBAC roles following the principle of least privilege. Rather than granting a broad administrator role to your **User-1** Administrator account, you will assign two targeted roles: **Key Vault Secrets Officer** (to create and manage secrets) and **Key Vault Crypto Officer** (to create and manage keys). You will then grant the **Key Vault Secrets User** role to the App Service managed identity (which will retrieve secrets at runtime), and the **Key Vault Reader** role to **User-2** (which you will use to verify that management-plane access does not grant data-plane access to secret values).
 
 > **Note**: When a Key Vault uses the RBAC authorization model, data-plane access is controlled entirely by role assignments — including for the account that created the vault. The subscription Owner role and the Global Administrator role do not grant any data-plane rights to Key Vault. Without an explicit assignment, your admin account cannot create, read, or delete secrets or keys.
 
@@ -101,7 +101,7 @@ The `sc500-lab1c-app` App Service has a system-assigned managed identity that wa
 
 1. On the **Members** tab, confirm **Assign access to** is set to **User, group, or service principal**.
 
-1. Select **+ Select members**, search for and select your **Global Administrator** account (the account you are currently signed in with), then select **Select**.
+1. Select **+ Select members**, search for and select your **User-1** account (the account you are currently signed in with), then select **Select**.
 
 1. Select **Review + assign**, then select **Review + assign** again to save.
 
@@ -113,7 +113,7 @@ The `sc500-lab1c-app` App Service has a system-assigned managed identity that wa
 
 1. On the **Members** tab, confirm **Assign access to** is set to **User, group, or service principal**.
 
-1. Select **+ Select members**, search for and select your **Global Administrator** account (the account you are currently signed in with), then select **Select**.
+1. Select **+ Select members**, search for and select your **User-1** account (the account you are currently signed in with), then select **Select**.
 
 1. Select **Review + assign**, then select **Review + assign** again to save.
 
@@ -139,7 +139,7 @@ The `sc500-lab1c-app` App Service has a system-assigned managed identity that wa
 
 1. On the **Members** tab, set **Assign access to** to **User, group, or service principal**.
 
-1. Select **+ Select members**, search for and select **sc500-user03**, then select **Select**.
+1. Select **+ Select members**, search for and select **User-2**, then select **Select**.
 
 1. Select **Review + assign**, then select **Review + assign** again to save.
 
@@ -147,10 +147,10 @@ The `sc500-lab1c-app` App Service has a system-assigned managed identity that wa
 
     | Principal | Role |
     |-----------|------|
-    | Your Global Administrator account | Key Vault Secrets Officer |
-    | Your Global Administrator account | Key Vault Crypto Officer |
+    | User-1 | Key Vault Secrets Officer |
+    | User-1 | Key Vault Crypto Officer |
     | sc500-lab1c-app | Key Vault Secrets User |
-    | sc500-user03 | Key Vault Reader |
+    | User-2 | Key Vault Reader |
 
     > **Note**: In a production environment, consider making the **Key Vault Secrets Officer** and **Key Vault Crypto Officer** assignments eligible through Privileged Identity Management (PIM) rather than active. This removes standing data-plane access entirely — administrators activate the role just-in-time when they need to manage vault contents, and access automatically expires.
 
@@ -169,8 +169,8 @@ You will now store two objects in the vault: a secret that represents the AI app
     | Setting | Value |
     |---------|-------|
     | **Upload options** | Manual |
-    | **Name** | foundry-api-key |
-    | **Secret value** | sk-foundry-demo-00000000000000000000000000000001 |
+    | **Name** | `foundry-api-key` |
+    | **Secret value** | `sk-foundry-demo-00000000000000000000000000000001` |
     | **Enabled** | Yes |
 
 1. Select **Create**.
@@ -186,7 +186,7 @@ You will now store two objects in the vault: a secret that represents the AI app
     | Setting | Value |
     |---------|-------|
     | **Options** | Generate |
-    | **Name** | data-encryption-key |
+    | **Name** | `data-encryption-key` |
     | **Key type** | RSA |
     | **RSA key size** | 2048 |
     | **Enabled** | Yes |
@@ -201,17 +201,17 @@ You will now store two objects in the vault: a secret that represents the AI app
 
 ## Verify access control enforcement
 
-The **Key Vault Reader** role grants management-plane access only — a user assigned this role can see that secrets exist and view their names, but cannot read secret values. You will sign in as `sc500-user03` to confirm that the role boundary is enforced at the data plane.
+The **Key Vault Reader** role grants management-plane access only — a user assigned this role can see that secrets exist and view their names, but cannot read secret values. You will sign in as **User-2** to confirm that the role boundary is enforced at the data plane.
 
 1. Open a new **InPrivate** or **Private** browser window.
 
-1. Navigate to [https://portal.azure.com](https://portal.azure.com) and sign in using the **sc500-user03** credentials from the **Resources** tab.
+1. Navigate to the Azure Portal at `https://portal.azure.com` and sign in using the **User-2** credentials from the **Resources** tab.
 
 1. In the search bar, search for and select **Key vaults**.
 
 1. Select **sc500-kv-@lab.LabInstance.Id** from the list.
 
-1. In the left menu, select **Secrets**.
+1. In the left menu open **Objects**, then select **Secrets**.
 
     Confirm that **foundry-api-key** appears in the list. The Key Vault Reader role grants `sc500-user03` management-plane access, so the secret name is visible.
 
@@ -235,7 +235,7 @@ When managed identity is enabled on an App Service, the runtime injects two envi
 
 > **Note**: Managed identity requires a **Basic (B1) tier** App Service or higher. The Free (F1) tier does not support managed identities and the `IDENTITY_ENDPOINT` environment variable will be empty. If your lab environment uses a Free tier App Service, managed identity is not available and the steps in this section cannot be completed until the App Service plan is upgraded.
 
-1. Confirm you are signed in to the [Azure portal](https://portal.azure.com) as your **Global Administrator** account. If the InPrivate window from the previous section is still active, close it first.
+1. Confirm you are signed in to the Azure portal at `https://portal.azure.com` as your **User-1** account. If the InPrivate window from the previous section is still active, close it first.
 
 1. In the search bar, search for and select **App Services**.
 
@@ -318,7 +318,7 @@ Identity-based access control is the primary enforcement mechanism for Key Vault
 
 1. Under **Allow access from**, select **Allow public access from specific virtual networks and IP addresses**.
 
-1. Under **Virtual networks**, select **+ Add existing virtual networks**.
+1. Under **Virtual networks**, use the dropdown to select **+ Add existing virtual networks**.
 
 1. On the **Add networks** pane, configure the following:
 
@@ -328,7 +328,7 @@ Identity-based access control is the primary enforcement mechanism for Key Vault
     | **Virtual networks** | sc500-lab1c-vnet |
     | **Subnets** | Select the available subnet - default |
 
-1. Select **Enable**.
+1. Select **Add**.
 
 1. Under **Exceptions**, confirm that **Allow trusted Microsoft services to bypass this firewall** is selected.
 
@@ -344,11 +344,11 @@ Identity-based access control is the primary enforcement mechanism for Key Vault
 
 Microsoft Defender for Key Vault detects unusual and potentially harmful access patterns — including access from known malicious IP addresses, suspicious retrieval volumes, and anomalous geographic locations. You will enable the Defender for Key Vault protection plan on the subscription and configure the vault to forward audit logs to the pre-provisioned Log Analytics workspace.
 
-1. In the [Azure portal](https://portal.azure.com) search bar, search for and select **Microsoft Defender for Cloud**.
+1. In the Azure portal `https://portal.azure.com` search bar, search for and select **`Microsoft Defender for Cloud`**.
 
-1. In the left menu, under **Management**, select **Environment settings**.
+1. In the left menu, under **Management**, select **Environment settings**.  Scroll to the bottom of the page.
 
-1. Expand your subscription node and select your subscription.
+1. Use the **Expand All** button to expand your subscription node and select your subscription.
 
 1. On the **Defender plans** page, locate **Key Vault** in the list of resource types.
 
@@ -368,7 +368,7 @@ Microsoft Defender for Key Vault detects unusual and potentially harmful access 
 
     | Setting | Value |
     |---------|-------|
-    | **Diagnostic setting name** | sc500-kv-diag |
+    | **Diagnostic setting name** | `sc500-kv-diag` |
     | **Logs — Category groups** | Check **audit** |
     | **Destination details** | Check **Send to Log Analytics workspace** |
     | **Subscription** | Your lab subscription |

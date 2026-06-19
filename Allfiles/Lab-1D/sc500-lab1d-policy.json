@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.43.8.12551",
+      "templateHash": "701218500790347331"
+    }
+  },
+  "variables": {
+    "policyDefinitionName": "sc500-require-env-tag-on-rgs",
+    "policyAssignmentName": "sc500-require-env-tag-assign"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Authorization/policyDefinitions",
+      "apiVersion": "2021-06-01",
+      "name": "[variables('policyDefinitionName')]",
+      "properties": {
+        "policyType": "Custom",
+        "mode": "All",
+        "displayName": "Require Environment tag on resource groups",
+        "description": "Denies creation of resource groups that do not include an Environment tag. Deployed as part of SC-500 ILT Lab 1D to demonstrate Infrastructure as Code policy governance.",
+        "metadata": {
+          "category": "Tags",
+          "version": "1.0.0"
+        },
+        "parameters": {},
+        "policyRule": "[json('      {\r\n        \"if\": {\r\n          \"allOf\": [\r\n            {\r\n              \"field\": \"type\",\r\n              \"equals\": \"Microsoft.Resources/subscriptions/resourceGroups\"\r\n            },\r\n            {\r\n              \"field\": \"tags[''Environment'']\",\r\n              \"exists\": \"false\"\r\n            }\r\n          ]\r\n        },\r\n        \"then\": {\r\n          \"effect\": \"deny\"\r\n        }\r\n      }\r\n    ')]"
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2022-06-01",
+      "name": "[variables('policyAssignmentName')]",
+      "properties": {
+        "displayName": "Require Environment tag on resource groups",
+        "description": "Subscription-scope assignment requiring the Environment tag on all resource groups. Part of SC-500 ILT Lab 1D.",
+        "policyDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/policyDefinitions', variables('policyDefinitionName'))]",
+        "enforcementMode": "Default",
+        "nonComplianceMessages": [
+          {
+            "message": "Resource groups must include an Environment tag. Add the Environment tag before creating this resource group."
+          }
+        ]
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Authorization/policyDefinitions', variables('policyDefinitionName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "policyDefinitionId": {
+      "type": "string",
+      "value": "[subscriptionResourceId('Microsoft.Authorization/policyDefinitions', variables('policyDefinitionName'))]"
+    },
+    "policyDefinitionName": {
+      "type": "string",
+      "value": "[variables('policyDefinitionName')]"
+    },
+    "policyAssignmentId": {
+      "type": "string",
+      "value": "[subscriptionResourceId('Microsoft.Authorization/policyAssignments', variables('policyAssignmentName'))]"
+    }
+  }
+}

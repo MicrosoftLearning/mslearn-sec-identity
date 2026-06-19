@@ -1,0 +1,271 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for all resources"
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "sc500-lab1c-vnet",
+      "metadata": {
+        "description": "Name of the virtual network"
+      }
+    },
+    "vnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.1.0.0/16",
+      "metadata": {
+        "description": "Address space for the virtual network"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "default",
+      "metadata": {
+        "description": "Name of the subnet"
+      }
+    },
+    "subnetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.1.0.0/24",
+      "metadata": {
+        "description": "Address prefix for the subnet"
+      }
+    },
+    "logAnalyticsWorkspaceName": {
+      "type": "string",
+      "defaultValue": "sc500-lab1c-log",
+      "metadata": {
+        "description": "Name of the Log Analytics workspace"
+      }
+    },
+    "appServicePlanName": {
+      "type": "string",
+      "defaultValue": "sc500-lab1c-plan",
+      "metadata": {
+        "description": "Name of the App Service Plan"
+      }
+    },
+    "appServicePlanSku": {
+      "type": "string",
+      "defaultValue": "B1",
+      "allowedValues": [
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1v2",
+        "P2v2",
+        "P3v2"
+      ],
+      "metadata": {
+        "description": "App Service Plan SKU (must be Basic B1 or higher for managed identity support)"
+      }
+    },
+    "appServiceName": {
+      "type": "string",
+      "defaultValue": "sc500-lab1c-app",
+      "metadata": {
+        "description": "Name of the App Service (must be globally unique)"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2023-05-01",
+      "name": "[parameters('vnetName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "lab": "SC-500-Lab-1C",
+        "purpose": "Key Vault Network Security"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnetAddressPrefix')]",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.KeyVault",
+                  "locations": [
+                    "*"
+                  ]
+                },
+                {
+                  "service": "Microsoft.Web",
+                  "locations": [
+                    "*"
+                  ]
+                }
+              ],
+              "delegations": [],
+              "privateEndpointNetworkPolicies": "Disabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2022-10-01",
+      "name": "[parameters('logAnalyticsWorkspaceName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "lab": "SC-500-Lab-1C",
+        "purpose": "Key Vault Audit Logging"
+      },
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        },
+        "retentionInDays": 30,
+        "features": {
+          "enableLogAccessUsingOnlyResourcePermissions": true
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('appServicePlanName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "lab": "SC-500-Lab-1C",
+        "purpose": "App Service with Managed Identity"
+      },
+      "sku": {
+        "name": "[parameters('appServicePlanSku')]",
+        "tier": "Basic",
+        "capacity": 1
+      },
+      "kind": "linux",
+      "properties": {
+        "reserved": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2023-01-01",
+      "name": "[parameters('appServiceName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+      ],
+      "tags": {
+        "lab": "SC-500-Lab-1C",
+        "purpose": "Managed Identity Key Vault Access"
+      },
+      "kind": "app,linux",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+        "virtualNetworkSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]",
+        "httpsOnly": true,
+        "siteConfig": {
+          "linuxFxVersion": "NODE|18-lts",
+          "alwaysOn": true,
+          "ftpsState": "Disabled",
+          "minTlsVersion": "1.2",
+          "http20Enabled": true
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "vnetId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+      "metadata": {
+        "description": "Resource ID of the virtual network"
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "value": "[parameters('vnetName')]",
+      "metadata": {
+        "description": "Name of the virtual network"
+      }
+    },
+    "subnetId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]",
+      "metadata": {
+        "description": "Resource ID of the subnet"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "value": "[parameters('subnetName')]",
+      "metadata": {
+        "description": "Name of the subnet"
+      }
+    },
+    "logAnalyticsWorkspaceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName'))]",
+      "metadata": {
+        "description": "Resource ID of the Log Analytics workspace"
+      }
+    },
+    "logAnalyticsWorkspaceName": {
+      "type": "string",
+      "value": "[parameters('logAnalyticsWorkspaceName')]",
+      "metadata": {
+        "description": "Name of the Log Analytics workspace"
+      }
+    },
+    "appServicePlanId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+      "metadata": {
+        "description": "Resource ID of the App Service Plan"
+      }
+    },
+    "appServiceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]",
+      "metadata": {
+        "description": "Resource ID of the App Service"
+      }
+    },
+    "appServiceName": {
+      "type": "string",
+      "value": "[parameters('appServiceName')]",
+      "metadata": {
+        "description": "Name of the App Service"
+      }
+    },
+    "appServiceUrl": {
+      "type": "string",
+      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('appServiceName'))).defaultHostName)]",
+      "metadata": {
+        "description": "URL of the App Service"
+      }
+    },
+    "appServicePrincipalId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Web/sites', parameters('appServiceName')), '2023-01-01', 'Full').identity.principalId]",
+      "metadata": {
+        "description": "Principal ID of the App Service managed identity"
+      }
+    }
+  }
+}

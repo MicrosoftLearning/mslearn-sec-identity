@@ -1,0 +1,285 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.43.8.12551",
+      "templateHash": "2519055863164194540"
+    }
+  },
+  "parameters": {
+    "labInstanceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 14,
+      "metadata": {
+        "description": "The Skillable lab instance ID. Used to generate globally unique storage account names. Typically a numeric string (e.g. 12345678)."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for all resources."
+      }
+    },
+    "user05ObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "Object ID of sc500-user05 in the Entra ID tenant. This user receives the Contributor role assignment on sc500-lab1d-rg — the overprivileged access the student remediates in Section 4 of the lab using an Access Review."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Local administrator password for the Windows 11 VM (sc500-lab1d-vm). Must satisfy Azure password complexity requirements (12+ characters, mix of uppercase, lowercase, number, symbol). The student does not log into this VM — it exists solely as a non-compliant resource for the policy compliance scan."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "defaultValue": "sc500admin",
+      "metadata": {
+        "description": "Local administrator username for the Windows 11 VM (sc500-lab1d-vm). Default is sc500admin."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2022-09-01",
+      "name": "sc500-lab1d-rg",
+      "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "lab1d-rg-resources",
+      "resourceGroup": "sc500-lab1d-rg",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "labInstanceId": {
+            "value": "[parameters('labInstanceId')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "user05ObjectId": {
+            "value": "[parameters('user05ObjectId')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.43.8.12551",
+              "templateHash": "5015935483938588429"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "labInstanceId": {
+              "type": "string"
+            },
+            "adminUsername": {
+              "type": "string"
+            },
+            "adminPassword": {
+              "type": "securestring"
+            },
+            "user05ObjectId": {
+              "type": "string",
+              "metadata": {
+                "description": "Object ID of sc500-user05. Receives Contributor on this resource group."
+              }
+            }
+          },
+          "variables": {
+            "storageAccountName": "[format('sc500lab1d{0}', parameters('labInstanceId'))]",
+            "vnetName": "sc500-lab1d-vnet",
+            "subnetName": "default",
+            "nicName": "sc500-lab1d-nic",
+            "vmName": "sc500-lab1d-vm",
+            "osDiskName": "sc500-lab1d-osdisk",
+            "contributorRoleId": "b24988ac-6180-42a0-ab88-20f7382dd24c"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2023-04-01",
+              "name": "[variables('vnetName')]",
+              "location": "[parameters('location')]",
+              "tags": {
+                "Environment": "Lab"
+              },
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "10.0.0.0/16"
+                  ]
+                },
+                "subnets": [
+                  {
+                    "name": "[variables('subnetName')]",
+                    "properties": {
+                      "addressPrefix": "10.0.0.0/24"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2023-04-01",
+              "name": "[variables('nicName')]",
+              "location": "[parameters('location')]",
+              "tags": {
+                "Environment": "Lab"
+              },
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "subnet": {
+                        "id": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', variables('vnetName')), variables('subnetName'))]"
+                      },
+                      "privateIPAllocationMethod": "Dynamic"
+                    }
+                  }
+                ],
+                "enableAcceleratedNetworking": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-01-01",
+              "name": "[variables('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "StorageV2",
+              "properties": {
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": false,
+                "supportsHttpsTrafficOnly": true
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2023-07-01",
+              "name": "[variables('vmName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "Standard_B1s"
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "MicrosoftWindowsDesktop",
+                    "offer": "windows-11",
+                    "sku": "win11-24h2-pro",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "name": "[variables('osDiskName')]",
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "Standard_LRS"
+                    },
+                    "deleteOption": "Delete"
+                  }
+                },
+                "osProfile": {
+                  "computerName": "sc500-lab1d-vm",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "adminPassword": "[parameters('adminPassword')]",
+                  "windowsConfiguration": {
+                    "enableAutomaticUpdates": false,
+                    "patchSettings": {
+                      "patchMode": "Manual"
+                    }
+                  }
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]",
+                      "properties": {
+                        "deleteOption": "Delete"
+                      }
+                    }
+                  ]
+                },
+                "diagnosticsProfile": {
+                  "bootDiagnostics": {
+                    "enabled": false
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceGroup().id, parameters('user05ObjectId'), variables('contributorRoleId'))]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('contributorRoleId'))]",
+                "principalId": "[parameters('user05ObjectId')]",
+                "principalType": "User",
+                "description": "SC-500 Lab 1D: sc500-user05 Contributor — overprivileged assignment remediated via Access Review in Section 4."
+              }
+            }
+          ],
+          "outputs": {
+            "storageAccountName": {
+              "type": "string",
+              "value": "[variables('storageAccountName')]"
+            },
+            "vmName": {
+              "type": "string",
+              "value": "[variables('vmName')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', 'sc500-lab1d-rg')]"
+      ]
+    }
+  ],
+  "outputs": {
+    "resourceGroupId": {
+      "type": "string",
+      "value": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', 'sc500-lab1d-rg')]"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, 'sc500-lab1d-rg'), 'Microsoft.Resources/deployments', 'lab1d-rg-resources'), '2025-04-01').outputs.storageAccountName.value]"
+    },
+    "vmName": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, 'sc500-lab1d-rg'), 'Microsoft.Resources/deployments', 'lab1d-rg-resources'), '2025-04-01').outputs.vmName.value]"
+    }
+  }
+}
