@@ -69,7 +69,7 @@ Azure Policy evaluates resources against defined rules and reports compliance wi
     az policy state trigger-scan --resource-group sc500-lab1d-rg
     ```
 
-    The command displays an **IN-PROGRESS** indicator while the scan runs and returns your Bash prompt only when the scan is complete. This typically takes **5+ minutes** but can take longer depending on subscription load.
+    The command displays an **IN-PROGRESS** indicator while the scan runs and returns your Bash prompt only when the scan is complete. This typically takes **5+ minutes** but can take longer depending on subscription load.  You don't need to wait for the Scan to finish. Wait a minute or two, then proceed to the next Note and Steps.
 
     > **Note**: If the compliance state still shows **Not started** or **0 non-compliant resources** after the command completes, wait 2–3 additional minutes and select **Refresh** in the portal. Compliance state updates are written asynchronously after the scan finishes.
 
@@ -89,7 +89,17 @@ Azure Policy evaluates resources against defined rules and reports compliance wi
 
 The built-in policy you assigned enforces tag requirements on individual resources. A complementary policy at the resource group level ensures that any new resource groups created in the subscription are also tagged from the start. Rather than configuring this policy in the portal, you will deploy a pre-written Bicep template that defines and assigns the custom policy at the subscription scope. Deploying governance policy through Infrastructure as Code ensures it is version-controlled, repeatable, and auditable.
 
-The `sc500-lab1d-policy.bicep` file has been pre-staged in your Cloud Shell home directory. It defines a custom `Deny` policy that requires an `Environment` tag on all resource groups and creates a subscription-scope assignment.
+The **sc500-lab1d-policy.bicep** file has been pre-staged in your Cloud Shell home directory. It defines a custom **Deny** policy that requires an **Environment** tag on all resource groups and creates a subscription-scope assignment.
+
+1. Open a Cloud Shell (Bash), if it is not already open.
+
+1. Select the **Manage file** button in the menu at the top of your Bash window.
+
+1. Select **Upload**.
+
+1. Browse to your **Desktop** folder, then select **sc500-lab1d-policy.bicep** file.
+
+1. Select **Open** to upload the file. Wait for the **Successfully uploaded file** message.
 
 1. In the Cloud Shell (Bash) session, run the following command to deploy the custom policy to the subscription scope:
 
@@ -108,7 +118,7 @@ The `sc500-lab1d-policy.bicep` file has been pre-staged in your Cloud Shell home
 
 1. In the **Type** filter, select **Custom**.
 
-    Confirm that a custom policy definition for requiring an `Environment` tag on resource groups appears in the list. This is the definition deployed by the Bicep template.
+    Confirm that a custom policy definition for requiring a **Require Environment tag on resource groups** policy appears in the list. This is the definition deployed by the Bicep template.
 
     > **Note**: This step demonstrates the Infrastructure as Code approach to policy governance. The same Bicep template can be committed to a repository, reviewed through a pull request, and deployed consistently across multiple environments — ensuring that governance rules are applied uniformly without relying on manual portal configuration.
 
@@ -122,7 +132,7 @@ The `sc500-lab1d-policy.bicep` file has been pre-staged in your Cloud Shell home
 
 ## Create a custom security reviewer role
 
-Built-in Azure roles such as **Reader** grant broad read access across all resource types in a scope. When a role is needed for a specific governance function — such as reviewing Defender for Cloud security posture data and role assignments — a custom role with the minimum required permissions is a better fit. You will create a role named `sc500-Security-Reviewer` that grants read access to Microsoft Defender for Cloud data and Azure authorization objects only, then assign it to `sc500-user04`.
+Built-in Azure roles such as **Reader** grant broad read access across all resource types in a scope. When a role is needed for a specific governance function — such as reviewing Defender for Cloud security posture data and role assignments — a custom role with the minimum required permissions is a better fit. You will create a role named **sc500-Security-Reviewer** that grants read access to Microsoft Defender for Cloud data and Azure authorization objects only, then assign it to **User-2**.
 
 1. In the Azure portal search bar, search for and select **Resource groups**.
 
@@ -136,8 +146,8 @@ Built-in Azure roles such as **Reader** grant broad read access across all resou
 
     | Setting | Value |
     |---------|-------|
-    | **Custom role name** | sc500-Security-Reviewer |
-    | **Description** | Read-only access to Defender for Cloud security posture data and role assignments. Scoped to the sc500-lab1d-rg resource group. |
+    | **Custom role name** | `sc500-Security-Reviewer` |
+    | **Description** | `Read-only access to Defender for Cloud security posture data and role assignments. Scoped to the sc500-lab1d-rg resource group.` |
     | **Baseline permissions** | Start from scratch |
 
 1. Select **Next** to proceed to the **Permissions** tab.
@@ -146,7 +156,7 @@ Built-in Azure roles such as **Reader** grant broad read access across all resou
 
 1. Select **Next** to proceed to the **Assignable scopes** tab.
 
-    Confirm that `sc500-lab1d-rg` is listed as an assignable scope. Because you opened the custom role wizard from the resource group's IAM page, the scope is pre-populated. If it is not listed, select **Add assignable scopes**, expand your subscription, select `sc500-lab1d-rg`, then select **Add**.
+    Confirm that **sc500-lab1d-rg** is listed as an assignable scope. Because you opened the custom role wizard from the resource group's IAM page, the scope is pre-populated. If it is not listed, select **Add assignable scopes**, expand your subscription, select **sc500-lab1d-rg**, then select **Add**.
 
 1. Select **Next** to proceed to the **JSON** tab.
 
@@ -223,18 +233,18 @@ An **Entra ID Access Review** provides a structured, auditable process for evalu
 
     | Setting | Value |
     |---------|-------|
-    | **Review name** | sc500-contributor-review |
-    | **Description** | Review of Contributor access on the AI platform resource group |
+    | **Review name** | `sc500-contributor-review` |
+    | **Description** | `Review of Contributor access on the AI platform resource group` |
     | **Start date** | Today's date |
     | **Frequency** | One time |
     | **Duration (in days)** | 3 |
 
-1. Under **Review scope**, configure the following:
+1. Under **Users scope**, configure the following:
 
     | Setting | Value |
     |---------|-------|
     | **Scope** | All users and groups |
-    | **Role** | Contributor |
+    | **Role** | `Contributor` |
     | **Assignment type** | Active assignments only |
 
 1. Under **Reviewers**, configure the following:
@@ -242,7 +252,7 @@ An **Entra ID Access Review** provides a structured, auditable process for evalu
     | Setting | Value |
     |---------|-------|
     | **Reviewers** | Selected users |
-    | **Select reviewers** | Search for and select `sc500-user04` |
+    | **Select reviewers** | User-2  |
 
 1. Under **Upon completion settings**, configure the following:
 
@@ -254,6 +264,8 @@ An **Entra ID Access Review** provides a structured, auditable process for evalu
 1. Select **Start** to create and activate the access review.
 
     > **Note**: With **Auto apply results to resource** enabled, review decisions are applied automatically when the review is stopped or reaches its end date. You do not need to click a separate Apply button.
+
+# RobertS - We need a User-3 or some other person with Contributor rights to perform this section.
 
 1. Open a new **InPrivate** or **Private** browser window.
 
@@ -297,6 +309,8 @@ An **Entra ID Access Review** provides a structured, auditable process for evalu
 
     > **Note**: Access Reviews create an auditable, timestamped record of the reviewer's decision and the resulting access change. In a production environment, this record provides evidence of due diligence for compliance frameworks that require periodic access certification — including SOC 2, ISO 27001, and NIST 800-53 AC-6.
 
+# RobertS - End of section
+
 ---
 
 ## Apply a resource lock
@@ -315,9 +329,9 @@ Resource locks prevent accidental or unauthorized deletion of critical resources
 
     | Setting | Value |
     |---------|-------|
-    | **Lock name** | sc500-storage-lock |
+    | **Lock name** | `sc500-storage-lock` |
     | **Lock type** | Delete |
-    | **Notes** | Prevents accidental deletion of the AI platform storage account. |
+    | **Notes** | `Prevents accidental deletion of the AI platform storage account.` |
 
 1. Select **OK**.
 
