@@ -35,9 +35,9 @@ This exercise should take approximately **60** minutes to complete.
 
 Azure Policy evaluates resources against defined rules and reports compliance without requiring changes to existing resources. A **Deny** effect policy blocks new non-compliant resources from being created; existing resources that already violate the policy appear as **Non-compliant** in the compliance report. You will assign the built-in **Require a tag on resources** policy to `sc500-lab1d-rg`, which will flag `sc500lab1d@lab.LabInstance.Id` (the storage account) and `sc500-lab1d-vm` (the virtual machine) as non-compliant because neither resource has an `Environment` tag. You may see one additional non-compliant resource listed — this is expected.
 
-1. Sign in to the [Azure portal](https://portal.azure.com) using your **Global Administrator** credentials.
+1. Sign in to the Azure portal `https://portal.azure.com` using your **User-1** credentials.
 
-1. In the search bar, search for and select **Policy**.
+1. In the search bar, search for and select **`Policy`**.
 
 1. In the left menu, under **Authoring**, select **Assignments**.
 
@@ -47,9 +47,9 @@ Azure Policy evaluates resources against defined rules and reports compliance wi
 
     | Setting | Value |
     |---------|-------|
-    | **Scope** | Select the ellipsis (**...**), then select your subscription and `sc500-lab1d-rg` as the resource group. Select **Select**. |
+    | **Scope** | Select the ellipsis (**...**), then select your subscription and **sc500-lab1d-rg** as the resource group. Select **Select**. |
     | **Exclusions** | Leave blank |
-    | **Policy definition** | Select the ellipsis (**...**), search for **Require a tag on resources**, select the result, then select **Add**. |
+    | **Policy definition** | Select the ellipsis (**...**), search for **`Require a tag on resources`**, select the result, then select **Add**. |
     | **Assignment name** | sc500-require-env-tag |
     | **Policy enforcement** | Enabled |
 
