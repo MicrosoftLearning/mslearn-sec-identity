@@ -36,7 +36,7 @@ Using a SQL-only administrator account means database access cannot be governed 
 
 You will create a security group named `sc500-sql-admins`, add `sc500-user06` as a member, and configure the group as the Entra ID administrator for `sc500-lab2b-sql`.
 
-1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) using your **Global Administrator** credentials.
+1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using your **Global Administrator** credentials.
 
 1. In the left menu, expand **Groups** and select **All groups**.
 
@@ -47,21 +47,21 @@ You will create a security group named `sc500-sql-admins`, add `sc500-user06` as
     | Setting | Value |
     |---------|-------|
     | **Group type** | Security |
-    | **Group name** | sc500-sql-admins |
+    | **Group name** | `sc500-sql-admins` |
     | **Group description** | Entra ID administrator group for sc500-lab2b-sql |
     | **Membership type** | Assigned |
 
 1. Under **Members**, select **No members selected**.
 
-1. Search for and select **sc500-user06**, then select **Select**.
+1. Search for and select **user-2**, then select **Select**.
 
 1. Select **Create**.
 
     > **Note**: Using a group rather than an individual account as the SQL Entra ID administrator centralizes access management — administrators are added and removed via group membership without requiring a change to the SQL server configuration. It also enables access reviews on the group to periodically certify that all members still need database admin access.
 
-1. Navigate to the [Azure portal](https://portal.azure.com).
+1. Navigate to the **Azure portal** `https://portal.azure.com`.
 
-1. In the search bar, search for and select **SQL servers**.
+1. In the search bar, search for and select `SQL server`.
 
 1. Select **sc500-lab2b-sql**.
 
@@ -85,9 +85,9 @@ The **Allow Azure services and resources to access this server** exception grant
 
 > **Important**: Complete the auditing task in the next section — specifically the step that runs a query using the portal query editor — **before** you disable the public endpoint in step 9 of this section. The portal query editor uses the public endpoint, and it will be unavailable after the public endpoint is disabled.
 
-1. In the left menu for `sc500-lab2b-sql`, under **Security**, select **Networking**.
+1. In the left menu for **sc500-lab2b-sql**, under **Security**, select **Networking**.
 
-1. On the **Firewalls and virtual networks** tab, under **Exceptions**, clear the checkbox for **Allow Azure services and resources to access this server**.
+1. At the bottom of the **Networking** page, under **Exceptions**, clear the checkbox for **Allow Azure services and resources to access this server**.
 
 1. Select **Save**.
 
@@ -100,8 +100,8 @@ The **Allow Azure services and resources to access this server** exception grant
     | Setting | Value |
     |---------|-------|
     | **Resource group** | sc500-lab2b-rg |
-    | **Name** | sc500-sql-pe |
-    | **Region** | Central US |
+    | **Name** | `sc500-sql-pe` |
+    | **Region** | East US |
 
 1. Select **Next: Resource**.
 
@@ -119,7 +119,7 @@ The **Allow Azure services and resources to access this server** exception grant
 
     | Setting | Value |
     |---------|-------|
-    | **Virtual network** | sc500-lab2b-vnet |
+    | **Virtual network** | `sc500-lab2b-vnet` |
     | **Subnet** | default |
     | **Private IP configuration** | Dynamically allocate IP address |
 
@@ -128,6 +128,8 @@ The **Allow Azure services and resources to access this server** exception grant
 1. On the **DNS** tab, confirm **Integrate with private DNS zone** is set to **Yes** and that the DNS zone shown is **privatelink.database.windows.net**.
 
     > **Note**: The `privatelink.database.windows.net` private DNS zone was pre-provisioned and linked to `sc500-lab2b-vnet`. When the private endpoint is created, it automatically registers an A record in this zone that maps the SQL server's fully qualified domain name to the private IP address — ensuring that resources in the VNet resolve to the private endpoint rather than the public IP.
+
+1. Use the **Next** button to get to the **Review + create** tab.
 
 1. Select **Review + create**, then select **Create**.
 
@@ -143,7 +145,7 @@ SQL auditing records all database-level events — queries, logins, schema chang
 
 > **Note**: Complete this entire section — including the step that runs a SELECT query in the portal query editor — **before** returning to disable the public SQL endpoint. Once the public endpoint is disabled, the portal query editor can no longer connect.
 
-1. In the left menu for `sc500-lab2b-sql`, under **Security**, select **Auditing**.
+1. In the left menu for **sc500-lab2b-sql**, under **Security**, select **Auditing**.
 
 1. Set **Enable Azure SQL Auditing** to **On**.
 
@@ -200,6 +202,8 @@ A security engineer doesn't just enable auditing — they confirm it's capturing
 
 Log Analytics ingestion typically takes 2–5 minutes after an event is generated.
 
+1. Select **Home** to return to the Azure Overview page.
+
 1. In the Azure portal search bar, search for and select **Log Analytics workspaces**.
 
 1. Select **sc500-lab2b-log**.
@@ -232,7 +236,7 @@ Log Analytics ingestion typically takes 2–5 minutes after an event is generate
 
 Defender for Databases provides continuous threat detection for your SQL server — identifying SQL injection attempts, brute-force login attacks, anomalous access patterns, and data exfiltration indicators. Unlike auditing, which records what happened, Defender generates real-time alerts when suspicious activity is detected.
 
-1. In the Azure portal search bar, search for and select **Microsoft Defender for Cloud**.
+1. In the Azure portal search bar, search for and select `Microsoft Defender for Cloud`.
 
 1. In the left menu, under **Management**, select **Environment settings**.
 
