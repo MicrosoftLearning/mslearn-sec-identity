@@ -1,0 +1,286 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Lab 2C setup template — pre-provisions the hub-spoke network, workload VM, storage account, and private DNS zone for the Configure Network Security Controls lab. Students create the ASG, NSG, Azure Firewall, private endpoint, and route table during the lab.",
+    "lab": "SC500-Lab2C",
+    "deployScope": "subscription",
+    "preProvisionedResources": [
+      "sc500-lab2c-rg (resource group)",
+      "sc500-lab2c-hub-vnet (10.3.0.0/16 with AzureFirewallSubnet 10.3.1.0/26)",
+      "sc500-lab2c-spoke-vnet (10.4.0.0/16 with workload-subnet 10.4.0.0/24)",
+      "VNet peering: hub-to-spoke and spoke-to-hub",
+      "sc500-lab2c-vm (Windows Server 2022, Standard_B2s, in workload-subnet, no NSG)",
+      "sc500lab2cstorage (storage account, public access enabled — students disable it)",
+      "privatelink.blob.core.windows.net (private DNS zone linked to spoke VNet)"
+    ],
+    "studentCreatedResources": [
+      "sc500-asg-ai-inference (Application Security Group)",
+      "sc500-lab2c-nsg (NSG with DenyInboundRDP and AllowInboundHTTPS rules)",
+      "sc500-lab2c-fw (Azure Firewall with sc500-fw-policy and sc500-lab2c-fw-pip)",
+      "sc500-storage-pe (Private Endpoint for blob storage in workload-subnet)",
+      "sc500-spoke-rt (Route Table with DefaultToFirewall route)"
+    ],
+    "deployCommand": "az deployment sub create --location eastus --template-file lab-2c-setup.json"
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for all resources. East US is the default. Central US also works. No SQL regional restrictions apply to this lab."
+      }
+    },
+    "vmAdminUsername": {
+      "type": "string",
+      "defaultValue": "sc500vmadmin",
+      "metadata": {
+        "description": "Local administrator username for sc500-lab2c-vm."
+      }
+    },
+    "vmAdminPassword": {
+      "type": "securestring",
+      "defaultValue": "SC500-Lab2C-2026!",
+      "metadata": {
+        "description": "Local administrator password for sc500-lab2c-vm. Must be 12-123 characters and meet Azure complexity requirements."
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "sc500lab2cstorage",
+      "metadata": {
+        "description": "Storage account name. Must be globally unique, lowercase, no hyphens, 3-24 characters. Default: sc500lab2cstorage. Change only if this name is already taken in the target subscription."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "sc500-lab2c-rg",
+      "location": "[parameters('location')]",
+      "tags": {
+        "lab": "SC500-Lab2C",
+        "purpose": "NetworkSecurityControls"
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "sc500-lab2c-resources",
+      "resourceGroup": "sc500-lab2c-rg",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/resourceGroups', 'sc500-lab2c-rg')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "parameters": {
+          "location": { "value": "[parameters('location')]" },
+          "vmAdminUsername": { "value": "[parameters('vmAdminUsername')]" },
+          "vmAdminPassword": { "value": "[parameters('vmAdminPassword')]" },
+          "storageAccountName": { "value": "[parameters('storageAccountName')]" }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "location": { "type": "string" },
+            "vmAdminUsername": { "type": "string" },
+            "vmAdminPassword": { "type": "securestring" },
+            "storageAccountName": { "type": "string" }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2022-01-01",
+              "name": "sc500-lab2c-hub-vnet",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [ "10.3.0.0/16" ]
+                },
+                "subnets": [
+                  {
+                    "name": "AzureFirewallSubnet",
+                    "properties": {
+                      "addressPrefix": "10.3.1.0/26"
+                    }
+                  },
+                  {
+                    "name": "AzureFirewallManagementSubnet",
+                    "properties": {
+                      "addressPrefix": "10.3.2.0/26"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2022-01-01",
+              "name": "sc500-lab2c-spoke-vnet",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [ "10.4.0.0/16" ]
+                },
+                "subnets": [
+                  {
+                    "name": "workload-subnet",
+                    "properties": {
+                      "addressPrefix": "10.4.0.0/24",
+                      "privateEndpointNetworkPolicies": "Disabled"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+              "apiVersion": "2022-01-01",
+              "name": "sc500-lab2c-hub-vnet/hub-to-spoke",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2c-hub-vnet')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2c-spoke-vnet')]"
+              ],
+              "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteVirtualNetwork": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2c-spoke-vnet')]"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+              "apiVersion": "2022-01-01",
+              "name": "sc500-lab2c-spoke-vnet/spoke-to-hub",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2c-hub-vnet')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2c-spoke-vnet')]"
+              ],
+              "properties": {
+                "allowVirtualNetworkAccess": true,
+                "allowForwardedTraffic": true,
+                "allowGatewayTransit": false,
+                "useRemoteGateways": false,
+                "remoteVirtualNetwork": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2c-hub-vnet')]"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2022-01-01",
+              "name": "sc500-lab2c-vm-nic",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2c-spoke-vnet')]"
+              ],
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "subnet": {
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'sc500-lab2c-spoke-vnet', 'workload-subnet')]"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2022-03-01",
+              "name": "sc500-lab2c-vm",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', 'sc500-lab2c-vm-nic')]"
+              ],
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "Standard_B2s"
+                },
+                "osProfile": {
+                  "computerName": "sc500lab2cvm",
+                  "adminUsername": "[parameters('vmAdminUsername')]",
+                  "adminPassword": "[parameters('vmAdminPassword')]",
+                  "windowsConfiguration": {
+                    "enableAutomaticUpdates": false,
+                    "provisionVMAgent": true
+                  }
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "MicrosoftWindowsServer",
+                    "offer": "WindowsServer",
+                    "sku": "2022-datacenter-azure-edition",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "Standard_LRS"
+                    }
+                  }
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', 'sc500-lab2c-vm-nic')]"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "StorageV2",
+              "properties": {
+                "publicNetworkAccess": "Enabled",
+                "allowBlobPublicAccess": false,
+                "minimumTlsVersion": "TLS1_2",
+                "supportsHttpsTrafficOnly": true
+              }
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2020-06-01",
+              "name": "privatelink.blob.core.windows.net",
+              "location": "global"
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2020-06-01",
+              "name": "privatelink.blob.core.windows.net/sc500-lab2c-dns-link",
+              "location": "global",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.blob.core.windows.net')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2c-spoke-vnet')]"
+              ],
+              "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2c-spoke-vnet')]"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
