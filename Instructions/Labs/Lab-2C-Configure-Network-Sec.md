@@ -37,7 +37,7 @@ This exercise should take approximately **65** minutes to complete.
 
 Azure Firewall is a managed, stateful network firewall as a service that provides centralized outbound traffic inspection for all resources in your hub-spoke network. In this lab, all outbound traffic from the `sc500-lab2c-spoke-vnet` workload subnet will route through the firewall in `sc500-lab2c-hub-vnet` — ensuring that outbound destinations are controlled by explicit application rules and all traffic is logged.
 
-1. Sign in to the [Azure portal](https://portal.azure.com) using your **Global Administrator** credentials.
+1. Sign in to the **Azure portal** `https://portal.azure.com` using your **User-1** credentials.
 
 1. In the search bar, search for and select **Firewalls**.
 
@@ -48,7 +48,7 @@ Azure Firewall is a managed, stateful network firewall as a service that provide
     | Setting | Value |
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
-    | **Name** | sc500-lab2c-fw |
+    | **Name** | `sc500-lab2c-fw` |
     | **Region** | East US |
     | **Availability zone** | None |
     | **Firewall tier** | Standard |
@@ -69,7 +69,7 @@ Azure Firewall is a managed, stateful network firewall as a service that provide
 
 An **Application Security Group (ASG)** tags a virtual machine with a logical workload identity that can be referenced in NSG rules — instead of using IP addresses that change when VMs are redeployed. An **NSG** attached to the workload subnet then enforces traffic rules that reference the ASG by name, making rules resilient to infrastructure changes.
 
-The workload VM (`sc500-lab2c-vm`) currently has no NSG applied. Any source can reach it on any port. You will create an ASG for the AI inference service, create an NSG with rules that deny inbound RDP from the internet and allow inbound HTTPS from within the virtual network, and apply the NSG to the workload subnet.
+The workload VM (**sc500-lab2c-vm**) currently has no NSG applied. Any source can reach it on any port. You will create an ASG for the AI inference service, create an NSG with rules that deny inbound RDP from the internet and allow inbound HTTPS from within the virtual network, and apply the NSG to the workload subnet.
 
 ### Create the Application Security Group
 
@@ -82,7 +82,7 @@ The workload VM (`sc500-lab2c-vm`) currently has no NSG applied. Any source can 
     | Setting | Value |
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
-    | **Name** | sc500-asg-ai-inference |
+    | **Name** | `sc500-asg-ai-inference` |
     | **Region** | East US |
 
 1. Select **Review + create**, then select **Create**.
@@ -110,7 +110,7 @@ The workload VM (`sc500-lab2c-vm`) currently has no NSG applied. Any source can 
     | Setting | Value |
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
-    | **Name** | sc500-lab2c-nsg |
+    | **Name** | `sc500-lab2c-nsg` |
     | **Region** | East US |
 
 1. Select **Review + create**, then select **Create**.
@@ -133,7 +133,7 @@ The workload VM (`sc500-lab2c-vm`) currently has no NSG applied. Any source can 
     | **Service** | RDP |
     | **Action** | Deny |
     | **Priority** | 100 |
-    | **Name** | DenyInboundRDP |
+    | **Name** | `DenyInboundRDP` |
 
 1. Select **Add**.
 
@@ -149,7 +149,7 @@ The workload VM (`sc500-lab2c-vm`) currently has no NSG applied. Any source can 
     | **Service** | HTTPS |
     | **Action** | Allow |
     | **Priority** | 200 |
-    | **Name** | AllowInboundHTTPS |
+    | **Name** | `AllowInboundHTTPS` |
 
 1. Select **Add**.
 
@@ -193,7 +193,7 @@ The workload storage account (`sc500lab2cstorage`) is currently accessible via i
     | Setting | Value |
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
-    | **Name** | sc500-storage-pe |
+    | **Name** | `sc500-storage-pe` |
     | **Region** | East US |
 
 1. Select **Next: Resource**.
@@ -263,21 +263,21 @@ You will add an application rule collection that allows the workload VMs to reac
 
     | Setting | Value |
     |---------|-------|
-    | **Name** | sc500-allow-outbound |
+    | **Name** | `sc500-allow-outbound` |
     | **Rule collection type** | Application |
-    | **Priority** | 100 |
+    | **Priority** | `100` |
     | **Rule collection action** | Allow |
 
 1. Under **Rules**, add the following rule:
 
     | Setting | Value |
     |---------|-------|
-    | **Name** | AllowMicrosoftEndpoints |
+    | **Name** | `AllowMicrosoftEndpoints` |
     | **Source type** | IP Address |
-    | **Source** | 10.4.0.0/16 |
-    | **Protocol** | https:443 |
+    | **Source** | `10.4.0.0/16` |
+    | **Protocol** | `https:443` |
     | **Destination type** | FQDN |
-    | **Destination** | *.microsoft.com,*.azure.com,*.windows.net |
+    | **Destination** | `*.microsoft.com, *.azure.com, *.windows.net` |
 
 1. Select **Add**.
 
@@ -294,7 +294,7 @@ You will add an application rule collection that allows the workload VMs to reac
     | Setting | Value |
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
-    | **Name** | sc500-spoke-rt |
+    | **Name** | `sc500-spoke-rt` |
     | **Propagate gateway routes** | No |
     | **Region** | East US |
 
@@ -310,7 +310,7 @@ You will add an application rule collection that allows the workload VMs to reac
 
     | Setting | Value |
     |---------|-------|
-    | **Route name** | DefaultToFirewall |
+    | **Route name** | `DefaultToFirewall` |
     | **Destination type** | IP Addresses |
     | **Destination IP addresses/CIDR ranges** | 0.0.0.0/0 |
     | **Next hop type** | Virtual appliance |
@@ -352,27 +352,27 @@ Network Watcher's **IP flow verify** tool tests whether a specific traffic flow 
     | **Protocol** | TCP |
     | **Direction** | Inbound |
     | **Local IP address** | Leave as the auto-detected private IP of the VM |
-    | **Local port** | 3389 |
-    | **Remote IP address** | 8.8.8.8 (a public internet IP) |
-    | **Remote port** | 60000 |
+    | **Local port** | `3389` |
+    | **Remote IP address** | `8.8.8.8` (a public internet IP) |
+    | **Remote port** | `60000` |
 
-1. Select **Verify IP flow**.
+1. Select **Verify IP flow**. Then scroll down to the bottom of the page, the message is below the button.
 
     Confirm the result shows **Access denied** and identifies `DenyInboundRDP` as the rule responsible.
 
-1. Change **Local port** to `443` and select **Verify IP flow** again.
+2. Change **Local port** to `443` and select **Verify IP flow** again.
 
     Confirm the result shows **Access allowed** and identifies `AllowInboundHTTPS` as the rule responsible.
 
     > **Note**: IP flow verify evaluates the effective security rules — the combined result of all NSGs applied at the NIC level and the subnet level. It does not test actual traffic; it simulates the NSG evaluation logic. This makes it a fast, non-destructive way to validate that a firewall rule is configured correctly before testing with real traffic.
 
-1. In the left menu for **Network Watcher**, select **Effective security rules** (under **Network diagnostic tools**).
+3. In the left menu for **Network Watcher**, select **Effective security rules** (under **Network diagnostic tools**).
 
-1. Select **sc500-lab2c-vm** and its network interface. The subscription, resource group, VM, and NIC fields are populated automatically.
+4. Select **sc500-lab2c-vm** and its network interface. The subscription, resource group, VM, and NIC fields are populated automatically.
 
-1. Under the **"Click on a rule row to see the expanded list of prefixes"** section, select **sc500-lab2c-nsg** to expand the inbound and outbound rule lists.
+5. Under the **"Click on a rule row to see the expanded list of prefixes"** section, select **sc500-lab2c-nsg** to expand the inbound and outbound rule lists.
 
-1. In the **Inbound** rules list, confirm the following rules appear:
+6. In the **Inbound** rules list, confirm the following rules appear:
 
     | Priority | Name | Action |
     |----------|------|--------|

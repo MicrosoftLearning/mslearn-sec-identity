@@ -10,8 +10,8 @@
       "sc500-lab2c-hub-vnet (10.3.0.0/16 with AzureFirewallSubnet 10.3.1.0/26)",
       "sc500-lab2c-spoke-vnet (10.4.0.0/16 with workload-subnet 10.4.0.0/24)",
       "VNet peering: hub-to-spoke and spoke-to-hub",
-      "sc500-lab2c-vm (Windows Server 2022, Standard_B2s, in workload-subnet, no NSG)",
-      "sc500lab2cstorage (storage account, public access enabled — students disable it)",
+      "sc500-lab2c-vm (Windows Server 2022, Standard_D2s_v3, in workload-subnet, no NSG)",
+      "sc500lab2c@lab.LabInstance.Id (storage account, public access enabled — students disable it)",
       "privatelink.blob.core.windows.net (private DNS zone linked to spoke VNet)"
     ],
     "studentCreatedResources": [
@@ -47,9 +47,9 @@
     },
     "storageAccountName": {
       "type": "string",
-      "defaultValue": "sc500lab2cstorage",
+      "defaultValue": "sc500lab2c@lab.LabInstance.Id",
       "metadata": {
-        "description": "Storage account name. Must be globally unique, lowercase, no hyphens, 3-24 characters. Default: sc500lab2cstorage. Change only if this name is already taken in the target subscription."
+        "description": "Storage account name. Must be globally unique, lowercase, no hyphens, 3-24 characters. Default uses @lab.LabInstance.Id for Skillable Cloud Slice uniqueness. Change only if needed."
       }
     }
   },
@@ -206,7 +206,7 @@
               ],
               "properties": {
                 "hardwareProfile": {
-                  "vmSize": "Standard_B2s"
+                  "vmSize": "Standard_D2s_v3"
                 },
                 "osProfile": {
                   "computerName": "sc500lab2cvm",
