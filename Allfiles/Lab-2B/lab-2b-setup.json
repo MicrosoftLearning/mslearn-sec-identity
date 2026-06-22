@@ -1,0 +1,242 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Lab 2B setup template — Secure Azure SQL Database. Deploys sc500-lab2b-rg with all pre-provisioned resources required before the student starts the lab.",
+    "postDeploymentSteps": [
+      "Register the Microsoft.Security provider so students can enable Defender for Databases: az provider register --namespace Microsoft.Security",
+      "SQL admin credentials — document in the Skillable lab guide for use in the Query Editor: login sc500sqladmin / password SC500Lab2b!"
+    ],
+    "queryEditorNote": "The lab guide Query Editor step must use SQL Server authentication (not Active Directory authentication). The Global Administrator account is not a member of sc500-sql-admins and will not have Entra ID access to the database. Students must select 'SQL Server authentication' and enter login sc500sqladmin with the documented password."
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure region for all resources. REQUIRED — no default is set because Azure SQL Server provisioning is restricted to specific regions depending on the subscription type. Verify SQL Server availability in the target region before deploying. Confirmed working regions for M365 E5 trial subscriptions: centralus. Regions confirmed unavailable: eastus, eastus2. To check availability: az sql server list-usages --location <region> or attempt: az sql server create --location <region> --name test-check-<unique> --resource-group <rg> --admin-user test --admin-password Test@1234."
+      }
+    },
+    "sqlAdminLogin": {
+      "type": "string",
+      "defaultValue": "sc500sqladmin",
+      "metadata": {
+        "description": "SQL Server administrator login. Students use this with SQL Server authentication in the portal Query Editor."
+      }
+    },
+    "sqlAdminPassword": {
+      "type": "string",
+      "defaultValue": "SC500Lab2b!",
+      "metadata": {
+        "description": "SQL Server administrator password. Document this value in the Skillable lab guide — students enter it when authenticating to the Query Editor. Must meet Azure SQL complexity requirements: 8+ characters, uppercase, lowercase, number, and special character."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "sc500-lab2b-rg",
+      "location": "[parameters('location')]",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "sc500-lab2b-resources",
+      "resourceGroup": "sc500-lab2b-rg",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/resourceGroups', 'sc500-lab2b-rg')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "parameters": {
+          "location": { "value": "[parameters('location')]" },
+          "sqlAdminLogin": { "value": "[parameters('sqlAdminLogin')]" },
+          "sqlAdminPassword": { "value": "[parameters('sqlAdminPassword')]" }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "location": { "type": "string" },
+            "sqlAdminLogin": { "type": "string" },
+            "sqlAdminPassword": { "type": "string" }
+          },
+          "resources": [
+
+            {
+              "comments": "Managed identity used by the deployment script that initialises the SQL database schema.",
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "apiVersion": "2023-01-31",
+              "name": "sc500-lab2b-script-id",
+              "location": "[parameters('location')]"
+            },
+
+            {
+              "comments": "Contributor on the resource group — required for the deployment script runtime to create and access its temporary storage account.",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceGroup().id, 'sc500-lab2b-script-id', 'Contributor')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'sc500-lab2b-script-id')]"
+              ],
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'sc500-lab2b-script-id')).principalId]",
+                "principalType": "ServicePrincipal"
+              }
+            },
+
+            {
+              "comments": "SQL Server. Starts with SQL authentication only and no Entra ID admin — the 'before' state the student remediates in the lab. Allow Azure services is enabled via the firewall rule below.",
+              "type": "Microsoft.Sql/servers",
+              "apiVersion": "2021-11-01",
+              "name": "sc500-lab2b-sql",
+              "location": "[parameters('location')]",
+              "properties": {
+                "administratorLogin": "[parameters('sqlAdminLogin')]",
+                "administratorLoginPassword": "[parameters('sqlAdminPassword')]",
+                "version": "12.0",
+                "minimalTlsVersion": "1.2",
+                "publicNetworkAccess": "Enabled"
+              }
+            },
+
+            {
+              "comments": "Allow Azure services firewall rule (0.0.0.0/0.0.0.0). This corresponds to the 'Allow Azure services and resources to access this server' checkbox in the portal — the misconfiguration the student identifies and removes in the lab.",
+              "type": "Microsoft.Sql/servers/firewallRules",
+              "apiVersion": "2021-11-01",
+              "name": "sc500-lab2b-sql/AllowAllWindowsAzureIps",
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', 'sc500-lab2b-sql')]"
+              ],
+              "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+              }
+            },
+
+            {
+              "comments": "SQL Database on the server. Basic tier (5 DTU). The AiModelMetadata table with 3 rows is created post-deployment by the deploymentScripts resource below.",
+              "type": "Microsoft.Sql/servers/databases",
+              "apiVersion": "2021-11-01",
+              "name": "sc500-lab2b-sql/ai-workload-db",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Basic",
+                "tier": "Basic",
+                "capacity": 5
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', 'sc500-lab2b-sql')]"
+              ],
+              "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 2147483648
+              }
+            },
+
+            {
+              "comments": "Virtual network for Private Endpoint placement. privateEndpointNetworkPolicies is Disabled on the subnet — required before a private endpoint can be placed in the subnet.",
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2023-05-01",
+              "name": "sc500-lab2b-vnet",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [ "10.2.0.0/16" ]
+                },
+                "subnets": [
+                  {
+                    "name": "default",
+                    "properties": {
+                      "addressPrefix": "10.2.0.0/24",
+                      "privateEndpointNetworkPolicies": "Disabled"
+                    }
+                  }
+                ]
+              }
+            },
+
+            {
+              "comments": "Private DNS zone for SQL Private Endpoint resolution. Pre-provisioned to avoid complex DNS configuration consuming lab time.",
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2020-06-01",
+              "name": "privatelink.database.windows.net",
+              "location": "global"
+            },
+
+            {
+              "comments": "VNet link so resources in sc500-lab2b-vnet resolve the private endpoint FQDN via the private DNS zone.",
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2020-06-01",
+              "name": "privatelink.database.windows.net/sc500-lab2b-dns-link",
+              "location": "global",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.database.windows.net')]",
+                "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2b-vnet')]"
+              ],
+              "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks', 'sc500-lab2b-vnet')]"
+                }
+              }
+            },
+
+            {
+              "comments": "Log Analytics workspace. Target for SQL audit logs.",
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "sc500-lab2b-log",
+              "location": "[parameters('location')]",
+              "properties": {
+                "sku": { "name": "PerGB2018" },
+                "retentionInDays": 30
+              }
+            },
+
+            {
+              "comments": "Deployment script that creates the AiModelMetadata table in ai-workload-db with 3 seed rows. Runs once after the database is provisioned. Uses SQL Server authentication via the sqlAdminPassword environment variable (marked secureValue so it does not appear in resource logs).",
+              "type": "Microsoft.Resources/deploymentScripts",
+              "apiVersion": "2023-08-01",
+              "name": "sc500-lab2b-sql-init",
+              "location": "[parameters('location')]",
+              "kind": "AzurePowerShell",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'sc500-lab2b-script-id')]": {}
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', 'sc500-lab2b-sql', 'ai-workload-db')]",
+                "[resourceId('Microsoft.Sql/servers/firewallRules', 'sc500-lab2b-sql', 'AllowAllWindowsAzureIps')]",
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'sc500-lab2b-script-id')]",
+                "[resourceId('Microsoft.Authorization/roleAssignments', guid(resourceGroup().id, 'sc500-lab2b-script-id', 'Contributor'))]"
+              ],
+              "properties": {
+                "azPowerShellVersion": "9.0",
+                "scriptContent": "param([string]$SqlServer, [string]$SqlAdmin)\n$plain = $env:SQL_ADMIN_PASSWORD\nAdd-Type -AssemblyName 'System.Data'\n$conn = New-Object System.Data.SqlClient.SqlConnection(\"Server=$SqlServer;Database=ai-workload-db;User Id=$SqlAdmin;Password=$plain;TrustServerCertificate=True;Connection Timeout=60;\")\n$conn.Open()\n$cmd = $conn.CreateCommand()\n$cmd.CommandTimeout = 60\n$cmd.CommandText = 'IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = N''AiModelMetadata'') BEGIN CREATE TABLE dbo.AiModelMetadata (ModelId INT NOT NULL, ModelName NVARCHAR(100) NOT NULL, Version NVARCHAR(20) NOT NULL, CONSTRAINT PK_AiModelMetadata PRIMARY KEY (ModelId)); INSERT INTO dbo.AiModelMetadata (ModelId, ModelName, Version) VALUES (1, N''GPT-Financial'', N''2.1''), (2, N''GPT-Legal'', N''1.4''), (3, N''GPT-Medical'', N''3.0''); END'\n$cmd.ExecuteNonQuery()\n$conn.Close()",
+                "arguments": "[concat('-SqlServer sc500-lab2b-sql.database.windows.net -SqlAdmin ', parameters('sqlAdminLogin'))]",
+                "environmentVariables": [
+                  {
+                    "name": "SQL_ADMIN_PASSWORD",
+                    "secureValue": "[parameters('sqlAdminPassword')]"
+                  }
+                ],
+                "timeout": "PT15M",
+                "cleanupPreference": "OnSuccess",
+                "retentionInterval": "P1D"
+              }
+            }
+
+          ]
+        }
+      }
+    }
+  ]
+}
