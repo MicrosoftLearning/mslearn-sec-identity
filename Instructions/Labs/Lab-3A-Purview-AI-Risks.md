@@ -11,6 +11,17 @@ lab:
         - SharePoint Oversharing
 ---
 
+# Optional Lab Only
+
+Lab Profile = Bring Your Own Subscription (BYOS)
+
+Note that this lab is still pending completion. The Purview DSPM tool will finalize in mid-September. At this time, this lab can be finalized and used with an ALH tenant.  The lab as written will function in a BYOS scenario now. So if you are working on this lab in a user owned tenant, feel free to test it.
+
+Please read through to learn the steps that are required. We apologize for the delay in this lab.
+
+===
+
+
 # Identify AI Data Risks with Microsoft Purview
 
 Your organization deployed Microsoft 365 Copilot six months ago. No one has reviewed what data Copilot can access on behalf of users since deployment. A security review request asks you to identify which SharePoint sites are overexposed and what risk signals Purview is surfacing about Copilot data access — before the next compliance audit.

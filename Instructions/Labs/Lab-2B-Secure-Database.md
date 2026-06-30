@@ -12,6 +12,34 @@ lab:
         - SQL Auditing
 ---
 
+# Lab Setup
+
+Lab profile - https://labondemand.com/LabProfile/217879
+
+This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
+
+1. Open the **Azure Portal** at `https://portal.azure.com`.
+
+1. Log in with the **User-1** administrator role.
+
+1. In the **Search** bar find and open **Deploy a custom template**.
+   
+1. Select **Build your own template in the editor**.
+
+1. In the menu choose **Load file**.
+
+1. Select the file **lab-2b-setup.json** from the Desktop folder.
+
+1. Select **Save**.
+
+1. Select **Review + create**.
+
+    > **Note**: Deployment may take a few minutes to complete.
+
+1. Close the browser.
+
+===
+
 # Secure Azure SQL Database
 
 A penetration test of your organization's AI application database found three critical findings. First, the database server uses SQL authentication only — there is no identity governance over who holds database credentials, and no Entra ID audit trail for administrative access. Second, the **Allow Azure services and resources to access this server** firewall exception is enabled, creating a bypass that allows any Azure-hosted service — regardless of ownership or location — to reach the database. Third, the server has no auditing configured, so there is no record of who queried what data or when.

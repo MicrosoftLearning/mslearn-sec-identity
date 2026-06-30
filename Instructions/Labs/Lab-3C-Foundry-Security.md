@@ -10,6 +10,16 @@ lab:
         - Azure AI Foundry
         - Microsoft Defender for AI Services
 ---
+# Lab Setup
+
+Lab profile - https://labondemand.com/LabProfile/217879
+
+This lab runs on a Cloud Slice.
+
+1. Close the browser.
+
+===
+
 
 # Configure AI Gateway and Foundry Security Controls
 

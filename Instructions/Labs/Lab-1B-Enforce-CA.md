@@ -11,6 +11,15 @@ lab:
         - App Registration
 ---
 
+# Lab Setup
+
+Lab profile - https://labondemand.com/LabProfile/217878
+
+This lab runs on a M365 Tenant with no special configuration needed.
+
+===
+
+
 # Enforce MFA with Conditional Access
 
 A recent security review of your organization's Entra ID tenant found that access controls rely entirely on Microsoft security defaults — a one-size-fits-all baseline with no targeted policies. At the same time, the AI platform team has registered a new application that accesses sensitive APIs, and one user account was recently flagged as a sign-in risk. Your task is to create a Conditional Access policy that explicitly enforces multifactor authentication (MFA) for a targeted user accessing the Azure portal, validate the policy behavior before enabling it, and register the new AI platform application with appropriately scoped API permissions.
@@ -25,8 +34,6 @@ In this lab, you will:
 - Register a new application in Entra ID and configure scoped API permissions
 
 This exercise should take approximately **45** minutes to complete.
-
-> **Note**: This lab uses two accounts: your **MOD Administrator** account (your primary lab credentials) and **sc500-user02** (the Conditional Access policy target). Credentials for both accounts are in the **Resources** tab of your lab environment. MFA for sc500-user02 is pre-registered — the TOTP code or authenticator details are also in the **Resources** tab.
 
 ---
 

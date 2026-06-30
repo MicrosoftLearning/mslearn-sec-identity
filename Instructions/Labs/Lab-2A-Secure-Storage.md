@@ -11,6 +11,34 @@ lab:
         - Stored Access Policies
 ---
 
+# Lab Setup
+
+Lab profile - https://labondemand.com/LabProfile/217879
+
+This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
+
+1. Open the **Azure Portal** at `https://portal.azure.com`.
+
+1. Log in with the **User-1** administrator role.
+
+1. In the **Search** bar find and open **Deploy a custom template**.
+   
+1. Select **Build your own template in the editor**.
+
+1. In the menu choose **Load file**.
+
+1. Select the file **lab-2a-setup.json** from the Desktop folder.
+
+1. Select **Save**.
+
+1. Select **Review + create**.
+
+    > **Note**: Deployment may take a few minutes to complete.
+
+1. Close the browser.
+
+===
+
 # Secure Azure Storage
 
 A storage account containing AI training data and model outputs is currently accessible from the public internet with no network restrictions. A recent security scan found that the account has no threat detection enabled and no policies governing how access tokens are issued or revoked. Any actor with the account key or a valid SAS token generated without policy backing can access training data with no audit trail and no revocation path.

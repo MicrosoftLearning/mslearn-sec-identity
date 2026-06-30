@@ -11,6 +11,34 @@ lab:
         - Microsoft Entra ID Governance
 ---
 
+# Lab Setup
+
+Lab profile - https://labondemand.com/LabProfile/217879
+
+This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
+
+1. Open the **Azure Portal** at `https://portal.azure.com`.
+
+1. Log in with the **User-1** administrator role.
+
+1. In the **Search** bar find and open **Deploy a custom template**.
+   
+1. Select **Build your own template in the editor**.
+
+1. In the menu choose **Load file**.
+
+1. Select the file **sc500-lab1c-policy.json** from the Desktop folder.
+
+1. Select **Save**.
+
+1. Select **Review + create**.
+
+    > **Note**: Deployment may take a few minutes to complete.
+
+1. Close the browser.
+
+===
+
 # Configure Azure Policy and Role-Based Access Control
 
 A compliance audit of your organization's AI platform environment has identified two governance gaps. First, no policy exists to enforce required resource tagging — resources in the subscription have no consistent `Environment` tag, making cost allocation and security boundary tracking unreliable. Second, a team member who moved off the AI platform team nine months ago still holds a standing Contributor assignment on the platform resource group, giving them full management access to resources they no longer work with.
@@ -265,51 +293,7 @@ An **Entra ID Access Review** provides a structured, auditable process for evalu
 
     > **Note**: With **Auto apply results to resource** enabled, review decisions are applied automatically when the review is stopped or reaches its end date. You do not need to click a separate Apply button.
 
-# RobertS - We need a User-3 or some other person with Contributor rights to perform this section.
-
-1. Open a new **InPrivate** or **Private** browser window.
-
-1. Navigate to the [Microsoft Entra admin center](https://entra.microsoft.com) and sign in using the **sc500-user04** credentials from the **Resources** tab.
-
-1. In the left menu, expand **ID Governance** and select **Privileged Identity Management**.
-
-1. Select **Review access**.
-
-    The pending review **sc500-contributor-review** appears in the access reviews list.
-
-1. Select **sc500-contributor-review** to open it.
-
-1. For the entry showing **sc500-user05**, select **Deny**.
-
-1. In the **Reason** field, enter a justification such as:
-
-    `sc500-user05 is no longer assigned to the AI platform team and does not require Contributor access.`
-
-1. Select **Submit**.
-
-    > **Note**: The review decision is recorded immediately. `sc500-user04` has completed their role as the designated reviewer. PIM-based Azure resource role reviews are completed through the Entra admin center — not myaccess.microsoft.com, which handles group and application access reviews only.
-
-1. Close the InPrivate browser window and return to your Global Administrator browser session.
-
-1. Navigate back to the **sc500-contributor-review** access review in the Microsoft Entra admin center. You can find it under **ID Governance** → **Privileged Identity Management** → **Azure resources** → your subscription → **Access reviews**.
-
-1. Select **Stop** to end the review before its scheduled end date.
-
-    With auto-apply enabled, stopping the review immediately triggers the application of results. The review status progresses through **Stopping** → **Applying** → **Applied**.
-
-    > **Note**: Allow 1–2 minutes for the status to reach **Applied**. Select **Refresh** if the status does not update.
-
-1. In the Azure portal, navigate to **sc500-lab1d-rg**.
-
-1. Select **Access control (IAM)**, then select the **Role assignments** tab.
-
-1. Search or scroll to find `sc500-user05` in the role assignments list.
-
-    Confirm that `sc500-user05` no longer appears as a **Contributor**. The Access Review has removed the assignment.
-
     > **Note**: Access Reviews create an auditable, timestamped record of the reviewer's decision and the resulting access change. In a production environment, this record provides evidence of due diligence for compliance frameworks that require periodic access certification — including SOC 2, ISO 27001, and NIST 800-53 AC-6.
-
-# RobertS - End of section
 
 ---
 

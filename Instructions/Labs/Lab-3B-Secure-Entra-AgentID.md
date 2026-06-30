@@ -12,6 +12,14 @@ lab:
         - Copilot Studio
 ---
 
+# Lab Setup
+
+Lab profile - https://labondemand.com/LabProfile/217879
+
+This lab runs on a Cloud Slice. NOTE - this lab is a work in progress as the technology around the Entra Agent ID is evolving almost daily. The steps as written worked on June 30, 2026. However with regular product changes you may find that the setups are not 100% accruate.  We don't have a lab setup for this lab yet, as it keeps changing. We will add a lab setup, once things stablize.
+
+===
+
 # Secure Microsoft Entra Agent Identities
 
 Your organization's development team deployed a Copilot Studio agent that has read access to a SharePoint site containing HR data and can send calendar invitations on behalf of users. No Conditional Access policy governs when the agent can authenticate, and no one has assessed what an attacker could do if the agent identity were compromised.
@@ -30,6 +38,50 @@ In this lab, you will:
 This exercise should take approximately **60** minutes to complete.
 
 > **Note**: This lab uses one account — your **Global Administrator** credentials — to access four different portals: the Microsoft Entra admin center, Microsoft Defender XDR, the Microsoft 365 admin center, and Copilot Studio. Credentials are in the **Resources** tab of your lab environment.
+
+---
+
+## Create and Agent in Foundry to populate the Agent ID
+
+1. Open the **Azure Portal** at `https://portal.azure.com`
+
+1. Log in as **User-1** using the provided credentials.
+
+1. Select **Yes** one the **Stay signed in?** dialog.
+
+1. In the **Search resources...** bar search for and open `Microsoft Foundry`.
+
+1. Select **Create a resource**.
+
+1. Use the following values on the **Basics** tab:
+
+   - Subscription -- **Use provided subscription**
+   - Resource Group -- **Create new** --> **lab3b-rg**
+   - Name -- **sc500-copilot-agent**
+   - Region -- **Use the default**
+   - Default project name -- **sc500-proj-default**
+
+1. Select **Review + create**.
+
+1. After the validation completes, select **Create**.
+
+   > **Note**: it should take about 30-seconds to create.
+
+1. Select **Go to resource**.
+
+1. Select the **Go to Foundry portal** button.
+
+1. Find the box **Build an agent** and select **Start building**
+
+1. Enter **Agent name** of `sc500-lab-test` into the box.
+
+1. Select **Create**.
+
+1. When the **sc500-lab-test** opens, review the information on the page.
+
+1. In the **Instructions** box type `This is a test agent`.
+
+1. Select **Save** in the upper-right.
 
 ---
 
@@ -62,8 +114,6 @@ Every Copilot Studio agent is registered in Microsoft Entra ID as a distinct ide
     > **Note**: The dual-object model is the most important concept in this lab. Every Entra Agent ID has an **agent identity** service principal (what you found under Agent identities) and, in some cases, an **agent's user account** (what you found in All Users). These are two distinct directory objects that require two different Conditional Access policy targets. More critically: any existing CA policy that targets **All users** — including your organization's baseline MFA policy — will also hit the agent's user account. Since the agent cannot fulfill an MFA challenge, an "All users, require MFA" policy will block the agent entirely. Designing around this is part of the next task.
 
 ---
-
-# RobertS - no conditional access access in Cloud Slice
 
 ## Create Conditional Access policies for agent identities
 
@@ -132,61 +182,6 @@ You will create two policies: one for agent identities (the service principal ob
 1. Select **Create**.
 
 1. Return to the **Conditional Access** policies list and confirm both **sc500-agent-risk-block** and **sc500-agent-user-block** are listed.
-
----
-
-## Analyze agent blast radius in Microsoft Defender XDR
-
-A blast radius analysis answers the question: *if this agent identity were compromised right now, what could an attacker do with it?* Defender XDR indexes the agent's configured connections and maps the data sources, user accounts, and services the agent can reach — producing a concrete, enumerable risk assessment.
-
-1. Open a new browser tab and navigate to **Microsoft Defender XDR** at `https://security.microsoft.com`.
-
-1. In the left navigation, expand **Assets** and select **Identities**.
-
-1. Filter the identity list or search for **sc500-copilot-agent**.
-
-    > **Note**: Agent identities may appear under a dedicated **Agent identities** sub-filter, or inline with other identity types depending on your Defender XDR version. Use the search bar at the top of the identity list if needed.
-
-1. Select **sc500-copilot-agent** to open the identity details page.
-
-1. Select the **Blast radius** tab.
-
-1. Review the blast radius map. For **sc500-copilot-agent**, confirm you can see at minimum:
-
-    | Connection | Risk |
-    |-----------|------|
-    | SharePoint read — `sc500-ai-datastore` | An attacker with control of this agent can extract all content from the HR data site without authenticating as a human user |
-    | Calendar read — sc500-user07 | An attacker can enumerate a user's meeting subjects, attendees, and calendar events — useful for social engineering |
-
-1. Review the **Permissions** tab on the same identity details page. Confirm the specific permission grants that back each connection in the blast radius.
-
-1. Consider the risk: the blast radius maps what an attacker gains by compromising this one identity. Both connections were granted to make the agent useful. Neither was granted with malicious intent. This is the fundamental AI identity security problem — blast radius accumulates naturally as agents are given access to do their jobs.
-
----
-
-## Manage the agent in the Microsoft 365 admin center
-
-The Microsoft 365 admin center provides an administrative control plane for agents deployed in the tenant. It shows which agents are active, what connections they hold, and allows administrators to disable or restrict agent access without deleting the agent.
-
-1. Open a new browser tab and navigate to the [Microsoft 365 admin center](https://admin.microsoft.com).
-
-1. In the left navigation, select **Copilot**, then select **Agents**.
-
-    > **Note**: If you do not see **Copilot** in the left navigation, select **Show all** to expand the full navigation menu.
-
-1. Locate **sc500-copilot-agent** and select it to open the agent management pane.
-
-1. Select the **Connections** tab and confirm the two configured connections — SharePoint access to **sc500-ai-datastore** and Calendar access for **sc500-user07** — match what you observed in the Defender XDR blast radius analysis.
-
-1. Select the **SharePoint** connection to **sc500-ai-datastore**.
-
-1. Select **Disable** to disconnect the agent's SharePoint access.
-
-    > **Note**: This is the least-privilege remediation for the oversharing finding from Lab 3A. The agent gained read access to the HR data site when it was deployed — a decision made without a security review. Disabling this connection removes one of the two attack paths in the blast radius without deleting the agent. The Calendar connection remains; removing it would require a separate business justification review.
-
-1. Confirm the connection status for **sc500-ai-datastore** changes to **Disabled**.
-
-1. Return to the agent's main details view and confirm the connection change is reflected in the configured connections list.
 
 ---
 

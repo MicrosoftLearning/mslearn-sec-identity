@@ -11,6 +11,14 @@ lab:
         - Managed Identity
 ---
 
+# Lab Setup
+
+Lab profile - https://labondemand.com/LabProfile/217878
+
+This lab runs on a M365 Tenant with no special configuration needed.
+
+===
+
 # Configure Privileged Identity Management
 
 Privileged Identity Management (PIM) is a Microsoft Entra ID service that enables just-in-time (JIT) privileged access to Azure and Microsoft Entra roles. Instead of granting permanent admin access — which creates a persistent attack surface — PIM requires users to request and activate elevated access for a limited time window, with optional approval and justification requirements.
@@ -27,8 +35,6 @@ In this lab, you will:
 - Deactivate the role to close the just-in-time access window
 
 This exercise should take approximately **45** minutes to complete.
-
-> **Note**: This lab uses three accounts: your **Global Administrator** account (your primary lab credentials), **sc500-user01** (the PIM eligible member), and **sc500-approver** (the approver). Credentials for all three accounts are in the **Resources** tab of your lab environment.
 
 ---
 
@@ -174,44 +180,13 @@ Return to the **Adele Vance** browser window and verify that the role activation
 
 1. Select **X** to close the policy pane without saving — creating a policy is not required for this verification step.
 
-
-
-
-
-# ROBERTS - The following steps don't work in Skillable / ALH without an Azure subscription attached. Putting on hold.
----
-
-## Enable system-assigned managed identity
-
-A managed identity is an identity automatically managed by Microsoft Entra ID, used by applications and services to authenticate to other Azure resources without storing credentials. In this task, you will enable a system-assigned managed identity on a pre-provisioned App Service.
-
-1. Switch back to your **Mod Administrator** browser window (or open a new browser and sign in with your MOD Administrator credentials).
-
-1. Navigate to the Azure portal at `https://portal.azure.com`.
-
-1. In the search bar, search for and select **App Services**.
-
-1. Select **sc500-lab1a-app** from the list.
-
-1. In the left menu, under **Settings**, select **Identity**.
-
-1. On the **System assigned** tab, set **Status** to **On**.
-
-1. Select **Save**, then select **Yes** to confirm.
-
-    After a few seconds, the page refreshes and displays an **Object (principal) ID** — this is the unique identity assigned to the App Service in Microsoft Entra ID.
-
-1. Note the **Object (principal) ID** value. In a real deployment, you would use this ID to grant the App Service access to other Azure resources such as Key Vault secrets or storage accounts.
-
-    > **Note**: A system-assigned managed identity is tied to the resource — if the App Service is deleted, the identity is automatically removed. This makes it a lower-maintenance option compared to a user-assigned managed identity, which persists independently of the resource.
-
 ---
 
 ## Deactivate the role
 
 Just-in-time access means access should be released as soon as the task is complete — not held until the time window expires. You will now manually deactivate the Conditional Access Administrator role for **sc500-user01**.
 
-1. Return to the **sc500-user01** browser window.
+1. Return to the **Administrator** browser window.
 
 1. Navigate to **Privileged Identity Management > My roles > Microsoft Entra roles > Active assignments**.
 

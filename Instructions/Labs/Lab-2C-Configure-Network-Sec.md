@@ -13,6 +13,34 @@ lab:
         - Network Watcher
 ---
 
+# Lab Setup
+
+Lab profile - https://labondemand.com/LabProfile/217879
+
+This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
+
+1. Open the **Azure Portal** at `https://portal.azure.com`.
+
+1. Log in with the **User-1** administrator role.
+
+1. In the **Search** bar find and open **Deploy a custom template**.
+   
+1. Select **Build your own template in the editor**.
+
+1. In the menu choose **Load file**.
+
+1. Select the file **lab-2c-setup.json** from the Desktop folder.
+
+1. Select **Save**.
+
+1. Select **Review + create**.
+
+    > **Note**: Deployment may take a few minutes to complete.
+
+1. Close the browser.
+
+===
+
 # Configure Network Security Controls
 
 A penetration test of your AI inference workload identified a critical network security gap: the workload VM serving the model endpoint has no NSG applied, making it directly reachable from the internet on any port. Outbound traffic from the workload subnet routes directly to the internet with no inspection or filtering. The backend storage account used by the inference service is also publicly accessible — any actor with a valid SAS token can reach it from anywhere.

@@ -1,0 +1,57 @@
+<!--
+  Lab 3C — AI Gateway Policy for sc500-lab3c-foundry API
+  Apply this policy in the Azure API Management policy editor:
+    API Management instance → APIs → [your Foundry API] → Design → All operations → Policy (</>)
+
+  This policy applies a token rate limit to all calls routed through the AI Gateway.
+  The token rate limit restricts consumption to 500 tokens per minute per subscription key,
+  protecting the Foundry endpoint against cost abuse attacks and uncontrolled consumption.
+
+  Content safety filtering is applied at the Foundry guardrail layer (Lab task 7–9),
+  not at the APIM layer. This is intentional: APIM enforces access control and volume
+  management; Foundry guardrails enforce content policy at the model inference layer.
+  Together, they form a two-layer defense:
+    - APIM layer:    Who can call the API, and how often
+    - Foundry layer: What content is allowed through to and from the model
+
+  Subscription key authentication is configured via the API product settings
+  in the APIM portal — not via policy XML. See Lab task 5 for instructions.
+-->
+<policies>
+    <inbound>
+        <base />
+
+        <!--
+          Token rate limit: restricts this API to 500 tokens per minute per subscription key.
+
+          counter-key:              Each subscription key gets its own independent counter.
+          tokens-per-minute:        Maximum tokens allowed per minute per key.
+          estimate-prompt-tokens:   Estimate prompt token count before the call completes,
+                                    so the limit applies to both input and output tokens.
+          tokens-left-header:       Response header showing remaining token budget.
+
+          When the limit is exceeded, APIM returns HTTP 429 Too Many Requests.
+          The Retry-After response header tells the caller when to retry.
+
+          Adjust tokens-per-minute to match your organization's usage policy.
+          500 TPM is appropriate for a lab or development environment.
+          Production values are typically 10,000–100,000 TPM per key.
+        -->
+        <azure-openai-token-limit
+            counter-key="@(context.Subscription.Id)"
+            tokens-per-minute="500"
+            estimate-prompt-tokens="true"
+            tokens-left-header="x-ratelimit-remaining-tokens"
+            remaining-tokens-after-retry-header="x-ratelimit-tokens-after-retry" />
+
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
