@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "metadata": {
-    "description": "SC-500 Lab 3C - Configure AI Gateway and Foundry Security Controls - Setup Template. This template provisions an Azure API Management instance, Azure AI Foundry hub and project, Azure OpenAI service with gpt-4o deployment, and configures the APIM API to route to the Foundry model endpoint in an intentionally unsecured state for students to remediate."
+    "description": "SC-500 Lab 3D - Monitor AI Security with Defender for Cloud - Setup Template. This template provisions an Azure AI Foundry hub and project with Azure OpenAI service (gpt-4o) in an intentionally unsecured state with NO content filters, enables Defender for AI Services, and prepares the environment for adversarial traffic generation. IMPORTANT: After deployment, run generate-adversarial-traffic.ps1 and wait 24+ hours before lab delivery for Defender findings to populate."
   },
   "parameters": {
     "location": {
@@ -21,7 +21,7 @@
         "southeastasia"
       ],
       "metadata": {
-        "description": "Azure region for all resources. Use a region that supports Azure OpenAI and API Management."
+        "description": "Azure region for all resources. Use a region that supports Azure OpenAI and Azure AI Foundry."
       }
     },
     "labInstanceId": {
@@ -33,35 +33,26 @@
         "description": "The Skillable lab instance ID. Used to generate globally unique resource names. Auto-populated by Skillable using @lab.LabInstance.Id variable."
       }
     },
-    "publisherEmail": {
-      "type": "string",
-      "defaultValue": "admin@contoso.com",
+    "enableDefenderForAI": {
+      "type": "bool",
+      "defaultValue": true,
       "metadata": {
-        "description": "Email address for the API Management publisher. Required by APIM."
-      }
-    },
-    "publisherName": {
-      "type": "string",
-      "defaultValue": "Contoso",
-      "metadata": {
-        "description": "Organization name for the API Management publisher."
+        "description": "Whether to enable Defender for AI Services on the subscription. Set to true for production lab delivery."
       }
     }
   },
   "variables": {
-    "resourceGroupName": "sc500-lab3c-rg",
-    "apimName": "sc500-lab3c-apim",
-    "openAiName": "[concat('sc500-lab3c-ai-', parameters('labInstanceId'))]",
-    "aiHubName": "[concat('sc500-lab3c-hub-', parameters('labInstanceId'))]",
-    "aiProjectName": "sc500-lab3c-foundry",
-    "storageAccountName": "[concat('sc500lab3c', parameters('labInstanceId'))]",
-    "keyVaultName": "[concat('sc500-kv-', parameters('labInstanceId'))]",
-    "appInsightsName": "sc500-lab3c-insights",
-    "logAnalyticsName": "sc500-lab3c-logs",
+    "resourceGroupName": "sc500-lab3d-rg",
+    "openAiName": "[concat('sc500-lab3d-ai-', parameters('labInstanceId'))]",
+    "aiHubName": "[concat('sc500-lab3d-hub-', parameters('labInstanceId'))]",
+    "aiProjectName": "sc500-lab3d-foundry",
+    "storageAccountName": "[concat('sc500lab3d', parameters('labInstanceId'))]",
+    "keyVaultName": "[concat('sc500-3d-kv-', parameters('labInstanceId'))]",
+    "appInsightsName": "sc500-lab3d-insights",
+    "logAnalyticsName": "sc500-lab3d-logs",
     "modelDeploymentName": "gpt-4o",
     "modelName": "gpt-4o",
-    "modelVersion": "2024-08-06",
-    "apiName": "sc500-foundry-api"
+    "modelVersion": "2024-08-06"
   },
   "resources": [
     {
@@ -70,15 +61,16 @@
       "name": "[variables('resourceGroupName')]",
       "location": "[parameters('location')]",
       "tags": {
-        "lab": "SC-500-Lab-3C",
-        "purpose": "AI Gateway and Foundry Security"
+        "lab": "SC-500-Lab-3D",
+        "purpose": "AI Security Monitoring with Defender for Cloud",
+        "security-state": "intentionally-unsecured"
       },
       "properties": {}
     },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
-      "name": "sc500-lab3c-infrastructure",
+      "name": "sc500-lab3d-infrastructure",
       "resourceGroup": "[variables('resourceGroupName')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/resourceGroups', variables('resourceGroupName'))]"
@@ -90,7 +82,6 @@
         },
         "parameters": {
           "location": { "value": "[parameters('location')]" },
-          "apimName": { "value": "[variables('apimName')]" },
           "openAiName": { "value": "[variables('openAiName')]" },
           "aiHubName": { "value": "[variables('aiHubName')]" },
           "aiProjectName": { "value": "[variables('aiProjectName')]" },
@@ -100,17 +91,13 @@
           "logAnalyticsName": { "value": "[variables('logAnalyticsName')]" },
           "modelDeploymentName": { "value": "[variables('modelDeploymentName')]" },
           "modelName": { "value": "[variables('modelName')]" },
-          "modelVersion": { "value": "[variables('modelVersion')]" },
-          "apiName": { "value": "[variables('apiName')]" },
-          "publisherEmail": { "value": "[parameters('publisherEmail')]" },
-          "publisherName": { "value": "[parameters('publisherName')]" }
+          "modelVersion": { "value": "[variables('modelVersion')]" }
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
           "parameters": {
             "location": { "type": "string" },
-            "apimName": { "type": "string" },
             "openAiName": { "type": "string" },
             "aiHubName": { "type": "string" },
             "aiProjectName": { "type": "string" },
@@ -120,10 +107,7 @@
             "logAnalyticsName": { "type": "string" },
             "modelDeploymentName": { "type": "string" },
             "modelName": { "type": "string" },
-            "modelVersion": { "type": "string" },
-            "apiName": { "type": "string" },
-            "publisherEmail": { "type": "string" },
-            "publisherName": { "type": "string" }
+            "modelVersion": { "type": "string" }
           },
           "variables": {
             "openAiEndpoint": "[concat('https://', parameters('openAiName'), '.openai.azure.com')]"
@@ -224,7 +208,7 @@
               ],
               "sku": {
                 "name": "Standard",
-                "capacity": 10
+                "capacity": 20
               },
               "properties": {
                 "model": {
@@ -233,7 +217,7 @@
                   "version": "[parameters('modelVersion')]"
                 },
                 "versionUpgradeOption": "OnceNewDefaultVersionAvailable",
-                "raiPolicyName": "Microsoft.Default"
+                "raiPolicyName": "Microsoft.DefaultV2"
               }
             },
             {
@@ -252,8 +236,8 @@
                 "[resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName'))]"
               ],
               "properties": {
-                "friendlyName": "SC500 Lab 3C AI Hub",
-                "description": "Azure AI Foundry Hub for SC-500 Lab 3C - AI Gateway and Security Controls",
+                "friendlyName": "SC500 Lab 3D AI Hub",
+                "description": "Azure AI Foundry Hub for SC-500 Lab 3D - Monitor AI Security with Defender for Cloud",
                 "storageAccount": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
                 "keyVault": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
                 "applicationInsights": "[resourceId('Microsoft.Insights/components', parameters('appInsightsName'))]",
@@ -273,70 +257,10 @@
                 "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('aiHubName'))]"
               ],
               "properties": {
-                "friendlyName": "sc500-lab3c-foundry",
-                "description": "Azure AI Foundry Project for SC-500 Lab 3C",
+                "friendlyName": "sc500-lab3d-foundry",
+                "description": "Azure AI Foundry Project for SC-500 Lab 3D - Intentionally unsecured for Defender monitoring",
                 "hubResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('aiHubName'))]",
                 "publicNetworkAccess": "Enabled"
-              }
-            },
-            {
-              "type": "Microsoft.ApiManagement/service",
-              "apiVersion": "2023-05-01-preview",
-              "name": "[parameters('apimName')]",
-              "location": "[parameters('location')]",
-              "sku": {
-                "name": "Consumption",
-                "capacity": 0
-              },
-              "identity": {
-                "type": "SystemAssigned"
-              },
-              "properties": {
-                "publisherEmail": "[parameters('publisherEmail')]",
-                "publisherName": "[parameters('publisherName')]",
-                "publicNetworkAccess": "Enabled"
-              }
-            },
-            {
-              "type": "Microsoft.ApiManagement/service/apis",
-              "apiVersion": "2023-05-01-preview",
-              "name": "[concat(parameters('apimName'), '/', parameters('apiName'))]",
-              "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service', parameters('apimName'))]",
-                "[resourceId('Microsoft.CognitiveServices/accounts/deployments', parameters('openAiName'), parameters('modelDeploymentName'))]"
-              ],
-              "properties": {
-                "displayName": "SC500 Foundry API",
-                "description": "Pre-configured API routing to Azure OpenAI gpt-4o deployment for SC-500 Lab 3C. Initially unsecured - students will apply rate limiting, subscription key authentication, and content safety controls.",
-                "subscriptionRequired": false,
-                "path": "sc500-foundry-api",
-                "protocols": [ "https" ],
-                "serviceUrl": "[concat(variables('openAiEndpoint'), '/openai')]",
-                "apiVersion": "2024-02-01",
-                "apiVersionSetId": "",
-                "isCurrent": true,
-                "type": "http",
-                "format": "openapi+json",
-                "value": "[concat('{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"Azure OpenAI API\",\"version\":\"2024-02-01\"},\"servers\":[{\"url\":\"', variables('openAiEndpoint'), '/openai\"}],\"paths\":{\"/deployments/', parameters('modelDeploymentName'), '/chat/completions\":{\"post\":{\"summary\":\"Create chat completion\",\"operationId\":\"chatCompletions\",\"parameters\":[{\"name\":\"api-version\",\"in\":\"query\",\"required\":true,\"schema\":{\"type\":\"string\",\"default\":\"2024-02-01\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"properties\":{\"messages\":{\"type\":\"array\"},\"max_tokens\":{\"type\":\"integer\"}}}}}},\"responses\":{\"200\":{\"description\":\"Success\"}}}}}}')]"
-              }
-            },
-            {
-              "type": "Microsoft.ApiManagement/service/backends",
-              "apiVersion": "2023-05-01-preview",
-              "name": "[concat(parameters('apimName'), '/openai-backend')]",
-              "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service', parameters('apimName'))]",
-                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName'))]"
-              ],
-              "properties": {
-                "description": "Azure OpenAI backend for SC-500 Lab 3C",
-                "url": "[variables('openAiEndpoint')]",
-                "protocol": "http",
-                "credentials": {
-                  "header": {
-                    "api-key": [ "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName')), '2024-04-01-preview').key1]" ]
-                  }
-                }
               }
             }
           ],
@@ -349,9 +273,9 @@
               "type": "string",
               "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName')), '2024-04-01-preview').key1]"
             },
-            "apimGatewayUrl": {
+            "modelEndpointUrl": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.ApiManagement/service', parameters('apimName'))).gatewayUrl]"
+              "value": "[concat(variables('openAiEndpoint'), '/openai/deployments/', parameters('modelDeploymentName'), '/chat/completions?api-version=2024-02-01')]"
             },
             "aiProjectId": {
               "type": "string",
@@ -366,10 +290,6 @@
     "resourceGroupName": {
       "type": "string",
       "value": "[variables('resourceGroupName')]"
-    },
-    "apimName": {
-      "type": "string",
-      "value": "[variables('apimName')]"
     },
     "openAiAccountName": {
       "type": "string",
@@ -387,9 +307,9 @@
       "type": "string",
       "value": "[variables('modelDeploymentName')]"
     },
-    "setupInstructions": {
+    "nextSteps": {
       "type": "string",
-      "value": "The infrastructure has been deployed. IMPORTANT: The Azure AI Foundry project requires additional configuration: 1) Navigate to https://ai.azure.com and select the sc500-lab3c-foundry project. 2) Add a connection to the Azure OpenAI service. 3) Ensure the gpt-4o deployment is visible in Models + endpoints. The API Management API (sc500-foundry-api) is intentionally configured with NO subscription requirement and NO rate limit policy - students will apply these controls during the lab."
+      "value": "CRITICAL POST-DEPLOYMENT STEPS: 1) Enable Defender for AI Services in Microsoft Defender for Cloud. 2) Navigate to Azure AI Foundry portal (ai.azure.com) and verify NO content filter is assigned to gpt-4o (or set to 'None'). 3) Run generate-adversarial-traffic.ps1 with the endpoint URL and API key from deployment outputs. 4) WAIT AT LEAST 24 HOURS after running the script before lab delivery. 5) Verify at least 2 security findings appear in Defender for Cloud > Data and AI security before marking environment as ready."
     }
   }
 }

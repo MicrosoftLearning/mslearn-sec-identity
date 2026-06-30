@@ -31,7 +31,7 @@
 
 .EXAMPLE
     .\generate-adversarial-traffic.ps1 `
-        -EndpointUrl "https://sc500-lab3d-foundry.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-02-01" `
+        -EndpointUrl "https://sc500-lab3d-ai-12345678.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-02-01" `
         -ApiKey "abc123..."
 #>
 
