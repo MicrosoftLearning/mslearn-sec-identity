@@ -17,7 +17,7 @@ The `lab-3c-setup.json` ARM template provisions the following resources in the *
 
 ### Core Infrastructure
 - **Azure OpenAI Service** (`sc500-lab3c-ai-{instanceId}`)
-  - gpt-5.4-mini model deployment with 10 TPM capacity
+  - gpt-5.4-mini model deployment (GlobalStandard SKU) with 10 TPM capacity
   - Initially configured with default content filter (no custom guardrail)
   
 - **Azure AI Foundry Hub** (`sc500-lab3c-hub-{instanceId}`)
@@ -166,9 +166,9 @@ az group delete --name sc500-lab3c-rg --yes --no-wait
 ## Important Notes
 
 - **Intentionally unsecured:** The API is deployed WITHOUT subscription key requirement, WITHOUT rate limit, and WITHOUT content safety guardrail. This is by design - students apply these controls during the lab.
-- **Model version:** The template deploys `gpt-5.4-mini` version `2026-03-17` (GA model, retires March 2027). Adjust `modelVersion` parameter if a different version is required.
-- **Quota requirements:** Ensure the subscription has sufficient Azure OpenAI quota (minimum 10 TPM for gpt-5.4-mini).
-- **Region availability:** Not all regions support Azure OpenAI. Use East US, West Europe, or check [Azure OpenAI region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability).
+- **Model version:** The template deploys `gpt-5.4-mini` version `2026-03-17` (GA model, GlobalStandard deployment type, retires March 2027).
+- **Quota requirements:** Ensure the subscription has sufficient Azure OpenAI quota. GlobalStandard deployments of gpt-5.4-mini provide 5,000 RPM and 5,000,000 TPM in Tier 1.
+- **Region availability:** GlobalStandard deployments route traffic globally. Use East US, West Europe, or other regions that support Azure OpenAI. See [Azure OpenAI region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability).
 
 ## Lab Resources Reference
 

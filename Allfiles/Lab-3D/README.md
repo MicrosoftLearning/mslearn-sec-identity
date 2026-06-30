@@ -18,7 +18,7 @@ The `lab-3d-setup.json` ARM template provisions the following resources in the *
 
 ### Core Infrastructure
 - **Azure OpenAI Service** (`sc500-lab3d-ai-{instanceId}`)
-  - gpt-5.4-mini model deployment with 20 TPM capacity
+  - gpt-5.4-mini model deployment (GlobalStandard SKU) with 20 TPM capacity
   - **INTENTIONALLY NO CUSTOM CONTENT FILTER** (uses default or none)
   
 - **Azure AI Foundry Hub** (`sc500-lab3d-hub-{instanceId}`)

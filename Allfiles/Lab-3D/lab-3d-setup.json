@@ -207,7 +207,7 @@
                 "[resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName'))]"
               ],
               "sku": {
-                "name": "Standard",
+                "name": "GlobalStandard",
                 "capacity": 20
               },
               "properties": {
