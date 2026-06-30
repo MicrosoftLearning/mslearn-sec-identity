@@ -17,7 +17,7 @@ The `lab-3c-setup.json` ARM template provisions the following resources in the *
 
 ### Core Infrastructure
 - **Azure OpenAI Service** (`sc500-lab3c-ai-{instanceId}`)
-  - gpt-4o model deployment with 10 TPM capacity
+  - gpt-5.4-mini model deployment with 10 TPM capacity
   - Initially configured with default content filter (no custom guardrail)
   
 - **Azure AI Foundry Hub** (`sc500-lab3c-hub-{instanceId}`)
@@ -95,7 +95,7 @@ After the ARM template deployment completes, **verify the following before stude
 ### 1. Verify Azure OpenAI Deployment
 1. Navigate to **Resource Groups** > **sc500-lab3c-rg** > **sc500-lab3c-ai-{instanceId}**
 2. Select **Model deployments** (or **Deployments**)
-3. Confirm **gpt-4o** is deployed and shows "Succeeded" status
+3. Confirm **gpt-5.4-mini** is deployed and shows "Succeeded" status
 
 ### 2. Configure Azure AI Foundry Project Connection
 The ARM template creates the AI Foundry project, but the connection to Azure OpenAI may need to be verified:
@@ -105,8 +105,8 @@ The ARM template creates the AI Foundry project, but the connection to Azure Ope
 3. In left navigation, select **Settings** or **Connected resources**
 4. Verify a connection to the Azure OpenAI service exists
    - If missing, click **+ New connection** → **Azure OpenAI** → select `sc500-lab3c-ai-{instanceId}`
-5. Navigate to **Models + endpoints** and confirm **gpt-4o** is visible
-6. Navigate to **Safety + security** > **Content filters** and confirm no custom filter is assigned to gpt-4o (should use "Default" or "None")
+5. Navigate to **Models + endpoints** and confirm **gpt-5.4-mini** is visible
+6. Navigate to **Safety + security** > **Content filters** and confirm no custom filter is assigned to gpt-5.4-mini (should use "Default" or "None")
 
 ### 3. Verify API Management API Configuration
 1. Navigate to **sc500-lab3c-apim** > **APIs**
@@ -138,7 +138,7 @@ Once deployment and verification are complete, students will:
 3. **Require subscription key** - Enable subscription requirement in APIM API settings
 4. **Test the configured gateway** - Verify 429 responses and 401 for missing keys
 5. **Create content safety guardrail** - Configure Prompt Shield in Foundry
-7. **Apply guardrail to deployment** - Assign custom filter to gpt-4o
+7. **Apply guardrail to deployment** - Assign custom filter to gpt-5.4-mini
 7. **Enable Defender for AI** - Turn on Defender for AI Services in Microsoft Defender for Cloud
 
 ## Troubleshooting
@@ -149,7 +149,7 @@ Once deployment and verification are complete, students will:
 ### Issue: API Management deployment fails
 **Solution:** Check that the selected region supports API Management Consumption tier. Try East US, West Europe, or North Europe.
 
-### Issue: gpt-4o deployment fails
+### Issue: gpt-5.4-mini deployment fails
 **Solution:** Check Azure OpenAI quota for the subscription. The model requires at least 10 TPM capacity. Request quota increase if needed.
 
 ### Issue: Students receive 403 when testing APIM API
@@ -166,8 +166,8 @@ az group delete --name sc500-lab3c-rg --yes --no-wait
 ## Important Notes
 
 - **Intentionally unsecured:** The API is deployed WITHOUT subscription key requirement, WITHOUT rate limit, and WITHOUT content safety guardrail. This is by design - students apply these controls during the lab.
-- **Model version:** The template deploys `gpt-4o` version `2024-08-06`. Adjust `modelVersion` parameter if a different version is required.
-- **Quota requirements:** Ensure the subscription has sufficient Azure OpenAI quota (minimum 10 TPM for gpt-4o).
+- **Model version:** The template deploys `gpt-5.4-mini` version `2026-03-17` (GA model, retires March 2027). Adjust `modelVersion` parameter if a different version is required.
+- **Quota requirements:** Ensure the subscription has sufficient Azure OpenAI quota (minimum 10 TPM for gpt-5.4-mini).
 - **Region availability:** Not all regions support Azure OpenAI. Use East US, West Europe, or check [Azure OpenAI region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability).
 
 ## Lab Resources Reference
@@ -176,10 +176,10 @@ az group delete --name sc500-lab3c-rg --yes --no-wait
 |--------------|---------------|---------|
 | Resource Group | sc500-lab3c-rg | Contains all lab resources |
 | API Management | sc500-lab3c-apim | AI Gateway for rate limiting and auth |
-| Azure OpenAI | sc500-lab3c-ai-{instanceId} | Hosts gpt-4o model |
+| Azure OpenAI | sc500-lab3c-ai-{instanceId} | Hosts gpt-5.4-mini model |
 | AI Hub | sc500-lab3c-hub-{instanceId} | Foundry hub workspace |
 | AI Project | sc500-lab3c-foundry | Foundry project for content safety |
-| Model Deployment | gpt-4o | Language model endpoint |
+| Model Deployment | gpt-5.4-mini | Language model endpoint |
 | APIM API | sc500-foundry-api | API routing to Foundry model |
 
 ---

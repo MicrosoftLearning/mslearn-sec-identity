@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "metadata": {
-    "description": "SC-500 Lab 3C - Configure AI Gateway and Foundry Security Controls - Setup Template. This template provisions an Azure API Management instance, Azure AI Foundry hub and project, Azure OpenAI service with gpt-4o deployment, and configures the APIM API to route to the Foundry model endpoint in an intentionally unsecured state for students to remediate."
+    "description": "SC-500 Lab 3C - Configure AI Gateway and Foundry Security Controls - Setup Template. This template provisions an Azure API Management instance, Azure AI Foundry hub and project, Azure OpenAI service with gpt-5.4-mini deployment, and configures the APIM API to route to the Foundry model endpoint in an intentionally unsecured state for students to remediate."
   },
   "parameters": {
     "location": {
@@ -58,9 +58,9 @@
     "keyVaultName": "[concat('sc500-kv-', parameters('labInstanceId'))]",
     "appInsightsName": "sc500-lab3c-insights",
     "logAnalyticsName": "sc500-lab3c-logs",
-    "modelDeploymentName": "gpt-4o",
-    "modelName": "gpt-4o",
-    "modelVersion": "2024-08-06",
+    "modelDeploymentName": "gpt-5.4-mini",
+    "modelName": "gpt-5.4-mini",
+    "modelVersion": "2026-03-17",
     "apiName": "sc500-foundry-api"
   },
   "resources": [
@@ -307,7 +307,7 @@
               ],
               "properties": {
                 "displayName": "SC500 Foundry API",
-                "description": "Pre-configured API routing to Azure OpenAI gpt-4o deployment for SC-500 Lab 3C. Initially unsecured - students will apply rate limiting, subscription key authentication, and content safety controls.",
+                "description": "Pre-configured API routing to Azure OpenAI gpt-5.4-mini deployment for SC-500 Lab 3C. Initially unsecured - students will apply rate limiting, subscription key authentication, and content safety controls.",
                 "subscriptionRequired": false,
                 "path": "sc500-foundry-api",
                 "protocols": [ "https" ],
@@ -389,7 +389,7 @@
     },
     "setupInstructions": {
       "type": "string",
-      "value": "The infrastructure has been deployed. IMPORTANT: The Azure AI Foundry project requires additional configuration: 1) Navigate to https://ai.azure.com and select the sc500-lab3c-foundry project. 2) Add a connection to the Azure OpenAI service. 3) Ensure the gpt-4o deployment is visible in Models + endpoints. The API Management API (sc500-foundry-api) is intentionally configured with NO subscription requirement and NO rate limit policy - students will apply these controls during the lab."
+      "value": "The infrastructure has been deployed. IMPORTANT: The Azure AI Foundry project requires additional configuration: 1) Navigate to https://ai.azure.com and select the sc500-lab3c-foundry project. 2) Add a connection to the Azure OpenAI service. 3) Ensure the gpt-5.4-mini deployment is visible in Models + endpoints. The API Management API (sc500-foundry-api) is intentionally configured with NO subscription requirement and NO rate limit policy - students will apply these controls during the lab."
     }
   }
 }

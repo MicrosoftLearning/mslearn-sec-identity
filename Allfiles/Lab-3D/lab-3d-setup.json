@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "metadata": {
-    "description": "SC-500 Lab 3D - Monitor AI Security with Defender for Cloud - Setup Template. This template provisions an Azure AI Foundry hub and project with Azure OpenAI service (gpt-4o) in an intentionally unsecured state with NO content filters, enables Defender for AI Services, and prepares the environment for adversarial traffic generation. IMPORTANT: After deployment, run generate-adversarial-traffic.ps1 and wait 24+ hours before lab delivery for Defender findings to populate."
+    "description": "SC-500 Lab 3D - Monitor AI Security with Defender for Cloud - Setup Template. This template provisions an Azure AI Foundry hub and project with Azure OpenAI service (gpt-5.4-mini) in an intentionally unsecured state with NO content filters, enables Defender for AI Services, and prepares the environment for adversarial traffic generation. IMPORTANT: After deployment, run generate-adversarial-traffic.ps1 and wait 24+ hours before lab delivery for Defender findings to populate."
   },
   "parameters": {
     "location": {
@@ -50,9 +50,9 @@
     "keyVaultName": "[concat('sc500-3d-kv-', parameters('labInstanceId'))]",
     "appInsightsName": "sc500-lab3d-insights",
     "logAnalyticsName": "sc500-lab3d-logs",
-    "modelDeploymentName": "gpt-4o",
-    "modelName": "gpt-4o",
-    "modelVersion": "2024-08-06"
+    "modelDeploymentName": "gpt-5.4-mini",
+    "modelName": "gpt-5.4-mini",
+    "modelVersion": "2026-03-17"
   },
   "resources": [
     {
@@ -309,7 +309,7 @@
     },
     "nextSteps": {
       "type": "string",
-      "value": "CRITICAL POST-DEPLOYMENT STEPS: 1) Enable Defender for AI Services in Microsoft Defender for Cloud. 2) Navigate to Azure AI Foundry portal (ai.azure.com) and verify NO content filter is assigned to gpt-4o (or set to 'None'). 3) Run generate-adversarial-traffic.ps1 with the endpoint URL and API key from deployment outputs. 4) WAIT AT LEAST 24 HOURS after running the script before lab delivery. 5) Verify at least 2 security findings appear in Defender for Cloud > Data and AI security before marking environment as ready."
+      "value": "CRITICAL POST-DEPLOYMENT STEPS: 1) Enable Defender for AI Services in Microsoft Defender for Cloud. 2) Navigate to Azure AI Foundry portal (ai.azure.com) and verify NO content filter is assigned to gpt-5.4-mini (or set to 'None'). 3) Run generate-adversarial-traffic.ps1 with the endpoint URL and API key from deployment outputs. 4) WAIT AT LEAST 24 HOURS after running the script before lab delivery. 5) Verify at least 2 security findings appear in Defender for Cloud > Data and AI security before marking environment as ready."
     }
   }
 }

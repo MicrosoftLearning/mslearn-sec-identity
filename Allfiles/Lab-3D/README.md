@@ -18,7 +18,7 @@ The `lab-3d-setup.json` ARM template provisions the following resources in the *
 
 ### Core Infrastructure
 - **Azure OpenAI Service** (`sc500-lab3d-ai-{instanceId}`)
-  - gpt-4o model deployment with 20 TPM capacity
+  - gpt-5.4-mini model deployment with 20 TPM capacity
   - **INTENTIONALLY NO CUSTOM CONTENT FILTER** (uses default or none)
   
 - **Azure AI Foundry Hub** (`sc500-lab3d-hub-{instanceId}`)
@@ -110,7 +110,7 @@ This is critical - content filters block adversarial queries before they reach t
 1. Navigate to [Azure AI Foundry portal](https://ai.azure.com)
 2. Select the **sc500-lab3d-foundry** project
 3. In left navigation, select **Safety + security** > **Content filters**
-4. Verify **gpt-4o** deployment shows:
+4. Verify **gpt-5.4-mini** deployment shows:
    - Content filter: **Default** or **None** (NOT a custom filter with Medium/High thresholds)
    - If a custom filter is assigned, remove it or set it to "None"
 
@@ -128,7 +128,7 @@ You'll need these values to run the adversarial traffic script.
 
 4. Construct the full endpoint URL:
    ```
-   https://sc500-lab3d-ai-{instanceId}.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-01
+   https://sc500-lab3d-ai-{instanceId}.openai.azure.com/openai/deployments/gpt-5.4-mini/chat/completions?api-version=2024-02-01
    ```
 
 Alternatively, check the deployment outputs:
@@ -146,7 +146,7 @@ This script sends 15 adversarial queries (5 jailbreak attempts, 5 prompt injecti
 
    ```powershell
    .\generate-adversarial-traffic.ps1 `
-       -EndpointUrl "https://sc500-lab3d-ai-{instanceId}.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-01" `
+       -EndpointUrl "https://sc500-lab3d-ai-{instanceId}.openai.azure.com/openai/deployments/gpt-5.4-mini/chat/completions?api-version=2024-02-01" `
        -ApiKey "YOUR_API_KEY_HERE"
    ```
 
@@ -209,18 +209,18 @@ Students do NOT configure or fix anything in this lab - they only observe and in
 - Adversarial traffic script failed → Check script output for HTTP 400/403 errors
 
 **Solution:**
-1. Verify NO content filter is assigned to gpt-4o
+1. Verify NO content filter is assigned to gpt-5.4-mini
 2. Re-run `generate-adversarial-traffic.ps1`
 3. Wait another 24 hours
 4. If still no findings, check Defender for Cloud > Workload protections > AI services coverage
 
 ### Issue: Script returns "HTTP 403 blocked by content filter"
-**Solution:** Content filter is active. Navigate to ai.azure.com > sc500-lab3d-foundry > Safety + security > Content filters and remove any custom filter assigned to gpt-4o. Set to "None" or "Default" (with all thresholds off).
+**Solution:** Content filter is active. Navigate to ai.azure.com > sc500-lab3d-foundry > Safety + security > Content filters and remove any custom filter assigned to gpt-5.4-mini. Set to "None" or "Default" (with all thresholds off).
 
 ### Issue: Defender for AI Services shows "Not enabled"
 **Solution:** Navigate to Defender for Cloud > Environment settings > [Your subscription] > Defender plans > AI Services → Set to "On" → Save.
 
-### Issue: gpt-4o deployment fails during ARM template deployment
+### Issue: gpt-5.4-mini deployment fails during ARM template deployment
 **Solution:** Check Azure OpenAI quota for the subscription. The model requires at least 20 TPM capacity. Request quota increase if needed.
 
 ## Cleanup
@@ -242,7 +242,7 @@ Also disable Defender for AI Services if no longer needed:
 |-------|------|--------|
 | T+0 hours | Deploy ARM template | Deploy lab-3d-setup.json via Azure Portal |
 | T+15 minutes | Enable Defender for AI | Manually enable in Defender for Cloud if not auto-enabled |
-| T+20 minutes | Verify content filter state | Confirm NO custom filter on gpt-4o |
+| T+20 minutes | Verify content filter state | Confirm NO custom filter on gpt-5.4-mini |
 | T+25 minutes | Run adversarial traffic script | Execute generate-adversarial-traffic.ps1 (15 queries, ~15 seconds) |
 | **T+24 hours** | **Verify findings** | **Check Defender for Cloud > Data and AI security for 2+ findings** |
 | T+36 hours | Re-run if needed | If <2 findings, re-run script and wait 12 more hours |
