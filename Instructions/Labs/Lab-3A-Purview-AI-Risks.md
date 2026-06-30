@@ -29,9 +29,34 @@ This exercise should take approximately **45** minutes to complete.
 
 ---
 
+## Prerequisites and Setup
+
+> **Important**: This lab requires a pre-configured SharePoint site named **sc500-ai-datastore** with oversharing permissions and sample sensitive documents. 
+
+### Setup Required Before Starting This Lab
+
+**Option 1 - Automated Setup (Recommended)**:
+1. Download the setup script from `Allfiles\Lab-3A\lab-3a-setup.ps1`
+2. Run in PowerShell 7:
+   ```powershell
+   .\lab-3a-setup.ps1 -TenantUrl "https://YOUR-TENANT.sharepoint.com"
+   ```
+3. Wait 2-3 minutes for completion
+
+**Option 2 - Manual Setup**:
+- Follow the detailed instructions in `Allfiles\Lab-3A\README.md`
+
+**Option 3 - Skillable Environment**:
+- If using Skillable Cloud Slice, the site may be pre-provisioned for you
+- Verify by navigating to `https://YOUR-TENANT.sharepoint.com/sites/sc500-ai-datastore`
+
+**Timing Note**: Purview DSPM signals can take 24-48 hours to fully populate after site creation. In a lab environment, you can proceed immediately to explore the dashboard structure, though some risk signals may still be processing.
+
+---
+
 ## Open the Purview Data Security Posture Management dashboard
 
-1. Sign in to the [Microsoft Purview compliance portal](https://purview.microsoft.com) using your **Global Administrator** credentials.
+1. Sign in to the **Microsoft Purview compliance portal** `https://purview.microsoft.com` using your **User-1** credentials.
 
 1. Select **Solutions** > **DSPM for AI (classic)**.
 

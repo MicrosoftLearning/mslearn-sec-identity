@@ -37,7 +37,7 @@ This exercise should take approximately **60** minutes to complete.
 
 Every Copilot Studio agent is registered in Microsoft Entra ID as a distinct identity type — separate from users, service principals, and managed identities. Before applying security controls, you need to understand what an agent identity object looks like in the directory.
 
-1. Sign in to the [Microsoft Entra admin center](https://entra.microsoft.com) using your **Global Administrator** credentials.
+1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using your **Administrator** credentials.
 
 1. In the left navigation, browse to **Entra ID** > **Agents** > **Agent identities**.
 
@@ -62,6 +62,8 @@ Every Copilot Studio agent is registered in Microsoft Entra ID as a distinct ide
     > **Note**: The dual-object model is the most important concept in this lab. Every Entra Agent ID has an **agent identity** service principal (what you found under Agent identities) and, in some cases, an **agent's user account** (what you found in All Users). These are two distinct directory objects that require two different Conditional Access policy targets. More critically: any existing CA policy that targets **All users** — including your organization's baseline MFA policy — will also hit the agent's user account. Since the agent cannot fulfill an MFA challenge, an "All users, require MFA" policy will block the agent entirely. Designing around this is part of the next task.
 
 ---
+
+# RobertS - no conditional access access in Cloud Slice
 
 ## Create Conditional Access policies for agent identities
 
@@ -137,7 +139,7 @@ You will create two policies: one for agent identities (the service principal ob
 
 A blast radius analysis answers the question: *if this agent identity were compromised right now, what could an attacker do with it?* Defender XDR indexes the agent's configured connections and maps the data sources, user accounts, and services the agent can reach — producing a concrete, enumerable risk assessment.
 
-1. Open a new browser tab and navigate to [Microsoft Defender XDR](https://security.microsoft.com).
+1. Open a new browser tab and navigate to **Microsoft Defender XDR** at `https://security.microsoft.com`.
 
 1. In the left navigation, expand **Assets** and select **Identities**.
 
