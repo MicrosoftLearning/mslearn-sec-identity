@@ -37,8 +37,6 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. Close the browser.
 
-1. Close the browser.
-
 ===
 
 
@@ -79,7 +77,7 @@ Before applying any controls, confirm the current state of the pre-provisioned e
 
 1. In the search bar, search for and select **API Management services**.
 
-1. Select **sc500-lab3c-apim** to open the API Management instance.
+1. Select **sc500-lab3c-apim-@lab.LabInstance.Id** to open the API Management instance.
 
 1. In the left menu, under **APIs**, select **APIs**.
 
@@ -119,7 +117,7 @@ Azure API Management provides AI Gateway policies that are purpose-built for lan
 
 The policy XML for this lab is provided in the **Lab3-resources** folder. You will paste it directly into the APIM policy editor — you do not need to author policy XML from memory.
 
-1. In the Azure portal, navigate back to **sc500-lab3c-apim > APIs > sc500-foundry-api**.
+1. In the Azure portal, navigate back to **sc500-lab3c-apim-@lab.LabInstance.Id > APIs > sc500-foundry-api**.
 
 1. Select the **Design** tab and select **All operations**.
 
@@ -209,7 +207,7 @@ With the token rate limit policy and subscription key authentication in place, v
 
     1. Open **Cloud Shell** from the Azure portal toolbar (the `>_` icon).
 
-    1. In the Cloud Shell prompt, run the following command, replacing `<your-key>` with your subscription key and `<your-apim-gateway-url>` with your APIM gateway URL (visible on the sc500-lab3c-apim overview page under **Gateway URL**):
+    1. In the Cloud Shell prompt, run the following command, replacing `<your-key>` with your subscription key and `<your-apim-gateway-url>` with your APIM gateway URL (visible on the sc500-lab3c-apim-@lab.LabInstance.Id overview page under **Gateway URL**):
 
         ```bash
         for i in {1..10}; do curl -s -o /dev/null -w "%{http_code}\n" -X POST "https://<your-apim-gateway-url>/sc500-foundry-api/chat/completions?api-version=2024-02-01" -H "Ocp-Apim-Subscription-Key: <your-key>" -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Summarize the security risks of unprotected AI endpoints in 100 words."}],"max_tokens":100}'; done

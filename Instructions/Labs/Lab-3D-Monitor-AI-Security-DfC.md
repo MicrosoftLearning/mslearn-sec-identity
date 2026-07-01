@@ -11,6 +11,36 @@ lab:
         - AI Security Monitoring
 ---
 
+# Lab Setup
+
+Lab profile - https://labondemand.com/LabProfile/217879
+
+   > **Note**: This lab has a 24-hour delay if you want to do more than simple configuration, with no output. The way the Defender for Cloud event collection works, it takes between 6 and 24 hours to process. If you want the full benefits of this lab the setup instructions in the README.md file in the Lab-3D folder have to be run a day in advance. This may not be possible in the classroom setting.  It will working in a Bring Your Own Subscription (BYOS) scenario, with the 24-hour delay.
+
+This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
+
+1. Open the **Azure Portal** at `https://portal.azure.com`.
+
+1. Log in with the **User-1** administrator role.
+
+1. In the **Search** bar find and open **Deploy a custom template**.
+   
+1. Select **Build your own template in the editor**.
+
+1. In the menu choose **Load file**.
+
+1. Select the file **lab-3d-setup.json** from the Desktop folder.
+
+1. Select **Save**.
+
+1. Select **Review + create**.
+
+    > **Note**: Deployment may take a few minutes to complete.
+
+1. Close the browser.
+
+===
+
 # Monitor AI Security with Defender for Cloud
 
 Your CISO wants a status report on the AI workload protections deployed this week: which AI resources are protected, what has Defender for Cloud detected, and what needs to be remediated first.

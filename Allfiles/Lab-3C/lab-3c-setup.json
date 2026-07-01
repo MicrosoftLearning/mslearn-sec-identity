@@ -50,7 +50,7 @@
   },
   "variables": {
     "resourceGroupName": "sc500-lab3c-rg",
-    "apimName": "sc500-lab3c-apim",
+    "apimName": "[concat('sc500-lab3c-apim-', parameters('labInstanceId'))]",
     "openAiName": "[concat('sc500-lab3c-ai-', parameters('labInstanceId'))]",
     "aiHubName": "[concat('sc500-lab3c-hub-', parameters('labInstanceId'))]",
     "aiProjectName": "sc500-lab3c-foundry",

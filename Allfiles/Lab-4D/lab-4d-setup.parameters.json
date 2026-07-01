@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "resourceGroupName": {
+      "value": "sc500-lab4d-rg"
+    },
+    "storageAccountName": {
+      "value": "sc500lab4dstorage"
+    },
+    "webAppName": {
+      "value": "sc500-lab4d-webapp"
+    },
+    "keyVaultName": {
+      "value": "sc500-lab4d-kv"
+    },
+    "virtualMachineName": {
+      "value": "sc500-lab4d-vm"
+    },
+    "vmAdminUsername": {
+      "value": "sc500vmadmin"
+    },
+    "vmAdminPassword": {
+      "value": "P@ssw0rd1234!ChangeMe"
+    },
+    "vmSize": {
+      "value": "Standard_D2s_v3"
+    },
+    "syntheticConnectionString": {
+      "value": "Server=sc500-db.database.windows.net;Database=AiWorkload;User Id=sqladmin;Password=Contoso@2026!;"
+    },
+    "keyVaultSecretValue": {
+      "value": "contoso-foundry-api-key-2026"
+    },
+    "configureDefenderPlans": {
+      "value": true
+    },
+    "webPlanSku": {
+      "value": "B1"
+    }
+  }
+}

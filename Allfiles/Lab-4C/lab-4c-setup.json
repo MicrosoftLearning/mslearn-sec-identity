@@ -1,0 +1,659 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Lab 4C setup template - pre-provisions Application Gateway with WAF in detection mode, Log Analytics diagnostics, App Service, Function App, API Management, and supporting network resources.",
+    "lab": "SC500-Lab4C",
+    "deployScope": "subscription",
+    "preProvisionedResources": [
+      "sc500-lab4c-rg (resource group)",
+      "sc500-lab4c-log (Log Analytics workspace)",
+      "sc500-lab4c-vnet with agw-subnet, appsvc-allowed-subnet, and func-allowed-subnet",
+      "sc500-lab4c-webapp (App Service)",
+      "sc500-lab4c-func (Function App)",
+      "sc500-lab4c-apim (API Management with preconfigured API)",
+      "sc500-lab4c-waf (WAF policy in Detection mode)",
+      "sc500-lab4c-agw (Application Gateway with WAF policy attached)",
+      "Diagnostics from Application Gateway to Log Analytics workspace"
+    ],
+    "studentCreatedOrModifiedResources": [
+      "WAF mode changed from Detection to Prevention",
+      "App Service authentication enabled with Microsoft Entra ID",
+      "Access restrictions for App Service and Function App",
+      "API subscription requirement enabled and key-based test validation"
+    ],
+    "deployCommand": "az deployment sub create --location eastus --template-file lab-4c-setup.json"
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for Lab 4C resources."
+      }
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4c-rg",
+      "metadata": {
+        "description": "Resource group for Lab 4C resources."
+      }
+    },
+    "applicationGatewayName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4c-agw",
+      "metadata": {
+        "description": "Application Gateway name."
+      }
+    },
+    "apiManagementName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4c-apim",
+      "metadata": {
+        "description": "API Management service name. Must be globally unique in Azure API Management DNS namespace."
+      }
+    },
+    "webAppName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4c-webapp",
+      "metadata": {
+        "description": "Web App name. Must be globally unique in azurewebsites.net namespace."
+      }
+    },
+    "functionAppName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4c-func",
+      "metadata": {
+        "description": "Function App name. Must be globally unique in azurewebsites.net namespace."
+      }
+    },
+    "functionStorageAccountName": {
+      "type": "string",
+      "defaultValue": "sc500lab4cfuncsa",
+      "metadata": {
+        "description": "Storage account for Function App. Must be globally unique, lowercase, 3-24 characters."
+      }
+    },
+    "logAnalyticsWorkspaceName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4c-log",
+      "metadata": {
+        "description": "Log Analytics workspace name."
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4c-vnet",
+      "metadata": {
+        "description": "Virtual network name."
+      }
+    },
+    "publisherEmail": {
+      "type": "string",
+      "defaultValue": "admin@contoso.com",
+      "metadata": {
+        "description": "Publisher email required by API Management."
+      }
+    },
+    "publisherName": {
+      "type": "string",
+      "defaultValue": "SC500 Lab",
+      "metadata": {
+        "description": "Publisher name required by API Management."
+      }
+    },
+    "appGatewaySkuName": {
+      "type": "string",
+      "defaultValue": "WAF_v2",
+      "metadata": {
+        "description": "Application Gateway SKU name."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('resourceGroupName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "lab": "SC500-Lab4C",
+        "purpose": "AppPlatformSecurity"
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "[format('{0}-resources', parameters('resourceGroupName'))]",
+      "resourceGroup": "[parameters('resourceGroupName')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/resourceGroups', parameters('resourceGroupName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "applicationGatewayName": {
+            "value": "[parameters('applicationGatewayName')]"
+          },
+          "apiManagementName": {
+            "value": "[toLower(parameters('apiManagementName'))]"
+          },
+          "webAppName": {
+            "value": "[toLower(parameters('webAppName'))]"
+          },
+          "functionAppName": {
+            "value": "[toLower(parameters('functionAppName'))]"
+          },
+          "functionStorageAccountName": {
+            "value": "[toLower(parameters('functionStorageAccountName'))]"
+          },
+          "logAnalyticsWorkspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "vnetName": {
+            "value": "[parameters('vnetName')]"
+          },
+          "publisherEmail": {
+            "value": "[parameters('publisherEmail')]"
+          },
+          "publisherName": {
+            "value": "[parameters('publisherName')]"
+          },
+          "appGatewaySkuName": {
+            "value": "[parameters('appGatewaySkuName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "applicationGatewayName": {
+              "type": "string"
+            },
+            "apiManagementName": {
+              "type": "string"
+            },
+            "webAppName": {
+              "type": "string"
+            },
+            "functionAppName": {
+              "type": "string"
+            },
+            "functionStorageAccountName": {
+              "type": "string"
+            },
+            "logAnalyticsWorkspaceName": {
+              "type": "string"
+            },
+            "vnetName": {
+              "type": "string"
+            },
+            "publisherEmail": {
+              "type": "string"
+            },
+            "publisherName": {
+              "type": "string"
+            },
+            "appGatewaySkuName": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "wafPolicyName": "sc500-lab4c-waf",
+            "appServicePlanName": "sc500-lab4c-webplan",
+            "applicationGatewayPublicIpName": "sc500-lab4c-agw-pip",
+            "agwSubnetName": "agw-subnet",
+            "appSvcSubnetName": "appsvc-allowed-subnet",
+            "funcSubnetName": "func-allowed-subnet",
+            "apiName": "lab4c-api",
+            "apiOperationName": "get-status",
+            "apiPath": "lab4c-api",
+            "webAppHostName": "[format('{0}.azurewebsites.net', parameters('webAppName'))]",
+            "agwSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), variables('agwSubnetName'))]",
+            "logWorkspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "[parameters('logAnalyticsWorkspaceName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "sku": {
+                  "name": "PerGB2018"
+                },
+                "retentionInDays": 30
+              }
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2023-11-01",
+              "name": "[parameters('vnetName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "10.45.0.0/16"
+                  ]
+                },
+                "subnets": [
+                  {
+                    "name": "[variables('agwSubnetName')]",
+                    "properties": {
+                      "addressPrefix": "10.45.1.0/24"
+                    }
+                  },
+                  {
+                    "name": "[variables('appSvcSubnetName')]",
+                    "properties": {
+                      "addressPrefix": "10.45.2.0/24",
+                      "serviceEndpoints": [
+                        {
+                          "service": "Microsoft.Web"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "[variables('funcSubnetName')]",
+                    "properties": {
+                      "addressPrefix": "10.45.3.0/24",
+                      "serviceEndpoints": [
+                        {
+                          "service": "Microsoft.Web"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2022-09-01",
+              "name": "[variables('appServicePlanName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "B1",
+                "tier": "Basic",
+                "size": "B1",
+                "capacity": 1
+              },
+              "kind": "app"
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('webAppName')]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+              ],
+              "kind": "app",
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                  "minTlsVersion": "1.2"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-01-01",
+              "name": "[parameters('functionStorageAccountName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "StorageV2",
+              "properties": {
+                "minimumTlsVersion": "TLS1_2",
+                "supportsHttpsTrafficOnly": true,
+                "allowBlobPublicAccess": false,
+                "publicNetworkAccess": "Enabled"
+              }
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('functionAppName')]",
+              "location": "[parameters('location')]",
+              "kind": "functionapp",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageAccountName'))]"
+              ],
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                  "minTlsVersion": "1.2",
+                  "appSettings": [
+                    {
+                      "name": "FUNCTIONS_EXTENSION_VERSION",
+                      "value": "~4"
+                    },
+                    {
+                      "name": "FUNCTIONS_WORKER_RUNTIME",
+                      "value": "dotnet"
+                    },
+                    {
+                      "name": "AzureWebJobsStorage",
+                      "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('functionStorageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('functionStorageAccountName')), '2023-01-01').keys[0].value, ';EndpointSuffix=', environment().suffixes.storage)]"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "Microsoft.ApiManagement/service",
+              "apiVersion": "2023-09-01-preview",
+              "name": "[parameters('apiManagementName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Consumption",
+                "capacity": 0
+              },
+              "properties": {
+                "publisherEmail": "[parameters('publisherEmail')]",
+                "publisherName": "[parameters('publisherName')]"
+              }
+            },
+            {
+              "type": "Microsoft.ApiManagement/service/apis",
+              "apiVersion": "2023-09-01-preview",
+              "name": "[format('{0}/{1}', parameters('apiManagementName'), variables('apiName'))]",
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagementName'))]",
+                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+              ],
+              "properties": {
+                "displayName": "Lab 4C API",
+                "path": "[variables('apiPath')]",
+                "protocols": [
+                  "https"
+                ],
+                "subscriptionRequired": false,
+                "serviceUrl": "[format('https://{0}', variables('webAppHostName'))]"
+              }
+            },
+            {
+              "type": "Microsoft.ApiManagement/service/apis/operations",
+              "apiVersion": "2023-09-01-preview",
+              "name": "[format('{0}/{1}/{2}', parameters('apiManagementName'), variables('apiName'), variables('apiOperationName'))]",
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiManagementName'), variables('apiName'))]"
+              ],
+              "properties": {
+                "displayName": "Get Status",
+                "method": "GET",
+                "urlTemplate": "/status",
+                "request": {
+                  "queryParameters": []
+                },
+                "responses": [
+                  {
+                    "statusCode": 200,
+                    "description": "OK"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2023-11-01",
+              "name": "[variables('applicationGatewayPublicIpName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard"
+              },
+              "properties": {
+                "publicIPAllocationMethod": "Static"
+              }
+            },
+            {
+              "type": "Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies",
+              "apiVersion": "2023-11-01",
+              "name": "[variables('wafPolicyName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "policySettings": {
+                  "state": "Enabled",
+                  "mode": "Detection",
+                  "requestBodyCheck": true,
+                  "maxRequestBodySizeInKb": 128,
+                  "fileUploadLimitInMb": 100
+                },
+                "managedRules": {
+                  "managedRuleSets": [
+                    {
+                      "ruleSetType": "OWASP",
+                      "ruleSetVersion": "3.2"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Network/applicationGateways",
+              "apiVersion": "2023-11-01",
+              "name": "[parameters('applicationGatewayName')]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('applicationGatewayPublicIpName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+                "[resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('wafPolicyName'))]",
+                "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+              ],
+              "properties": {
+                "sku": {
+                  "name": "[parameters('appGatewaySkuName')]",
+                  "tier": "WAF_v2",
+                  "capacity": 1
+                },
+                "gatewayIPConfigurations": [
+                  {
+                    "name": "appGatewayIpConfig",
+                    "properties": {
+                      "subnet": {
+                        "id": "[variables('agwSubnetId')]"
+                      }
+                    }
+                  }
+                ],
+                "frontendIPConfigurations": [
+                  {
+                    "name": "appGatewayFrontendIP",
+                    "properties": {
+                      "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('applicationGatewayPublicIpName'))]"
+                      }
+                    }
+                  }
+                ],
+                "frontendPorts": [
+                  {
+                    "name": "port_80",
+                    "properties": {
+                      "port": 80
+                    }
+                  }
+                ],
+                "backendAddressPools": [
+                  {
+                    "name": "appGatewayBackendPool",
+                    "properties": {
+                      "backendAddresses": [
+                        {
+                          "fqdn": "[variables('webAppHostName')]"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "backendHttpSettingsCollection": [
+                  {
+                    "name": "appGatewayBackendHttpSettings",
+                    "properties": {
+                      "port": 80,
+                      "protocol": "Http",
+                      "cookieBasedAffinity": "Disabled",
+                      "requestTimeout": 30,
+                      "pickHostNameFromBackendAddress": true
+                    }
+                  }
+                ],
+                "httpListeners": [
+                  {
+                    "name": "appGatewayHttpListener",
+                    "properties": {
+                      "frontendIPConfiguration": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', parameters('applicationGatewayName'), 'appGatewayFrontendIP')]"
+                      },
+                      "frontendPort": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/frontendPorts', parameters('applicationGatewayName'), 'port_80')]"
+                      },
+                      "protocol": "Http"
+                    }
+                  }
+                ],
+                "requestRoutingRules": [
+                  {
+                    "name": "rule1",
+                    "properties": {
+                      "ruleType": "Basic",
+                      "priority": 100,
+                      "httpListener": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/httpListeners', parameters('applicationGatewayName'), 'appGatewayHttpListener')]"
+                      },
+                      "backendAddressPool": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/backendAddressPools', parameters('applicationGatewayName'), 'appGatewayBackendPool')]"
+                      },
+                      "backendHttpSettings": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', parameters('applicationGatewayName'), 'appGatewayBackendHttpSettings')]"
+                      }
+                    }
+                  }
+                ],
+                "firewallPolicy": {
+                  "id": "[resourceId('Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies', variables('wafPolicyName'))]"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "name": "[format('{0}-diag', parameters('applicationGatewayName'))]",
+              "scope": "[resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName'))]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName'))]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName'))]"
+              ],
+              "properties": {
+                "workspaceId": "[reference(variables('logWorkspaceId'), '2022-10-01', 'full').id]",
+                "logs": [
+                  {
+                    "category": "ApplicationGatewayAccessLog",
+                    "enabled": true
+                  },
+                  {
+                    "category": "ApplicationGatewayPerformanceLog",
+                    "enabled": true
+                  },
+                  {
+                    "category": "ApplicationGatewayFirewallLog",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "AllMetrics",
+                    "enabled": true
+                  }
+                ]
+              }
+            }
+          ],
+          "outputs": {
+            "resourceGroupName": {
+              "type": "string",
+              "value": "[resourceGroup().name]"
+            },
+            "applicationGatewayName": {
+              "type": "string",
+              "value": "[parameters('applicationGatewayName')]"
+            },
+            "apiManagementName": {
+              "type": "string",
+              "value": "[parameters('apiManagementName')]"
+            },
+            "webAppName": {
+              "type": "string",
+              "value": "[parameters('webAppName')]"
+            },
+            "functionAppName": {
+              "type": "string",
+              "value": "[parameters('functionAppName')]"
+            },
+            "logAnalyticsWorkspaceName": {
+              "type": "string",
+              "value": "[parameters('logAnalyticsWorkspaceName')]"
+            },
+            "appGatewayPublicIp": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('applicationGatewayPublicIpName')), '2023-11-01').ipAddress]"
+            },
+            "webAllowedSubnetName": {
+              "type": "string",
+              "value": "[variables('appSvcSubnetName')]"
+            },
+            "funcAllowedSubnetName": {
+              "type": "string",
+              "value": "[variables('funcSubnetName')]"
+            },
+            "preconfiguredApiName": {
+              "type": "string",
+              "value": "[variables('apiName')]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "resourceGroupName": {
+      "type": "string",
+      "value": "[parameters('resourceGroupName')]"
+    },
+    "applicationGatewayName": {
+      "type": "string",
+      "value": "[parameters('applicationGatewayName')]"
+    },
+    "apiManagementName": {
+      "type": "string",
+      "value": "[toLower(parameters('apiManagementName'))]"
+    },
+    "webAppName": {
+      "type": "string",
+      "value": "[toLower(parameters('webAppName'))]"
+    },
+    "functionAppName": {
+      "type": "string",
+      "value": "[toLower(parameters('functionAppName'))]"
+    },
+    "logAnalyticsWorkspaceName": {
+      "type": "string",
+      "value": "[parameters('logAnalyticsWorkspaceName')]"
+    }
+  }
+}

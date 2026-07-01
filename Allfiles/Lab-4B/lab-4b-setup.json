@@ -1,0 +1,301 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Lab 4B setup template - pre-provisions AKS, ACR, and VNet resources for the Secure Container Workloads with AKS and Defender for Containers lab. Students enable Defender for Containers, review recommendations, configure ACR RBAC for user accounts, and restrict ACR network access during the lab. In tenants that block deployment script storage key auth, seed the sample image with the output az acr import command after deployment.",
+    "lab": "SC500-Lab4B",
+    "deployScope": "subscription",
+    "preProvisionedResources": [
+      "sc500-lab4b-rg (resource group)",
+      "sc500-lab4b-vnet (10.44.0.0/16 with aks-subnet 10.44.1.0/24)",
+      "sc500-lab4b-acr (Premium SKU, public network access enabled)",
+      "ACR ready for nginx:1.19.0-alpine import via post-deployment command",
+      "sc500-lab4b-aks (single-node AKS cluster in aks-subnet)"
+    ],
+    "studentCreatedOrModifiedResources": [
+      "Defender for Containers plan enabled at subscription scope",
+      "Defender recommendations review for sc500-lab4b-aks",
+      "AcrPull role assignment for sc500-user08",
+      "AcrPush role assignment for sc500-user09",
+      "ACR admin user disabled",
+      "ACR network access changed to selected networks with approved subnet"
+    ],
+    "deployCommand": "az deployment sub create --location eastus --template-file lab-4b-setup.json"
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for all resources."
+      }
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4b-rg",
+      "metadata": {
+        "description": "Resource group for Lab 4B resources."
+      }
+    },
+    "aksName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4b-aks",
+      "metadata": {
+        "description": "AKS cluster name."
+      }
+    },
+    "acrName": {
+      "type": "string",
+      "defaultValue": "sc500lab4bacr",
+      "metadata": {
+        "description": "ACR name (5-50 chars, alphanumeric only, globally unique)."
+      }
+    },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4b-vnet",
+      "metadata": {
+        "description": "Virtual network name."
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "aks-subnet",
+      "metadata": {
+        "description": "Subnet name used by AKS and for the later ACR networking task."
+      }
+    },
+    "kubernetesVersion": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional AKS version. Leave blank to use the region default."
+      }
+    },
+    "dnsPrefix": {
+      "type": "string",
+      "defaultValue": "sc500lab4b",
+      "metadata": {
+        "description": "DNS prefix for AKS API server endpoint."
+      }
+    },
+    "agentPoolVmSize": {
+      "type": "string",
+      "defaultValue": "Standard_DC2as_v5",
+      "metadata": {
+        "description": "AKS system node pool VM size. Set this to a size allowed in the target subscription and region."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('resourceGroupName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "lab": "SC500-Lab4B",
+        "purpose": "DefenderForContainers"
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "[format('{0}-resources', parameters('resourceGroupName'))]",
+      "resourceGroup": "[parameters('resourceGroupName')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/resourceGroups', parameters('resourceGroupName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "aksName": {
+            "value": "[parameters('aksName')]"
+          },
+          "acrName": {
+            "value": "[toLower(parameters('acrName'))]"
+          },
+          "vnetName": {
+            "value": "[parameters('vnetName')]"
+          },
+          "subnetName": {
+            "value": "[parameters('subnetName')]"
+          },
+          "kubernetesVersion": {
+            "value": "[parameters('kubernetesVersion')]"
+          },
+          "dnsPrefix": {
+            "value": "[parameters('dnsPrefix')]"
+          },
+          "agentPoolVmSize": {
+            "value": "[parameters('agentPoolVmSize')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "aksName": {
+              "type": "string"
+            },
+            "acrName": {
+              "type": "string"
+            },
+            "vnetName": {
+              "type": "string"
+            },
+            "subnetName": {
+              "type": "string"
+            },
+            "kubernetesVersion": {
+              "type": "string"
+            },
+            "dnsPrefix": {
+              "type": "string"
+            },
+            "agentPoolVmSize": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2023-11-01",
+              "name": "[parameters('vnetName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "10.44.0.0/16"
+                  ]
+                },
+                "subnets": [
+                  {
+                    "name": "[parameters('subnetName')]",
+                    "properties": {
+                      "addressPrefix": "10.44.1.0/24"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.ContainerRegistry/registries",
+              "apiVersion": "2023-11-01-preview",
+              "name": "[parameters('acrName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Premium"
+              },
+              "properties": {
+                "adminUserEnabled": true,
+                "publicNetworkAccess": "Enabled",
+                "networkRuleBypassOptions": "AzureServices",
+                "policies": {
+                  "quarantinePolicy": {
+                    "status": "disabled"
+                  },
+                  "trustPolicy": {
+                    "type": "Notary",
+                    "status": "disabled"
+                  }
+                }
+              }
+            },
+            {
+              "type": "Microsoft.ContainerService/managedClusters",
+              "apiVersion": "2024-01-01",
+              "name": "[parameters('aksName')]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+              ],
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "dnsPrefix": "[parameters('dnsPrefix')]",
+                "kubernetesVersion": "[if(equals(parameters('kubernetesVersion'), ''), json('null'), parameters('kubernetesVersion'))]",
+                "agentPoolProfiles": [
+                  {
+                    "name": "systempool",
+                    "count": 1,
+                    "vmSize": "[parameters('agentPoolVmSize')]",
+                    "osType": "Linux",
+                    "type": "VirtualMachineScaleSets",
+                    "mode": "System",
+                    "vnetSubnetID": "[variables('subnetId')]"
+                  }
+                ],
+                "networkProfile": {
+                  "networkPlugin": "azure",
+                  "loadBalancerSku": "standard"
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "resourceGroupName": {
+              "type": "string",
+              "value": "[resourceGroup().name]"
+            },
+            "aksName": {
+              "type": "string",
+              "value": "[parameters('aksName')]"
+            },
+            "acrName": {
+              "type": "string",
+              "value": "[parameters('acrName')]"
+            },
+            "vnetName": {
+              "type": "string",
+              "value": "[parameters('vnetName')]"
+            },
+            "subnetName": {
+              "type": "string",
+              "value": "[parameters('subnetName')]"
+            },
+            "seedImageCommand": {
+              "type": "string",
+              "value": "[format('az acr import --name {0} --source docker.io/library/nginx:1.19.0-alpine --image nginx:1.19.0-alpine --force', parameters('acrName'))]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "resourceGroupName": {
+      "type": "string",
+      "value": "[parameters('resourceGroupName')]"
+    },
+    "aksName": {
+      "type": "string",
+      "value": "[parameters('aksName')]"
+    },
+    "acrName": {
+      "type": "string",
+      "value": "[toLower(parameters('acrName'))]"
+    },
+    "vnetName": {
+      "type": "string",
+      "value": "[parameters('vnetName')]"
+    },
+    "seedImageCommand": {
+      "type": "string",
+      "value": "[format('az acr import --name {0} --source docker.io/library/nginx:1.19.0-alpine --image nginx:1.19.0-alpine --force', toLower(parameters('acrName')))]"
+    }
+  }
+}

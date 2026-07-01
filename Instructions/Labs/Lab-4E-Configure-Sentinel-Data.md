@@ -11,6 +11,14 @@ lab:
         - Automation rules and playbooks
 ---
 
+# Lab Setup
+
+Lab profile - Bring Your Own Subscription (BYOS) recommended. 
+
+This lab requires at least a Security Admin role to run. Most ALH hosted environments cannot provide this within their hosted lab environment. Please feel free to read over the steps to learn about the features and capabilities. If you have a personally available subscription with a Security Admin role and a Microsoft Sentinel license; the lab will work as built. Please use as needed. The Security Admin role has privileged access that can be used to exploit systems, so its use has to be limited.
+
+===
+
 # Configure Microsoft Sentinel Data Collection and Automation
 
 Your SOC cannot automate triage if data sources are disconnected and workflow actions are missing. In this lab, you will connect high-value Microsoft data sources, verify ingestion in the workspace, and configure an automation rule that drives a pre-built playbook.
@@ -31,27 +39,36 @@ This exercise should take approximately **45** minutes to complete.
 
 ---
 
-## Review / Create a Workspace for use in Microsoft Sentinel
+## Create a Log Analytics space
 
 1. Sign in to the **Azure portal** `https://portal.azure.com` with your Administrator account.
 
-2. Open **Microsoft Sentinel**.
+1. In the **Search resources...** bar, find and open `Log Analytics Workspaces`.
 
-3. Select workspace **sc500-lab4e-sentinel**.
+1. Select the **+ Create** option.
 
-4. Review the workspace overview and confirm the current baseline state (connectors and incidents).
+1. Create a **Workspace** with these settings:
+
+   - Subscription = **Use the default provided**
+   - Resource Group = **Create New** --> **lab4e-rg**
+   - Name = `sc500-lab4e-sentinel`
+   - Region = **Use the default**
+
+1. Select **Review + create**.
+
+1. When the validation finishes, select **Create**.
 
 ---
 
-## Add a Microsoft Sentinel instance to a Workspace
+## Review / Create a Workspace for use in Microsoft Sentinel
 
-1. If you are not already in Azure Portal, log in.
+1. Use the search bar to open `Microsoft Sentinel`.
 
-1. Open **Microsoft Sentinel**.
+1. Select workspace **sc500-lab4e-sentinel**.
 
-1. Select **Create** to add **Microsoft Sentinel** to your workspace.
+1. Use the **Add** button to attach Sentinel to the workspace.
 
-1. Select **sc500-lab4e-sentinel**, then select **Add**.
+1. Review the workspace overview and confirm the current baseline state (connectors and incidents).
 
 ---
 

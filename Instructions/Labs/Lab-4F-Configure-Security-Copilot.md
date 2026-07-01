@@ -11,6 +11,14 @@ lab:
         - Plugins and agents
 ---
 
+# Lab Setup
+
+Lab profile - Bring Your Own Subscription (BYOS). 
+
+This lab requires both a Security Admin role and a Global Admin role to run. Additionally, it requires access to SCUs, and a Microsoft Security Copilot license. Most ALH hosted environments cannot provide this within their hosted lab environment. Please feel free to read over the steps to learn about the features and capabilities. If you have a personally available subscription that meets the requirements, the lab will work as built. Please use as needed. The Global Admin and Security Admin roles have privileged access that can be used to exploit systems, so its use has to be limited.
+
+===
+
 # Configure and Use Microsoft Security Copilot
 
 You are preparing Security Copilot for operational use in a production security environment. The objective is not just to run prompts, but to set up capacity, permissions, data access, and plugin scope so Copilot can provide grounded, useful responses without unnecessary blast radius.

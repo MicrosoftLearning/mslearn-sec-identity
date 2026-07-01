@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "resourceGroupName": {
+      "value": "sc500-lab4b-rg"
+    },
+    "aksName": {
+      "value": "sc500-lab4b-aks"
+    },
+    "acrName": {
+      "value": "sc500lab4bacr"
+    },
+    "vnetName": {
+      "value": "sc500-lab4b-vnet"
+    },
+    "subnetName": {
+      "value": "aks-subnet"
+    },
+    "kubernetesVersion": {
+      "value": ""
+    },
+    "dnsPrefix": {
+      "value": "sc500lab4b"
+    },
+    "agentPoolVmSize": {
+      "value": "Standard_DC2as_v5"
+    }
+  }
+}

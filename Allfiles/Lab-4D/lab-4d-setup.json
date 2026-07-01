@@ -1,0 +1,574 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Lab 4D setup template - pre-provisions Defender for Cloud posture lab resources with intentional baseline findings.",
+    "lab": "SC500-Lab4D",
+    "deployScope": "subscription",
+    "notes": [
+      "This template provisions baseline resources and intentional posture gaps for lab activities.",
+      "Defender finding population (especially CSPM secret scanning and attack path analysis) can require 24+ hours after plan enablement.",
+      "If configureDefenderPlans is true, subscription-level Defender pricing resources are configured."
+    ],
+    "deployCommand": "az deployment sub create --location eastus --template-file lab-4d-setup.json"
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "eastus",
+      "metadata": {
+        "description": "Azure region for Lab 4D resources."
+      }
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4d-rg",
+      "metadata": {
+        "description": "Resource group for Lab 4D resources."
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "defaultValue": "sc500lab4dstorage",
+      "metadata": {
+        "description": "Storage account name for sc500-lab4d-storage (must be globally unique, lowercase, 3-24 chars)."
+      }
+    },
+    "webAppName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4d-webapp",
+      "metadata": {
+        "description": "Web App name (must be globally unique in azurewebsites.net)."
+      }
+    },
+    "keyVaultName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4d-kv",
+      "metadata": {
+        "description": "Key Vault name (must be globally unique)."
+      }
+    },
+    "virtualMachineName": {
+      "type": "string",
+      "defaultValue": "sc500-lab4d-vm",
+      "metadata": {
+        "description": "Virtual machine name."
+      }
+    },
+    "vmAdminUsername": {
+      "type": "string",
+      "defaultValue": "sc500vmadmin",
+      "metadata": {
+        "description": "Administrator username for the lab VM."
+      }
+    },
+    "vmAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Administrator password for the lab VM. Must meet Azure complexity requirements."
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D2s_v3",
+      "allowedValues": [
+        "Standard_B2s",
+        "Standard_B1ms",
+        "Standard_D2s_v3",
+        "Standard_D2s_v5",
+        "Standard_DS1_v2"
+      ],
+      "metadata": {
+        "description": "Virtual machine size for sc500-lab4d-vm."
+      }
+    },
+    "syntheticConnectionString": {
+      "type": "string",
+      "defaultValue": "Server=sc500-db.database.windows.net;Database=AiWorkload;User Id=sqladmin;Password=Contoso@2026!;",
+      "metadata": {
+        "description": "Synthetic credential-like connection string used to seed CSPM secret scanning for the web app."
+      }
+    },
+    "keyVaultSecretValue": {
+      "type": "securestring",
+      "defaultValue": "contoso-foundry-api-key-2026",
+      "metadata": {
+        "description": "Baseline Key Vault secret value for foundry-api-key."
+      }
+    },
+    "configureDefenderPlans": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "When true, enables required Defender plans (Storage, Key Vault, App Service, Servers, CSPM) at subscription scope."
+      }
+    },
+    "webPlanSku": {
+      "type": "string",
+      "defaultValue": "B1",
+      "allowedValues": [
+        "F1",
+        "B1",
+        "B2",
+        "B3"
+      ],
+      "metadata": {
+        "description": "App Service plan SKU for sc500-lab4d-webapp."
+      }
+    }
+  },
+  "variables": {
+    "webPlanName": "sc500-lab4d-webplan",
+    "vnetName": "sc500-lab4d-vnet",
+    "vmSubnetName": "vm-subnet",
+    "vmNsgName": "sc500-lab4d-vm-nsg",
+    "vmNicName": "sc500-lab4d-vm-nic",
+    "vmPublicIpName": "sc500-lab4d-vm-pip",
+    "keyVaultSecretName": "foundry-api-key",
+    "storagePricingName": "StorageAccounts",
+    "serversPricingName": "VirtualMachines",
+    "keyVaultPricingName": "KeyVaults",
+    "appServicePricingName": "AppServices",
+    "cspmPricingName": "CloudPosture"
+  },
+  "resources": [
+    {
+      "condition": "[parameters('configureDefenderPlans')]",
+      "type": "Microsoft.Security/pricings",
+      "apiVersion": "2024-01-01",
+      "name": "[variables('storagePricingName')]",
+      "properties": {
+        "pricingTier": "Standard"
+      }
+    },
+    {
+      "condition": "[parameters('configureDefenderPlans')]",
+      "type": "Microsoft.Security/pricings",
+      "apiVersion": "2024-01-01",
+      "name": "[variables('serversPricingName')]",
+      "properties": {
+        "pricingTier": "Standard",
+        "subPlan": "P2"
+      }
+    },
+    {
+      "condition": "[parameters('configureDefenderPlans')]",
+      "type": "Microsoft.Security/pricings",
+      "apiVersion": "2024-01-01",
+      "name": "[variables('keyVaultPricingName')]",
+      "properties": {
+        "pricingTier": "Standard"
+      }
+    },
+    {
+      "condition": "[parameters('configureDefenderPlans')]",
+      "type": "Microsoft.Security/pricings",
+      "apiVersion": "2024-01-01",
+      "name": "[variables('appServicePricingName')]",
+      "properties": {
+        "pricingTier": "Standard"
+      }
+    },
+    {
+      "condition": "[parameters('configureDefenderPlans')]",
+      "type": "Microsoft.Security/pricings",
+      "apiVersion": "2024-01-01",
+      "name": "[variables('cspmPricingName')]",
+      "properties": {
+        "pricingTier": "Standard"
+      }
+    },
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2021-04-01",
+      "name": "[parameters('resourceGroupName')]",
+      "location": "[parameters('location')]",
+      "tags": {
+        "lab": "SC500-Lab4D",
+        "purpose": "DefenderCSPM"
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "[format('{0}-resources', parameters('resourceGroupName'))]",
+      "resourceGroup": "[parameters('resourceGroupName')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/resourceGroups', parameters('resourceGroupName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "storageAccountName": {
+            "value": "[toLower(parameters('storageAccountName'))]"
+          },
+          "webAppName": {
+            "value": "[toLower(parameters('webAppName'))]"
+          },
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          },
+          "virtualMachineName": {
+            "value": "[parameters('virtualMachineName')]"
+          },
+          "vmAdminUsername": {
+            "value": "[parameters('vmAdminUsername')]"
+          },
+          "vmAdminPassword": {
+            "value": "[parameters('vmAdminPassword')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "syntheticConnectionString": {
+            "value": "[parameters('syntheticConnectionString')]"
+          },
+          "keyVaultSecretValue": {
+            "value": "[parameters('keyVaultSecretValue')]"
+          },
+          "webPlanSku": {
+            "value": "[parameters('webPlanSku')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "webAppName": {
+              "type": "string"
+            },
+            "keyVaultName": {
+              "type": "string"
+            },
+            "virtualMachineName": {
+              "type": "string"
+            },
+            "vmAdminUsername": {
+              "type": "string"
+            },
+            "vmAdminPassword": {
+              "type": "securestring"
+            },
+            "vmSize": {
+              "type": "string"
+            },
+            "syntheticConnectionString": {
+              "type": "string"
+            },
+            "keyVaultSecretValue": {
+              "type": "securestring"
+            },
+            "webPlanSku": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "webPlanName": "sc500-lab4d-webplan",
+            "vnetName": "sc500-lab4d-vnet",
+            "vmSubnetName": "vm-subnet",
+            "vmNsgName": "sc500-lab4d-vm-nsg",
+            "vmNicName": "sc500-lab4d-vm-nic",
+            "vmPublicIpName": "sc500-lab4d-vm-pip",
+            "keyVaultSecretName": "foundry-api-key",
+            "vmSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnetName'), variables('vmSubnetName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-01-01",
+              "name": "[parameters('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "StorageV2",
+              "properties": {
+                "publicNetworkAccess": "Enabled",
+                "allowBlobPublicAccess": true,
+                "minimumTlsVersion": "TLS1_2",
+                "supportsHttpsTrafficOnly": true
+              }
+            },
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2022-09-01",
+              "name": "[variables('webPlanName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "[parameters('webPlanSku')]",
+                "tier": "[if(equals(parameters('webPlanSku'), 'F1'), 'Free', 'Basic')]",
+                "size": "[parameters('webPlanSku')]",
+                "capacity": 1
+              },
+              "kind": "app"
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2022-09-01",
+              "name": "[parameters('webAppName')]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('webPlanName'))]"
+              ],
+              "kind": "app",
+              "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('webPlanName'))]",
+                "httpsOnly": true,
+                "siteConfig": {
+                  "minTlsVersion": "1.2",
+                  "appSettings": [
+                    {
+                      "name": "DatabaseConnectionString",
+                      "value": "[parameters('syntheticConnectionString')]"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2023-07-01",
+              "name": "[parameters('keyVaultName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                  "family": "A",
+                  "name": "standard"
+                },
+                "enableRbacAuthorization": true,
+                "enabledForTemplateDeployment": true,
+                "publicNetworkAccess": "Enabled",
+                "networkAcls": {
+                  "bypass": "AzureServices",
+                  "defaultAction": "Allow"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.KeyVault/vaults/secrets",
+              "apiVersion": "2023-07-01",
+              "name": "[format('{0}/{1}', parameters('keyVaultName'), variables('keyVaultSecretName'))]",
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              ],
+              "properties": {
+                "value": "[parameters('keyVaultSecretValue')]"
+              }
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2023-11-01",
+              "name": "[variables('vnetName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "10.46.0.0/16"
+                  ]
+                },
+                "subnets": [
+                  {
+                    "name": "[variables('vmSubnetName')]",
+                    "properties": {
+                      "addressPrefix": "10.46.1.0/24"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2023-11-01",
+              "name": "[variables('vmNsgName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "Allow-RDP-Internet",
+                    "properties": {
+                      "priority": 100,
+                      "access": "Allow",
+                      "direction": "Inbound",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "3389",
+                      "sourceAddressPrefix": "0.0.0.0/0",
+                      "destinationAddressPrefix": "*"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2023-11-01",
+              "name": "[variables('vmPublicIpName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard"
+              },
+              "properties": {
+                "publicIPAllocationMethod": "Static"
+              }
+            },
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2023-11-01",
+              "name": "[variables('vmNicName')]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vmNsgName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmPublicIpName'))]"
+              ],
+              "properties": {
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('vmNsgName'))]"
+                },
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "privateIPAllocationMethod": "Dynamic",
+                      "subnet": {
+                        "id": "[variables('vmSubnetId')]"
+                      },
+                      "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('vmPublicIpName'))]"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2023-09-01",
+              "name": "[parameters('virtualMachineName')]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('vmNicName'))]"
+              ],
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                  "computerName": "sc500lab4dvm",
+                  "adminUsername": "[parameters('vmAdminUsername')]",
+                  "adminPassword": "[parameters('vmAdminPassword')]",
+                  "windowsConfiguration": {
+                    "provisionVMAgent": true,
+                    "enableAutomaticUpdates": true
+                  }
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "publisher": "MicrosoftWindowsServer",
+                    "offer": "WindowsServer",
+                    "sku": "2022-datacenter-azure-edition",
+                    "version": "latest"
+                  },
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "Standard_LRS"
+                    }
+                  }
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmNicName'))]"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2023-09-01",
+              "name": "[format('{0}/AzureMonitorWindowsAgent', parameters('virtualMachineName'))]",
+              "location": "[parameters('location')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachineName'))]"
+              ],
+              "properties": {
+                "publisher": "Microsoft.Azure.Monitor",
+                "type": "AzureMonitorWindowsAgent",
+                "typeHandlerVersion": "1.23",
+                "autoUpgradeMinorVersion": true,
+                "settings": {}
+              }
+            }
+          ],
+          "outputs": {
+            "storageAccountName": {
+              "type": "string",
+              "value": "[parameters('storageAccountName')]"
+            },
+            "webAppName": {
+              "type": "string",
+              "value": "[parameters('webAppName')]"
+            },
+            "keyVaultName": {
+              "type": "string",
+              "value": "[parameters('keyVaultName')]"
+            },
+            "virtualMachineName": {
+              "type": "string",
+              "value": "[parameters('virtualMachineName')]"
+            },
+            "vmPublicIp": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('vmPublicIpName')), '2023-11-01').ipAddress]"
+            },
+            "seededAppSettingName": {
+              "type": "string",
+              "value": "DatabaseConnectionString"
+            },
+            "seededKeyVaultSecretName": {
+              "type": "string",
+              "value": "[variables('keyVaultSecretName')]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "resourceGroupName": {
+      "type": "string",
+      "value": "[parameters('resourceGroupName')]"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "value": "[toLower(parameters('storageAccountName'))]"
+    },
+    "webAppName": {
+      "type": "string",
+      "value": "[toLower(parameters('webAppName'))]"
+    },
+    "keyVaultName": {
+      "type": "string",
+      "value": "[parameters('keyVaultName')]"
+    },
+    "virtualMachineName": {
+      "type": "string",
+      "value": "[parameters('virtualMachineName')]"
+    }
+  }
+}

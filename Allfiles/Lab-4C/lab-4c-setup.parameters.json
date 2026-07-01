@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "eastus"
+    },
+    "resourceGroupName": {
+      "value": "sc500-lab4c-rg"
+    },
+    "applicationGatewayName": {
+      "value": "sc500-lab4c-agw"
+    },
+    "apiManagementName": {
+      "value": "sc500-lab4c-apim"
+    },
+    "webAppName": {
+      "value": "sc500-lab4c-webapp"
+    },
+    "functionAppName": {
+      "value": "sc500-lab4c-func"
+    },
+    "functionStorageAccountName": {
+      "value": "sc500lab4cfuncsa"
+    },
+    "logAnalyticsWorkspaceName": {
+      "value": "sc500-lab4c-log"
+    },
+    "vnetName": {
+      "value": "sc500-lab4c-vnet"
+    },
+    "publisherEmail": {
+      "value": "admin@contoso.com"
+    },
+    "publisherName": {
+      "value": "SC500 Lab"
+    },
+    "appGatewaySkuName": {
+      "value": "WAF_v2"
+    }
+  }
+}

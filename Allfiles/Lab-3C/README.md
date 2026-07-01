@@ -26,7 +26,7 @@ The `lab-3c-setup.json` ARM template provisions the following resources in the *
 - **Azure AI Foundry Project** (`sc500-lab3c-foundry`)
   - Project workspace where students configure content safety guardrails
   
-- **Azure API Management** (`sc500-lab3c-apim`)
+- **Azure API Management** (`sc500-lab3c-apim-{instanceId}`)
   - Consumption tier APIM instance
   - Pre-registered API: `sc500-foundry-api`
   - **Intentionally unsecured state:**
@@ -109,7 +109,7 @@ The ARM template creates the AI Foundry project, but the connection to Azure Ope
 6. Navigate to **Safety + security** > **Content filters** and confirm no custom filter is assigned to gpt-5.4-mini (should use "Default" or "None")
 
 ### 3. Verify API Management API Configuration
-1. Navigate to **sc500-lab3c-apim** > **APIs**
+1. Navigate to **sc500-lab3c-apim-{instanceId}** > **APIs**
 2. Select **sc500-foundry-api**
 3. Verify the **Settings** tab shows:
    - ✅ **Subscription required**: **Not required** (this is intentional - students enable it)
@@ -153,7 +153,7 @@ Once deployment and verification are complete, students will:
 **Solution:** Check Azure OpenAI quota for the subscription. The model requires at least 10 TPM capacity. Request quota increase if needed.
 
 ### Issue: Students receive 403 when testing APIM API
-**Solution:** Verify the backend configuration in APIM includes the Azure OpenAI API key in the `api-key` header. Check `sc500-lab3c-apim` > **Backends** > **openai-backend**.
+**Solution:** Verify the backend configuration in APIM includes the Azure OpenAI API key in the `api-key` header. Check `sc500-lab3c-apim-{instanceId}` > **Backends** > **openai-backend**.
 
 ## Cleanup
 
@@ -175,7 +175,7 @@ az group delete --name sc500-lab3c-rg --yes --no-wait
 | Resource Type | Resource Name | Purpose |
 |--------------|---------------|---------|
 | Resource Group | sc500-lab3c-rg | Contains all lab resources |
-| API Management | sc500-lab3c-apim | AI Gateway for rate limiting and auth |
+| API Management | sc500-lab3c-apim-{instanceId} | AI Gateway for rate limiting and auth |
 | Azure OpenAI | sc500-lab3c-ai-{instanceId} | Hosts gpt-5.4-mini model |
 | AI Hub | sc500-lab3c-hub-{instanceId} | Foundry hub workspace |
 | AI Project | sc500-lab3c-foundry | Foundry project for content safety |
