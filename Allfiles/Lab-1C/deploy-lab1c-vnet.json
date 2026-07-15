@@ -112,7 +112,14 @@
                   ]
                 }
               ],
-              "delegations": [],
+              "delegations": [
+                {
+                  "name": "delegation-webserverfarms",
+                  "properties": {
+                    "serviceName": "Microsoft.Web/serverFarms"
+                  }
+                }
+              ],
               "privateEndpointNetworkPolicies": "Disabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
