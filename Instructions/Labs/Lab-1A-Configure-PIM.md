@@ -12,16 +12,7 @@ lab:
 
 # Lab Setup
 
-This lab runs on a Skillable-provided Microsoft 365 E5 tenant. In the Entra admin center the tenant is displayed as **Contoso** with a domain of the form `*.onmicrosoft.com` — the exact domain is unique per lab instance and is shown on the **Resources** tab in the lab console.
-
-You will use two of the seeded accounts:
-
-| Role in this lab | Account |
-|------------------|---------|
-| Global Administrator (assigns the role and approves activation) | **MOD Administrator** — `admin@<your-tenant>.onmicrosoft.com` |
-| End user who requests activation of the role | **Adele Vance** — `AdeleV@<your-tenant>.OnMicrosoft.com` |
-
-Both accounts share the **User Password** shown on the Resources tab in the Skillable lab console. No additional configuration is required.
+This lab runs on a M365 Tenant with no special configuration needed.
 
 ===
 

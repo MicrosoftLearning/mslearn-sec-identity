@@ -13,16 +13,7 @@ lab:
 
 # Lab Setup
 
-This lab runs on a Skillable-provided Microsoft 365 E5 tenant. In the Entra admin center the tenant is displayed as **Contoso** with a domain of the form `*.onmicrosoft.com` — the exact domain is unique per lab instance and is shown on the **Resources** tab in the lab console.
-
-You will use two of the seeded accounts:
-
-| Role in this lab | Account |
-|------------------|---------|
-| Global Administrator (creates and tests the CA policy) | **MOD Administrator** — `admin@<your-tenant>.onmicrosoft.com` |
-| Target user for the MFA policy | **Adele Vance** — `AdeleV@<your-tenant>.OnMicrosoft.com` |
-
-Both accounts share the **User Password** shown on the Resources tab. **Adele Vance has no pre-registered MFA method** — when the Conditional Access policy triggers, she will be prompted to register a method (Microsoft Authenticator, phone SMS, or voice call) using your own device. This is by design and demonstrates the real-world "first sign-in after CA policy applies" flow.
+This lab runs on a M365 Tenant with no special configuration needed.
 
 ===
 
