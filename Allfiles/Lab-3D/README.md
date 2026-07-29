@@ -55,7 +55,7 @@ Lab 3D is a **monitoring and detection lab**, not a configuration lab. Students 
 6. Configure parameters:
    - **Subscription**: Select the lab subscription
    - **Location**: Choose a region that supports Azure OpenAI (e.g., East US, West Europe)
-   - **Lab Instance Id**: Use the Skillable variable `@lab.LabInstance.Id` or enter a unique 6-8 character identifier
+   - **Lab Instance Id**: **Leave blank** to auto-generate an 8-character hash from the subscription ID. Only enter a value if you want a specific override.
    - **Enable Defender For AI**: Leave as `true` (enables Defender for AI Services on the subscription)
 7. Click **Review + create**, then **Create**
 
@@ -66,13 +66,12 @@ Lab 3D is a **monitoring and detection lab**, not a configuration lab. Students 
 ```bash
 # Set variables
 LOCATION="eastus"
-LAB_INSTANCE_ID="12345678"  # Use a unique 8-digit ID or Skillable @lab.LabInstance.Id
 
-# Deploy the template
+# Deploy the template (labInstanceId defaults to a hash of the subscription ID)
 az deployment sub create \
   --location $LOCATION \
   --template-file lab-3d-setup.json \
-  --parameters location=$LOCATION labInstanceId=$LAB_INSTANCE_ID
+  --parameters location=$LOCATION
 ```
 
 ### Option 3: Deploy via PowerShell
@@ -80,14 +79,12 @@ az deployment sub create \
 ```powershell
 # Set variables
 $Location = "eastus"
-$LabInstanceId = "12345678"  # Use a unique 8-digit ID or Skillable @lab.LabInstance.Id
 
-# Deploy the template
+# Deploy the template (labInstanceId defaults to a hash of the subscription ID)
 New-AzSubscriptionDeployment `
   -Location $Location `
   -TemplateFile .\lab-3d-setup.json `
-  -location $Location `
-  -labInstanceId $LabInstanceId
+  -location $Location
 ```
 
 ## Post-Deployment Configuration (CRITICAL)

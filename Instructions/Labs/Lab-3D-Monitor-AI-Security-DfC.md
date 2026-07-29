@@ -13,8 +13,6 @@ lab:
 
 # Lab Setup
 
-Lab profile - https://labondemand.com/LabProfile/217879
-
    > **Note**: This lab has a 24-hour delay if you want to do more than simple configuration, with no output. The way the Defender for Cloud event collection works, it takes between 6 and 24 hours to process. If you want the full benefits of this lab the setup instructions in the README.md file in the Lab-3D folder have to be run a day in advance. This may not be possible in the classroom setting.  It will working in a Bring Your Own Subscription (BYOS) scenario, with the 24-hour delay.
 
 This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:

@@ -11,10 +11,11 @@
   "parameters": {
     "labInstanceId": {
       "type": "string",
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]",
       "minLength": 1,
       "maxLength": 14,
       "metadata": {
-        "description": "The Skillable lab instance ID. Used to generate globally unique storage account names. Typically a numeric string (e.g. 12345678)."
+        "description": "Suffix appended to the storage account name (sc500lab1d<suffix>) to keep it globally unique. Defaults to an 8-character hash of the subscription ID so Skillable does not need to pass a value \u2014 matches the pattern used by Labs 2A/2C/3C/3D setup templates."
       }
     },
     "location": {

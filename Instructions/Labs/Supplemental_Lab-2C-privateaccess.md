@@ -204,13 +204,13 @@ Like any Enterprise Application, the Quick Access application must be assigned t
 
 1. Under **Users**, select **None selected**.
 
-1. Search for and select **sc500-user07**, then select **Select**.
+1. Search for and select **User3**, then select **Select**.
 
 1. Under **Select a role**, the role is pre-set to **User** — this is correct.
 
 1. Select **Assign**.
 
-    > **Note**: `sc500-user07` now has an assignment to the `sc500-inference-access` Quick Access application. When this user is signed into a device running the **Global Secure Access client**, traffic destined for the workload VM's private IP on port 443 is automatically tunneled through the connector — without any VPN configuration or network firewall rule change.
+    > **Note**: `User3` now has an assignment to the `sc500-inference-access` Quick Access application. When this user is signed into a device running the **Global Secure Access client**, traffic destined for the workload VM's private IP on port 443 is automatically tunneled through the connector — without any VPN configuration or network firewall rule change.
 
 ---
 
@@ -225,7 +225,7 @@ Like any Enterprise Application, the Quick Access application must be assigned t
 
 1. In the Entra admin center, navigate to **Global Secure Access** → **Monitor** → **Traffic logs**.
 
-    > **Note**: In a production scenario, you would install the **Global Secure Access client** on an end-user device and sign in as `sc500-user07` to generate traffic through the connector. Traffic logs capture all tunneled sessions — showing which user accessed which private resource, when, and from which device. This log is the identity-governed audit trail that replaces the network perimeter log in a zero-trust architecture.
+    > **Note**: In a production scenario, you would install the **Global Secure Access client** on an end-user device and sign in as `User3` to generate traffic through the connector. Traffic logs capture all tunneled sessions — showing which user accessed which private resource, when, and from which device. This log is the identity-governed audit trail that replaces the network perimeter log in a zero-trust architecture.
 
     > **Lab constraint**: Installing and testing the Global Secure Access client on the lab VM is outside the scope of this add-on lab. The configuration you completed — connector registration, Quick Access application segment, and user assignment — is the complete administrative provisioning workflow. In a production deployment, end users install the lightweight client from `aka.ms/GlobalSecureAccessClient` and private access begins working transparently at sign-in.
 
@@ -237,4 +237,4 @@ In this add-on lab, you configured **Microsoft Entra Private Access** to provide
 
 The **Global Secure Access connector** installed on `sc500-lab2c-gsa-connector-vm` acts as the bridge between the Entra identity plane and the private network. You created a **Quick Access application segment** targeting the workload VM's private IP on port 443, making the resource available to authorized users through the connector tunnel.
 
-By assigning the Enterprise Application to `sc500-user07`, you established that access is governed by Entra ID identity — not network membership. The same user could be targeted by **Conditional Access policies** applied to this application, requiring MFA, compliant device status, or sign-in risk thresholds before private access is granted. This is the zero-trust network access model: identity and device health replace the VPN tunnel as the access control boundary.
+By assigning the Enterprise Application to `User3`, you established that access is governed by Entra ID identity — not network membership. The same user could be targeted by **Conditional Access policies** applied to this application, requiring MFA, compliant device status, or sign-in risk thresholds before private access is granted. This is the zero-trust network access model: identity and device health replace the VPN tunnel as the access control boundary.

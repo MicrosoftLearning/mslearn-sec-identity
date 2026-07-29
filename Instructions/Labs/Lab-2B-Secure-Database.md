@@ -14,8 +14,6 @@ lab:
 
 # Lab Setup
 
-Lab profile - https://labondemand.com/LabProfile/217879
-
 This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
@@ -28,7 +26,7 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. In the menu choose **Load file**.
 
-1. Select the file **lab-2b-setup.json** from the Desktop folder.
+1. Select the file **lab-2b-setup.json** from the **F:\AllFiles\Lab-2B** folder on the lab VM.
 
 1. Select **Save**.
 
@@ -62,9 +60,9 @@ This exercise should take approximately **60** minutes to complete.
 
 Using a SQL-only administrator account means database access cannot be governed by Entra ID Conditional Access, PIM, or sign-in risk policies — and the credentials exist independently of your identity platform. Replacing the SQL admin with an Entra ID security group addresses this: group membership is managed in Entra ID, access can be audited through Entra sign-in logs, and the group itself can be governed by access reviews.
 
-You will create a security group named `sc500-sql-admins`, add `sc500-user06` as a member, and configure the group as the Entra ID administrator for `sc500-lab2b-sql`.
+You will create a security group named `sc500-sql-admins`, add `User3` as a member, and configure the group as the Entra ID administrator for `sc500-lab2b-sql`.
 
-1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using your **Global Administrator** credentials.
+1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` as **User1** (the seeded Global Administrator for this Cloud Slice profile — the display name may show as `User1-<hash>@<your-tenant>.onmicrosoft.com`; use the password from the Skillable **Resources** tab).
 
 1. In the left menu, expand **Groups** and select **All groups**.
 
@@ -189,7 +187,7 @@ SQL auditing records all database-level events — queries, logins, schema chang
 
 1. Select **ai-workload-db** to open the database.
 
-1. In the left menu for `ai-workload-db`, under **Query editor**, select **Query editor (preview)**.
+1. In the left menu for `ai-workload-db`, select **Query editor (preview)**.
 
 1. In the authentication panel, select **SQL Server authentication**. Enter the following credentials:
 
@@ -200,7 +198,9 @@ SQL auditing records all database-level events — queries, logins, schema chang
 
     If prompted to add your client IP to the firewall, select **Add client IP**, then select **OK** and authenticate again with the same credentials.
 
-    > **Note**: The Global Administrator account does not have database access — only members of the `sc500-sql-admins` Entra ID admin group do. SQL Server authentication uses the built-in SQL admin account created when the server was provisioned, which has access regardless of Entra ID group membership.
+    > **Note**: The User1 account does not have database access — only members of the `sc500-sql-admins` Entra ID admin group do. SQL Server authentication uses the built-in SQL admin account created when the server was provisioned, which has access regardless of Entra ID group membership.
+
+1. Select **+ New Query** to open a new query pane before typing.
 
 1. In the query editor, run the following query:
 

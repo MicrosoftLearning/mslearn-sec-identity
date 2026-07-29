@@ -1,21 +1,27 @@
 ---
 lab:
     title: 'Configure Privileged Identity Management'
-    description: 'Configure PIM-eligible role assignments, activation settings, and approval workflows to enforce just-in-time privileged access, then enable managed identity on an Azure resource.'
+    description: 'Configure PIM-eligible role assignments, activation settings, and approval workflows to enforce just-in-time privileged access to Microsoft Entra roles.'
     level: 300
     duration: 45
     islab: true
     primarytopics:
         - Microsoft Entra Privileged Identity Management
         - Conditional Access
-        - Managed Identity
 ---
 
 # Lab Setup
 
-Lab profile - https://labondemand.com/LabProfile/217878
+This lab runs on a Skillable-provided Microsoft 365 E5 tenant. In the Entra admin center the tenant is displayed as **Contoso** with a domain of the form `*.onmicrosoft.com` — the exact domain is unique per lab instance and is shown on the **Resources** tab in the lab console.
 
-This lab runs on a M365 Tenant with no special configuration needed.
+You will use two of the seeded accounts:
+
+| Role in this lab | Account |
+|------------------|---------|
+| Global Administrator (assigns the role and approves activation) | **MOD Administrator** — `admin@<your-tenant>.onmicrosoft.com` |
+| End user who requests activation of the role | **Adele Vance** — `AdeleV@<your-tenant>.OnMicrosoft.com` |
+
+Both accounts share the **User Password** shown on the Resources tab in the Skillable lab console. No additional configuration is required.
 
 ===
 
@@ -23,7 +29,7 @@ This lab runs on a M365 Tenant with no special configuration needed.
 
 Privileged Identity Management (PIM) is a Microsoft Entra ID service that enables just-in-time (JIT) privileged access to Azure and Microsoft Entra roles. Instead of granting permanent admin access — which creates a persistent attack surface — PIM requires users to request and activate elevated access for a limited time window, with optional approval and justification requirements.
 
-In this lab, you will configure PIM for the Conditional Access Administrator role, enforce an approval-based activation workflow, validate that elevated access works as expected, and then enable a system-assigned managed identity on an Azure App Service.
+In this lab, you will configure PIM for the Conditional Access Administrator role, enforce an approval-based activation workflow, and validate that elevated access works as expected.
 
 In this lab, you will:
 
@@ -31,7 +37,6 @@ In this lab, you will:
 - Configure activation settings including a time limit, justification requirement, and approver
 - Request and approve a role activation using two separate accounts
 - Verify that the activated role grants the expected access
-- Enable a system-assigned managed identity on a pre-provisioned App Service
 - Deactivate the role to close the just-in-time access window
 
 This exercise should take approximately **45** minutes to complete.
@@ -40,11 +45,11 @@ This exercise should take approximately **45** minutes to complete.
 
 ## Assign a PIM-eligible role
 
-In this section, you assign the Conditional Access Administrator role to **sc500-user01** as an eligible assignment. An eligible assignment means the user does not hold the role permanently — they must request and activate it each time they need it.
+In this section, you assign the Conditional Access Administrator role to **Adele Vance** as an eligible assignment. An eligible assignment means the user does not hold the role permanently — they must request and activate it each time they need it.
 
-1. Sign in to the Microsoft Entra admin center at `https://entra.microsoft.com` using your **Administrator** credentials.
+1. Sign in to the Microsoft Entra admin center at `https://entra.microsoft.com` as **MOD Administrator** — sign-in name `admin@<your-tenant>.onmicrosoft.com` and the **User Password** from the Resources tab.
 
-1. In the left navigation, expand **Identity governance** and select **Privileged Identity Management**.
+1. In the left navigation, expand **ID Governance** and select **Privileged Identity Management**.
 
 1. Under **Manage**, select **Microsoft Entra roles**.
 
@@ -94,50 +99,50 @@ PIM role settings control how the activation process works: how long the activat
 1. Verify the role settings page now shows:
     - Maximum activation duration: **1 hour**
     - Approval required: **Yes**
-    - Approver: **sc500-approver**
+    - Approver: **MOD Administrator**
 
 ---
 
 ## Request role activation
 
-Now you will sign in as **sc500-user01** and submit a role activation request. This simulates a user who needs temporary elevated access to perform a specific task.
+Now you will sign in as **Adele Vance** and submit a role activation request. This simulates a user who needs temporary elevated access to perform a specific task.
 
 1. Open a new **InPrivate** or **Private** browser window.
 
-1. Navigate to the Entra Admin Center using `https://entra.microsoft.com` and sign in as **Adele Vance** using the credentials from the **Resources** tab.
+1. Navigate to the Entra admin center using `https://entra.microsoft.com`. Sign in as **Adele Vance** — sign-in name `AdeleV@<your-tenant>.OnMicrosoft.com` and the **User Password** from the Resources tab.
 
-2. In the left navigation, expand **Identity governance** and select **Privileged Identity Management**.
+1. In the left navigation, expand **ID Governance** and select **Privileged Identity Management**.
 
-3. Under **Tasks**, select **My roles**.
+1. Under **Tasks**, select **My roles**.
 
-4. Select the **Microsoft Entra roles** tab.
+1. Select the **Microsoft Entra roles** tab.
 
-5. Under **Eligible assignments**, find **Conditional Access Administrator** and select **Activate**.
+1. Under **Eligible assignments**, find **Conditional Access Administrator** and select **Activate**.
 
-6. On the **Activate** pane, configure the following:
+1. On the **Activate** pane, configure the following:
 
     | Setting | Value |
     |---------|-------|
     | **Duration** | 1 hour |
     | **Justification** | `Reviewing and updating Conditional Access policies as part of a scheduled security review.` |
 
-7. Select **Activate**.
+1. Select **Activate**.
 
-    You will see a confirmation that the request is pending approval. The role is not yet active — it requires approval from **sc500-approver** before access is granted.
+    You will see a confirmation that the request is pending approval. The role is not yet active — it requires approval from **MOD Administrator** before access is granted.
 
-8. Leave this browser window open — you will return to it after approving the request.
+1. Leave this browser window open — you will return to it after approving the request.
 
 ---
 
 ## Approve the activation request
 
-You will now switch to the **sc500-approver** account and approve the pending activation request.
+You will now switch back to the **MOD Administrator** browser window and approve the pending activation request.
 
-1. Return to your primary browser window (MOD Administrator is current logged in).
+1. Return to your primary browser window (**MOD Administrator** is currently signed in).
 
-1. Navigate to the Microsoft Entra Admin Center.
+1. Navigate to the Microsoft Entra admin center.
 
-1. In the left navigation, expand **Identity governance** and select **Privileged Identity Management**.
+1. In the left navigation, expand **ID Governance** and select **Privileged Identity Management**.
 
 1. Under **Tasks**, select **Approve requests**.
 
@@ -148,7 +153,6 @@ You will now switch to the **sc500-approver** account and approve the pending ac
 1. Add a mark in the box next to the request, then select **Approve**.
 
 1. In the **Justification** field, enter: `Approved for scheduled security review task.`
-    ```
 
 1. Select **Submit**.
 
@@ -184,9 +188,9 @@ Return to the **Adele Vance** browser window and verify that the role activation
 
 ## Deactivate the role
 
-Just-in-time access means access should be released as soon as the task is complete — not held until the time window expires. You will now manually deactivate the Conditional Access Administrator role for **sc500-user01**.
+Just-in-time access means access should be released as soon as the task is complete — not held until the time window expires. You will now manually deactivate the Conditional Access Administrator role for **Adele Vance**.
 
-1. Return to the **Administrator** browser window.
+1. Return to the **Adele Vance** browser window (My roles shows the currently signed-in user's assignments, so deactivation must be done from Adele's window — not the MOD Administrator window).
 
 1. Navigate to **Privileged Identity Management > My roles > Microsoft Entra roles > Active assignments**.
 
@@ -196,13 +200,13 @@ Just-in-time access means access should be released as soon as the task is compl
 
 1. Confirm the role no longer appears under **Active assignments** and has returned to **Eligible assignments** only.
 
-    The access window is now closed. If sc500-user01 needs to perform CA Admin tasks again, they must submit a new activation request.
+    The access window is now closed. If Adele needs to perform CA Admin tasks again, she must submit a new activation request.
 
 ---
 
 ## Summary
 
-In this lab, you configured Privileged Identity Management to enforce just-in-time access to the Conditional Access Administrator role. You assigned an eligible role, configured activation settings with a time limit, justification requirement, and named approver, then walked through the full activation and approval workflow. You verified that the activated role granted the expected access, and manually deactivated the role to close the access window. You also enabled a system-assigned managed identity on an Azure App Service, establishing the pattern for workload identity that you will apply to Key Vault access in a later lab.
+In this lab, you configured Privileged Identity Management to enforce just-in-time access to the Conditional Access Administrator role. You assigned an eligible role to **Adele Vance**, configured activation settings with a time limit, justification requirement, and named approver, then walked through the full activation and approval workflow. You verified that the activated role granted the expected access, and manually deactivated the role to close the access window.
 
 You have successfully completed this exercise.
 
@@ -214,5 +218,5 @@ If you want to clean up the PIM assignment before the session ends:
 
 1. Sign in to the Entra admin center as your Global Administrator.
 1. Navigate to **Privileged Identity Management > Microsoft Entra roles > Assignments**.
-1. Find the **Conditional Access Administrator** eligible assignment for **sc500-user01**.
+1. Find the **Conditional Access Administrator** eligible assignment for **Adele Vance**.
 1. Select **Remove** and confirm.

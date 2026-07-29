@@ -79,7 +79,7 @@ This exercise should take approximately **45** minutes to complete.
 
 1. Confirm your account is listed as workspace owner.
 
-1. Assign **Security Copilot Contributor** role to **sc500-user12**.
+1. Assign **Security Copilot Contributor** role to **User3**.
 
 1. Confirm the role assignment is visible.
 

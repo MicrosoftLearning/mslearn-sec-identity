@@ -13,8 +13,6 @@ lab:
 
 # Lab Setup
 
-Lab profile - https://labondemand.com/LabProfile/217879
-
 This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
@@ -179,7 +177,7 @@ This exercise should take approximately **75** minutes to complete.
 
 1. Assign a **Governance rule** with these settings:
 
-    - Owner: **sc500-user11**
+    - Owner: **User3**
     - Due date: 14 days from today
     - Notification cadence: weekly
 

@@ -11,7 +11,7 @@
       "sc500-lab2c-spoke-vnet (10.4.0.0/16 with workload-subnet 10.4.0.0/24)",
       "VNet peering: hub-to-spoke and spoke-to-hub",
       "sc500-lab2c-vm (Windows Server 2022, Standard_D2s_v3, in workload-subnet, no NSG)",
-      "sc500lab2c@lab.LabInstance.Id (storage account, public access enabled — students disable it)",
+      "sc500lab2c<hash> (storage account, public access enabled — students disable it. The <hash> suffix is derived from the subscription ID at deploy time.)",
       "privatelink.blob.core.windows.net (private DNS zone linked to spoke VNet)"
     ],
     "studentCreatedResources": [
@@ -47,9 +47,9 @@
     },
     "storageAccountName": {
       "type": "string",
-      "defaultValue": "sc500lab2c@lab.LabInstance.Id",
+      "defaultValue": "[concat('sc500lab2c', take(uniqueString(subscription().subscriptionId), 8))]",
       "metadata": {
-        "description": "Storage account name. Must be globally unique, lowercase, no hyphens, 3-24 characters. Default uses @lab.LabInstance.Id for Skillable Cloud Slice uniqueness. Change only if needed."
+        "description": "Storage account name. Must be globally unique, lowercase, no hyphens, 3-24 characters. Default is sc500lab2c + an 8-character hash of the subscription ID (deterministic per subscription). Override at deploy time if you want a specific value."
       }
     }
   },

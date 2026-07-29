@@ -26,11 +26,11 @@
     },
     "labInstanceId": {
       "type": "string",
-      "defaultValue": "@lab.LabInstance.Id",
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]",
       "minLength": 1,
       "maxLength": 8,
       "metadata": {
-        "description": "The Skillable lab instance ID. Used to generate globally unique resource names. Auto-populated by Skillable using @lab.LabInstance.Id variable."
+        "description": "Suffix used to generate globally unique resource names. Defaults to an 8-character hash of the subscription ID (deterministic per subscription). Override at deploy time if you want a specific value."
       }
     },
     "publisherEmail": {

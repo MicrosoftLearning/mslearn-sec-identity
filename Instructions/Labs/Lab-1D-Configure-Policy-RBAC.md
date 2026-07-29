@@ -13,8 +13,6 @@ lab:
 
 # Lab Setup
 
-Lab profile - https://labondemand.com/LabProfile/217879
-
 This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
@@ -27,7 +25,7 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. In the menu choose **Load file**.
 
-1. Select the file **sc500-lab1c-policy.json** from the Desktop folder.
+1. Select the file **sc500-lab1d-policy.json** from the **F:\AllFiles\Lab-1D** folder on the lab VM.
 
 1. Select **Save**.
 
@@ -55,13 +53,13 @@ In this lab, you will:
 
 This exercise should take approximately **60** minutes to complete.
 
-> **Note**: This lab uses two accounts: your **Global Administrator** account (your primary lab credentials) and **sc500-user04** (used to complete the Access Review decision as the designated reviewer). Credentials for both accounts are in the **Resources** tab of your lab environment.
+> **Note**: This lab uses two accounts: your **Global Administrator** account (your primary lab credentials) and **User2** (used to complete the Access Review decision as the designated reviewer). Credentials for both accounts are in the **Resources** tab of your lab environment.
 
 ---
 
 ## Assign a built-in compliance policy
 
-Azure Policy evaluates resources against defined rules and reports compliance without requiring changes to existing resources. A **Deny** effect policy blocks new non-compliant resources from being created; existing resources that already violate the policy appear as **Non-compliant** in the compliance report. You will assign the built-in **Require a tag on resources** policy to `sc500-lab1d-rg`, which will flag `sc500lab1d@lab.LabInstance.Id` (the storage account) and `sc500-lab1d-vm` (the virtual machine) as non-compliant because neither resource has an `Environment` tag. You may see one additional non-compliant resource listed — this is expected.
+Azure Policy evaluates resources against defined rules and reports compliance without requiring changes to existing resources. A **Deny** effect policy blocks new non-compliant resources from being created; existing resources that already violate the policy appear as **Non-compliant** in the compliance report. You will assign the built-in **Require a tag on resources** policy to `sc500-lab1d-rg`, which will flag the pre-provisioned storage account (name starts with **`sc500lab1d`**) and `sc500-lab1d-vm` (the virtual machine) as non-compliant because neither resource has an `Environment` tag. You may see one additional non-compliant resource listed — this is expected.
 
 1. Sign in to the Azure portal `https://portal.azure.com` using your **User-1** credentials.
 
@@ -107,7 +105,7 @@ Azure Policy evaluates resources against defined rules and reports compliance wi
 
 1. Locate the **sc500-require-env-tag** assignment in the compliance list.
 
-1. Confirm that **`sc500lab1d@lab.LabInstance.Id`** (storage account) and **`sc500-lab1d-vm`** (virtual machine) appear in the non-compliant resources list. You may see one additional resource listed — this is expected and does not affect the lab outcome.
+1. Confirm that the storage account (name starts with **`sc500lab1d`**) and **`sc500-lab1d-vm`** (virtual machine) appear in the non-compliant resources list. You may see one additional resource listed — this is expected and does not affect the lab outcome.
 
     > **Note**: Both resources were deployed without an `Environment` tag and therefore violate the policy. The policy assignment also prevents any future resource deployments in `sc500-lab1d-rg` from omitting the `Environment` tag. Existing resources remain operational — compliance evaluation is non-destructive.
 
@@ -125,7 +123,7 @@ The **sc500-lab1d-policy.bicep** file has been pre-staged in your Cloud Shell ho
 
 1. Select **Upload**.
 
-1. Browse to your **Desktop** folder, then select **sc500-lab1d-policy.bicep** file.
+1. Browse to the **F:\AllFiles\Lab-1D** folder on the lab VM, then select **sc500-lab1d-policy.bicep** file.
 
 1. Select **Open** to upload the file. Wait for the **Successfully uploaded file** message.
 
@@ -229,19 +227,19 @@ Built-in Azure roles such as **Reader** grant broad read access across all resou
 
 1. On the **Members** tab, confirm **Assign access to** is set to **User, group, or service principal**.
 
-1. Select **+ Select members**, search for and select **sc500-user04**, then select **Select**.
+1. Select **+ Select members**, search for and select **User2**, then select **Select**.
 
 1. Select **Review + assign**, then select **Review + assign** again to save.
 
-    > **Note**: `sc500-user04` now holds the `sc500-Security-Reviewer` role on `sc500-lab1d-rg`. They have read access to Defender for Cloud data and role assignments within this resource group — without any management or write permissions. This role will also be used in the next section: `sc500-user04` is the designated reviewer for the Access Review you are about to create.
+    > **Note**: `User2` now holds the `sc500-Security-Reviewer` role on `sc500-lab1d-rg`. They have read access to Defender for Cloud data and role assignments within this resource group — without any management or write permissions. This role will also be used in the next section: `User2` is the designated reviewer for the Access Review you are about to create.
 
 ---
 
 ## Evaluate and remediate overprivileged access
 
-`sc500-user05` holds an active **Contributor** role assignment on `sc500-lab1d-rg`. The Contributor role grants full management access — the ability to create, modify, and delete resources — without the ability to manage role assignments. This level of access is appropriate while someone is actively working on a platform, but `sc500-user05` no longer has a business need for it.
+`User3` holds an active **Contributor** role assignment on `sc500-lab1d-rg`. The Contributor role grants full management access — the ability to create, modify, and delete resources — without the ability to manage role assignments. This level of access is appropriate while someone is actively working on a platform, but `User3` no longer has a business need for it.
 
-An **Entra ID Access Review** provides a structured, auditable process for evaluating whether existing role assignments remain appropriate. You will create a review that targets the Contributor role on `sc500-lab1d-rg`, designate `sc500-user04` as the reviewer, then sign in as `sc500-user04` to submit the denial decision. The review will automatically remove the assignment when stopped.
+An **Entra ID Access Review** provides a structured, auditable process for evaluating whether existing role assignments remain appropriate. You will create a review that targets the Contributor role on `sc500-lab1d-rg`, designate `User2` as the reviewer, then sign in as `User2` to submit the denial decision. The review will automatically remove the assignment when stopped.
 
 1. Navigate to the [Microsoft Entra admin center](https://entra.microsoft.com).
 
@@ -253,7 +251,7 @@ An **Entra ID Access Review** provides a structured, auditable process for evalu
 
 1. From the list of Azure resources, select your lab subscription.
 
-1. In the left menu, under **Manage**, select **Access reviews**.
+1. In the left navigation, expand **ID Governance** and select **Access reviews**.
 
 1. Select **New** to create a new access review.
 
@@ -299,11 +297,13 @@ An **Entra ID Access Review** provides a structured, auditable process for evalu
 
 ## Apply a resource lock
 
-Resource locks prevent accidental or unauthorized deletion of critical resources. A **CanNotDelete** lock allows all read and write operations on a resource but blocks delete operations — even for users with the Owner role. You will apply a lock to `sc500lab1d@lab.LabInstance.Id` and verify that the lock prevents deletion.
+Resource locks prevent accidental or unauthorized deletion of critical resources. A **CanNotDelete** lock allows all read and write operations on a resource but blocks delete operations — even for users with the Owner role. You will apply a lock to the pre-provisioned storage account in `sc500-lab1d-rg` and verify that the lock prevents deletion.
+
+> **Note**: The `sc500-lab1d-rg` resource group contains exactly one storage account, and its name begins with **`sc500lab1d`** followed by an 8-character suffix unique to your lab subscription. Select it whenever the lab refers to it.
 
 1. In the Azure portal search bar, search for and select **Storage accounts**.
 
-1. Select **sc500lab1d@lab.LabInstance.Id**.
+1. Select the storage account whose name starts with **`sc500lab1d`** (there is only one in `sc500-lab1d-rg`).
 
 1. In the left menu, under **Settings**, select **Locks**.
 
@@ -339,9 +339,9 @@ In this lab, you applied governance controls across four dimensions: policy comp
 
 You assigned the built-in **Require a tag on resources** policy to surface existing non-compliant resources missing an `Environment` tag, and triggered an on-demand compliance scan to observe results immediately rather than waiting for the standard evaluation cycle. You then deployed a complementary custom policy at the subscription scope using a pre-written Bicep template — demonstrating that governance rules, like application code, can be version-controlled and deployed repeatably through Infrastructure as Code.
 
-You created a custom Azure role — `sc500-Security-Reviewer` — with exactly the permissions needed for a security auditor function: read access to Defender for Cloud posture data and role assignments, and nothing else. You assigned this role to `sc500-user04` following the principle of least privilege, ensuring the reviewer can observe the security state without any management authority over resources.
+You created a custom Azure role — `sc500-Security-Reviewer` — with exactly the permissions needed for a security auditor function: read access to Defender for Cloud posture data and role assignments, and nothing else. You assigned this role to `User2` following the principle of least privilege, ensuring the reviewer can observe the security state without any management authority over resources.
 
-You used an Entra ID Access Review to formally evaluate `sc500-user05`'s standing Contributor assignment. Rather than removing access directly, the review process created an auditable record of the decision — who reviewed, the justification, and the resulting action. This audit trail satisfies compliance requirements for periodic access certification. Finally, you applied a CanNotDelete resource lock to the platform storage account, demonstrating that identity-based access control and resource locks serve complementary functions: access control governs who can act, while locks create an explicit barrier that even highly privileged identities cannot bypass without a deliberate removal step.
+You used an Entra ID Access Review to formally evaluate `User3`'s standing Contributor assignment. Rather than removing access directly, the review process created an auditable record of the decision — who reviewed, the justification, and the resulting action. This audit trail satisfies compliance requirements for periodic access certification. Finally, you applied a CanNotDelete resource lock to the platform storage account, demonstrating that identity-based access control and resource locks serve complementary functions: access control governs who can act, while locks create an explicit barrier that even highly privileged identities cannot bypass without a deliberate removal step.
 
 You have successfully completed this exercise.
 
