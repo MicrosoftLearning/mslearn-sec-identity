@@ -13,8 +13,6 @@ lab:
 
 # Lab Setup
 
-Lab profile - https://labondemand.com/LabProfile/217879
-
 This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
@@ -27,7 +25,7 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. In the menu choose **Load file**.
 
-1. Select the file **deploy-lab1c-vnet.json** from the Desktop folder.
+1. Select the file **deploy-lab1c-vnet.json** from the **F:\AllFiles\Lab-1C** folder on the lab VM.
 
 1. Select **Save**.
 
@@ -66,7 +64,7 @@ This exercise should take approximately **60** minutes to complete.
 
 Azure Key Vault supports two permission models: **Vault access policies** (the legacy model) and **Azure role-based access control** (the recommended model). The RBAC model integrates Key Vault access governance into the same role assignment system used across all Azure resources, making it easier to audit permissions and apply the principle of least privilege consistently. You will create the vault with the RBAC model enabled and then verify and configure its deletion protection settings.
 
-> **Note**: The Key Vault name must be globally unique across all Azure subscriptions. The name `sc500-kv-@lab.LabInstance.Id` uses your lab instance ID to ensure uniqueness. This name is referenced throughout the lab — if you use a different name, substitute it wherever `sc500-kv-@lab.LabInstance.Id` appears.
+> **Note**: Key Vault names must be globally unique across all Azure subscriptions. In the next step you will pick your own name that begins with **`sc500-kv-`** (for example, `sc500-kv-yourinitials-1234`). Throughout the rest of this lab, `<your-kv-name>` refers to whatever name you entered here — write it down or leave a Notepad window open with it, since you will reuse it in later sections.
 
 1. Sign in to the **Azure portal** using `https://portal.azure.com` using your **Global Administrator** credentials.
 
@@ -80,7 +78,7 @@ Azure Key Vault supports two permission models: **Vault access policies** (the l
     |---------|-------|
     | **Subscription** | Your lab subscription |
     | **Resource group** | sc500-lab1c-rg |
-    | **Key vault name** | sc500-kv-@lab.LabInstance.Id |
+    | **Key vault name** | A globally unique name starting with `sc500-kv-` (for example, `sc500-kv-yourinitials-1234`). Record it as `<your-kv-name>` for later steps. |
     | **Region** | East US |
     | **Pricing tier** | Standard |
 
@@ -96,7 +94,7 @@ Azure Key Vault supports two permission models: **Vault access policies** (the l
 
 8. Select **Go to resource** to open the vault.
 
-9. On the Key Vault **Overview** page, locate the **Vault URI** field. Copy this value and save it — it follows the format `https://sc500-kv-<your-lab-id>.vault.azure.net/`. You will use it in a later section. NOTEPAD in Windows is a great tool for saving this information.
+9. On the Key Vault **Overview** page, locate the **Vault URI** field. Copy this value and save it — it follows the format `https://<your-kv-name>.vault.azure.net/`. You will use it in a later section. NOTEPAD in Windows is a great tool for saving this information.
 
 10. In the left menu, under **Settings**, select **Properties**.
 
@@ -238,11 +236,11 @@ The **Key Vault Reader** role grants management-plane access only — a user ass
 
 1. In the search bar, search for and select **Key vaults**.
 
-1. Select **sc500-kv-@lab.LabInstance.Id** from the list.
+1. Select **`<your-kv-name>`** from the list.
 
 1. In the left menu open **Objects**, then select **Secrets**.
 
-    Confirm that **foundry-api-key** appears in the list. The Key Vault Reader role grants `sc500-user03` management-plane access, so the secret name is visible.
+    Confirm that **foundry-api-key** appears in the list. The Key Vault Reader role grants `User3` management-plane access, so the secret name is visible.
 
 1. Select **foundry-api-key** to open the secret, then select the current version.
 
@@ -250,7 +248,7 @@ The **Key Vault Reader** role grants management-plane access only — a user ass
 
     Confirm that an error message appears, such as **"The operation is not allowed by RBAC. If role assignments were recently changed, please wait several minutes for role assignments to become effective."** or an access denied notification.
 
-    > **Note**: The Key Vault Reader role includes `Microsoft.KeyVault/vaults/read` (management plane) but does not include `Microsoft.KeyVault/vaults/secrets/getSecret/action` (data plane). This means `sc500-user03` can enumerate secrets but cannot retrieve their values — precisely the boundary that separates the Reader role from the Secrets User role.
+    > **Note**: The Key Vault Reader role includes `Microsoft.KeyVault/vaults/read` (management plane) but does not include `Microsoft.KeyVault/vaults/secrets/getSecret/action` (data plane). This means `User3` can enumerate secrets but cannot retrieve their values — precisely the boundary that separates the Reader role from the Secrets User role.
 
 1. Close the InPrivate browser window and return to your Global Administrator browser session.
 
@@ -312,7 +310,7 @@ When managed identity is enabled on an App Service, the runtime injects two envi
 
     > **Note**: App Services use a different token endpoint than virtual machines. Rather than calling the VM-specific IMDS address (`169.254.169.254`), App Services expose two environment variables: `IDENTITY_ENDPOINT` (the local token service URL) and `IDENTITY_HEADER` (a secret value that prevents SSRF attacks). The `X-IDENTITY-HEADER` header serves the same security purpose as the `Metadata: true` header on the VM IMDS endpoint. The token returned is a JWT issued by Microsoft Entra ID for the `sc500-lab1c-app` managed identity.
 
-1. Run the following command to call the Key Vault REST API and retrieve the secret value. Replace `<your-vault-uri>` with the Vault URI you copied from the Key Vault Overview page earlier (for example, `https://sc500-kv-12345678.vault.azure.net`):
+1. Run the following command to call the Key Vault REST API and retrieve the secret value. Replace `<your-vault-uri>` with the Vault URI you copied from the Key Vault Overview page earlier (for example, `https://<your-kv-name>.vault.azure.net`):
 
     ```powershell
     $kvUri = "<your-vault-uri>"
@@ -341,7 +339,7 @@ Identity-based access control is the primary enforcement mechanism for Key Vault
 
 > **Note**: The `sc500-lab1c-vnet` virtual network was pre-provisioned with the `Microsoft.KeyVault` service endpoint already enabled on its subnet. This is required before a VNet can be added to a Key Vault firewall allow list — the service endpoint configures the subnet to route Key Vault traffic directly through the Azure backbone rather than through the public internet.
 
-1. Navigate to your Key Vault, **sc500-kv-@lab.LabInstance.Id**.
+1. Navigate to your Key Vault, **`<your-kv-name>`**.
 
 1. In the left menu, under **Settings**, select **Networking**.
 
@@ -387,7 +385,7 @@ Microsoft Defender for Key Vault detects unusual and potentially harmful access 
 
     > **Note**: Enabling Defender for Key Vault activates threat detection across all Key Vaults in the subscription, including the vault you created in this lab. Alerts are generated for anomalies such as access from Tor exit nodes, access from atypical geographic locations, and bulk secret retrieval patterns that may indicate a credential harvesting attempt.
 
-1. Navigate back to your Key Vault, **sc500-kv-@lab.LabInstance.Id**.
+1. Navigate back to your Key Vault, **`<your-kv-name>`**.
 
 1. In the left menu, under **Monitoring**, select **Diagnostic settings**.
 
@@ -413,7 +411,7 @@ Microsoft Defender for Key Vault detects unusual and potentially harmful access 
 
 ## Summary
 
-In this lab, you secured an Azure Key Vault from end to end. You deployed the vault using the RBAC authorization model, ensuring access governance integrates with the same role assignment system used across all Azure resources. You granted the App Service managed identity the minimum required permission — **Key Vault Secrets User** — and confirmed that the **Key Vault Reader** role assigned to `sc500-user03` enforces the management-plane and data-plane boundary: the user can see that a secret exists but cannot read its value. You stored a simulated AI application API key and a cryptographic key, then retrieved the secret programmatically from the App Service using a managed identity bearer token acquired from the IMDS endpoint — with no stored credentials involved at any step. Finally, you applied a network firewall to restrict vault access to an authorized virtual network, enabled the Defender for Key Vault protection plan, and configured audit log forwarding to a Log Analytics workspace.
+In this lab, you secured an Azure Key Vault from end to end. You deployed the vault using the RBAC authorization model, ensuring access governance integrates with the same role assignment system used across all Azure resources. You granted the App Service managed identity the minimum required permission — **Key Vault Secrets User** — and confirmed that the **Key Vault Reader** role assigned to `User3` enforces the management-plane and data-plane boundary: the user can see that a secret exists but cannot read its value. You stored a simulated AI application API key and a cryptographic key, then retrieved the secret programmatically from the App Service using a managed identity bearer token acquired from the IMDS endpoint — with no stored credentials involved at any step. Finally, you applied a network firewall to restrict vault access to an authorized virtual network, enabled the Defender for Key Vault protection plan, and configured audit log forwarding to a Log Analytics workspace.
 
 You have successfully completed this exercise.
 

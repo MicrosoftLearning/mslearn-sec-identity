@@ -13,8 +13,6 @@ lab:
 
 # Lab Setup
 
-Lab profile - https://labondemand.com/LabProfile/217879
-
 This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
@@ -157,11 +155,11 @@ This exercise should take approximately **45** minutes to complete.
 
 1. On the **Role** tab, select **AcrPull**, and then select **Next**.
 
-1. On the **Members** tab, select **User, group, or service principal**, select **+ Select members**, choose **sc500-user08**, and then select **Review + assign**.
+1. On the **Members** tab, select **User, group, or service principal**, select **+ Select members**, choose **User2**, and then select **Review + assign**.
 
 1. Repeat the role assignment process: select **+ Add** > **Add role assignment**, choose **AcrPush**, and select **Next**.
 
-1. On the **Members** tab, select **User, group, or service principal**, select **+ Select members**, choose **sc500-user09**, and then select **Review + assign**.
+1. On the **Members** tab, select **User, group, or service principal**, select **+ Select members**, choose **User3**, and then select **Review + assign**.
 
 1. Verify both assignments are visible in role assignments.
 

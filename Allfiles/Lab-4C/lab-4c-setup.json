@@ -48,28 +48,28 @@
     },
     "apiManagementName": {
       "type": "string",
-      "defaultValue": "sc500-lab4c-apim",
+      "defaultValue": "[concat('sc500-lab4c-apim-', take(uniqueString(subscription().subscriptionId), 8))]",
       "metadata": {
         "description": "API Management service name. Must be globally unique in Azure API Management DNS namespace."
       }
     },
     "webAppName": {
       "type": "string",
-      "defaultValue": "sc500-lab4c-webapp",
+      "defaultValue": "[concat('sc500-lab4c-webapp-', take(uniqueString(subscription().subscriptionId), 8))]",
       "metadata": {
         "description": "Web App name. Must be globally unique in azurewebsites.net namespace."
       }
     },
     "functionAppName": {
       "type": "string",
-      "defaultValue": "sc500-lab4c-func",
+      "defaultValue": "[concat('sc500-lab4c-func-', take(uniqueString(subscription().subscriptionId), 8))]",
       "metadata": {
         "description": "Function App name. Must be globally unique in azurewebsites.net namespace."
       }
     },
     "functionStorageAccountName": {
       "type": "string",
-      "defaultValue": "sc500lab4cfuncsa",
+      "defaultValue": "[concat('sc500lab4cfuncsa', take(uniqueString(subscription().subscriptionId), 8))]",
       "metadata": {
         "description": "Storage account for Function App. Must be globally unique, lowercase, 3-24 characters."
       }

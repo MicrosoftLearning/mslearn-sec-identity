@@ -13,8 +13,6 @@ lab:
 
 # Lab Setup
 
-Lab profile - https://labondemand.com/LabProfile/217879
-
 This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
@@ -73,11 +71,13 @@ Before applying any controls, confirm the current state of the pre-provisioned e
 
 ### Review the API Management configuration
 
+> **Note**: The pre-provisioned API Management instance name begins with **`sc500-lab3c-apim-`** followed by an 8-character suffix that is unique to your lab subscription. Throughout this lab, `<apim-name>` refers to that instance. The `sc500-lab3c-rg` resource group contains exactly one API Management instance — select it whenever the lab asks for `<apim-name>`.
+
 1. Sign in to the [Azure portal](https://portal.azure.com) using your **Global Administrator** credentials.
 
 1. In the search bar, search for and select **API Management services**.
 
-1. Select **sc500-lab3c-apim-@lab.LabInstance.Id** to open the API Management instance.
+1. Select the API Management instance whose name starts with **`sc500-lab3c-apim-`** to open it.
 
 1. In the left menu, under **APIs**, select **APIs**.
 
@@ -117,7 +117,7 @@ Azure API Management provides AI Gateway policies that are purpose-built for lan
 
 The policy XML for this lab is provided in the **Lab3-resources** folder. You will paste it directly into the APIM policy editor — you do not need to author policy XML from memory.
 
-1. In the Azure portal, navigate back to **sc500-lab3c-apim-@lab.LabInstance.Id > APIs > sc500-foundry-api**.
+1. In the Azure portal, navigate back to **`<apim-name>` > APIs > sc500-foundry-api**.
 
 1. Select the **Design** tab and select **All operations**.
 
@@ -207,7 +207,7 @@ With the token rate limit policy and subscription key authentication in place, v
 
     1. Open **Cloud Shell** from the Azure portal toolbar (the `>_` icon).
 
-    1. In the Cloud Shell prompt, run the following command, replacing `<your-key>` with your subscription key and `<your-apim-gateway-url>` with your APIM gateway URL (visible on the sc500-lab3c-apim-@lab.LabInstance.Id overview page under **Gateway URL**):
+    1. In the Cloud Shell prompt, run the following command, replacing `<your-key>` with your subscription key and `<your-apim-gateway-url>` with your APIM gateway URL (visible on the `<apim-name>` overview page under **Gateway URL**):
 
         ```bash
         for i in {1..10}; do curl -s -o /dev/null -w "%{http_code}\n" -X POST "https://<your-apim-gateway-url>/sc500-foundry-api/chat/completions?api-version=2024-02-01" -H "Ocp-Apim-Subscription-Key: <your-key>" -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Summarize the security risks of unprotected AI endpoints in 100 words."}],"max_tokens":100}'; done

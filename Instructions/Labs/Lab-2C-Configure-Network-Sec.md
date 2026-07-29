@@ -15,8 +15,6 @@ lab:
 
 # Lab Setup
 
-Lab profile - https://labondemand.com/LabProfile/217879
-
 This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
@@ -29,7 +27,7 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. In the menu choose **Load file**.
 
-1. Select the file **lab-2c-setup.json** from the Desktop folder.
+1. Select the file **lab-2c-setup.json** from the **F:\AllFiles\Lab-2C** folder on the lab VM.
 
 1. Select **Save**.
 
@@ -79,9 +77,10 @@ Azure Firewall is a managed, stateful network firewall as a service that provide
     | **Name** | `sc500-lab2c-fw` |
     | **Region** | East US |
     | **Availability zone** | None |
-    | **Firewall tier** | Standard |
+    | **Firewall SKU** | Standard |
     | **Firewall management** | Use a Firewall Policy to manage this firewall |
     | **Firewall policy** | Select **Add new**; name it `sc500-fw-policy`; select **Standard** tier; select **OK** |
+    | **Choose a virtual network** | Select **Use existing** |
     | **Virtual network** | sc500-lab2c-hub-vnet |
     | **Public IP address** | Select **Add new**; name it `sc500-lab2c-fw-pip`; select **OK** |
     | **Enable Firewall Management NIC** | Uncheck this checkbox |

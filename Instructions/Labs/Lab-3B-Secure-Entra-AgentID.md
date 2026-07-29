@@ -14,8 +14,6 @@ lab:
 
 # Lab Setup
 
-Lab profile - https://labondemand.com/LabProfile/217879
-
 This lab runs on a Cloud Slice. NOTE - this lab is a work in progress as the technology around the Entra Agent ID is evolving almost daily. The steps as written worked on June 30, 2026. However with regular product changes you may find that the setups are not 100% accruate.  We don't have a lab setup for this lab yet, as it keeps changing. We will add a lab setup, once things stablize.
 
 ===
