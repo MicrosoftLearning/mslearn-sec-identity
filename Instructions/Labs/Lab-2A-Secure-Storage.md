@@ -17,7 +17,7 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
 
-1. Log in with the **User-1** administrator role.
+1. Log in with the **User1** administrator role.
 
 1. In the **Search** bar find and open **Deploy a custom template**.
    
@@ -64,7 +64,7 @@ You will create a stored access policy on the `training-data` container that gra
 
 > **Note**: The pre-provisioned storage account name begins with **`sc500lab2a`** followed by an 8-character suffix unique to your lab subscription. Throughout this lab, `<storage-account-name>` refers to that account. The `sc500-lab2a-rg` resource group contains exactly one storage account — select it whenever the lab asks for `<storage-account-name>`.
 
-1. Sign in to the Azure portal at `https://portal.azure.com` using your **User-1** credentials.
+1. Sign in to the Azure portal at `https://portal.azure.com` using your **User1** credentials.
 
 1. In the search bar, search for and select **Storage accounts**.
 

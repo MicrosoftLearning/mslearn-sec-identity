@@ -17,7 +17,7 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
 
-1. Log in with the **User-1** administrator role.
+1. Log in with the **User1** administrator role.
 
 1. In the **Search** bar find and open **Deploy a custom template**.
    
@@ -81,7 +81,7 @@ This exercise should take approximately **75** minutes to complete.
 
 ## Review Secure Score and Top Recommendations
 
-1. Sign in to the [Azure portal](https://portal.azure.com) with your Global Administrator account.
+1. Sign in to the [Azure portal](https://portal.azure.com) with your **User1** account.
 
 1. Open **Microsoft Defender for Cloud**.
 

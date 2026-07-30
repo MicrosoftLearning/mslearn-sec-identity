@@ -9,6 +9,7 @@
       "type": "string",
       "defaultValue": "eastus",
       "allowedValues": [
+        "centralus",
         "eastus",
         "eastus2",
         "westus",

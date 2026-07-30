@@ -222,7 +222,7 @@ Students do NOT configure or fix anything in this lab - they only observe and in
 
 ## Cleanup
 
-The lab environment is typically auto-reset by Skillable. If manual cleanup is needed:
+Your lab host may reset the environment automatically. If manual cleanup is needed:
 
 ```bash
 az group delete --name sc500-lab3d-rg --yes --no-wait

@@ -42,7 +42,7 @@ The `lab-3c-setup.json` ARM template provisions the following resources in the *
 
 ## Deployment Instructions
 
-### Option 1: Deploy via Azure Portal (Recommended for Skillable labs)
+### Option 1: Deploy via Azure Portal (Recommended for hosted labs)
 
 1. Sign in to the [Azure Portal](https://portal.azure.com)
 2. Search for **Deploy a custom template**
@@ -154,7 +154,7 @@ Once deployment and verification are complete, students will:
 
 ## Cleanup
 
-The lab environment is typically auto-reset by Skillable. If manual cleanup is needed:
+Your lab host may reset the environment automatically. If manual cleanup is needed:
 
 ```bash
 az group delete --name sc500-lab3c-rg --yes --no-wait

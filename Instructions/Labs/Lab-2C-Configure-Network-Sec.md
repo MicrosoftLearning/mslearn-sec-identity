@@ -19,7 +19,7 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
 
-1. Log in with the **User-1** administrator role.
+1. Log in with the **User1** administrator role.
 
 1. In the **Search** bar find and open **Deploy a custom template**.
    
@@ -63,7 +63,7 @@ This exercise should take approximately **65** minutes to complete.
 
 Azure Firewall is a managed, stateful network firewall as a service that provides centralized outbound traffic inspection for all resources in your hub-spoke network. In this lab, all outbound traffic from the `sc500-lab2c-spoke-vnet` workload subnet will route through the firewall in `sc500-lab2c-hub-vnet` — ensuring that outbound destinations are controlled by explicit application rules and all traffic is logged.
 
-1. Sign in to the **Azure portal** `https://portal.azure.com` using your **User-1** credentials.
+1. Sign in to the **Azure portal** `https://portal.azure.com` using your **User1** credentials.
 
 1. In the search bar, search for and select **Firewalls**.
 
@@ -75,7 +75,7 @@ Azure Firewall is a managed, stateful network firewall as a service that provide
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-lab2c-fw` |
-    | **Region** | East US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
     | **Availability zone** | None |
     | **Firewall SKU** | Standard |
     | **Firewall management** | Use a Firewall Policy to manage this firewall |
@@ -110,7 +110,7 @@ The workload VM (**sc500-lab2c-vm**) currently has no NSG applied. Any source ca
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-asg-ai-inference` |
-    | **Region** | East US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
 
 1. Select **Review + create**, then select **Create**.
 
@@ -138,7 +138,7 @@ The workload VM (**sc500-lab2c-vm**) currently has no NSG applied. Any source ca
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-lab2c-nsg` |
-    | **Region** | East US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
 
 1. Select **Review + create**, then select **Create**.
 
@@ -221,7 +221,7 @@ The workload storage account (`sc500lab2cstorage`) is currently accessible via i
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-storage-pe` |
-    | **Region** | East US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
 
 1. Select **Next: Resource**.
 
@@ -323,7 +323,7 @@ You will add an application rule collection that allows the workload VMs to reac
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-spoke-rt` |
     | **Propagate gateway routes** | No |
-    | **Region** | East US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
 
 1. Select **Review + create**, then select **Create**.
 

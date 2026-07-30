@@ -28,7 +28,7 @@
       "type": "string",
       "defaultValue": "eastus",
       "metadata": {
-        "description": "Azure region for all resources. East US is the default. Central US also works. No SQL regional restrictions apply to this lab."
+        "description": "Azure region for all resources. East US is the default. If the lab environment identifies a capacity constraint, replace this value with the region it recommends before deployment."
       }
     },
     "vmAdminUsername": {

@@ -15,7 +15,7 @@
       "minLength": 1,
       "maxLength": 14,
       "metadata": {
-        "description": "Suffix appended to the storage account name (sc500lab1d<suffix>) to keep it globally unique. Defaults to an 8-character hash of the subscription ID so Skillable does not need to pass a value \u2014 matches the pattern used by Labs 2A/2C/3C/3D setup templates."
+        "description": "Suffix appended to the storage account name (sc500lab1d<suffix>) to keep it globally unique. Defaults to an 8-character hash of the subscription ID so lab hosts do not need to pass a value \u2014 matches the pattern used by Labs 2A/2C/3C/3D setup templates."
       }
     },
     "location": {
@@ -25,10 +25,10 @@
         "description": "Azure region for all resources."
       }
     },
-    "user05ObjectId": {
+    "user3ObjectId": {
       "type": "string",
       "metadata": {
-        "description": "Object ID of sc500-user05 in the Entra ID tenant. This user receives the Contributor role assignment on sc500-lab1d-rg — the overprivileged access the student remediates in Section 4 of the lab using an Access Review."
+        "description": "Object ID of the User3 alias (username prefix sc500-user3-) in the Microsoft Entra tenant. This user has baseline Reader access and receives a direct Contributor assignment on sc500-lab1d-rg — the overprivileged access remediated in Section 4."
       }
     },
     "adminPassword": {
@@ -75,8 +75,8 @@
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
           },
-          "user05ObjectId": {
-            "value": "[parameters('user05ObjectId')]"
+          "user3ObjectId": {
+            "value": "[parameters('user3ObjectId')]"
           }
         },
         "template": {
@@ -102,10 +102,10 @@
             "adminPassword": {
               "type": "securestring"
             },
-            "user05ObjectId": {
+            "user3ObjectId": {
               "type": "string",
               "metadata": {
-                "description": "Object ID of sc500-user05. Receives Contributor on this resource group."
+                "description": "Object ID of User3 (sc500-user3-). Receives Contributor on this resource group in addition to baseline Reader access."
               }
             }
           },
@@ -243,12 +243,12 @@
             {
               "type": "Microsoft.Authorization/roleAssignments",
               "apiVersion": "2022-04-01",
-              "name": "[guid(resourceGroup().id, parameters('user05ObjectId'), variables('contributorRoleId'))]",
+              "name": "[guid(resourceGroup().id, parameters('user3ObjectId'), variables('contributorRoleId'))]",
               "properties": {
                 "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('contributorRoleId'))]",
-                "principalId": "[parameters('user05ObjectId')]",
+                "principalId": "[parameters('user3ObjectId')]",
                 "principalType": "User",
-                "description": "SC-500 Lab 1D: sc500-user05 Contributor — overprivileged assignment remediated via Access Review in Section 4."
+                "description": "SC-500 Lab 1D: User3 Contributor — overprivileged assignment remediated via Access Review in Section 4."
               }
             }
           ],

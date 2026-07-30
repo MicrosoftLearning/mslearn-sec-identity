@@ -138,7 +138,7 @@ This exercise should take approximately **45** minutes to complete.
 1. Add actions:
 
     - Change severity to Critical
-    - Assign owner to your Global Administrator account
+    - Assign owner to **User1**
     - Run playbook: **sc500-incident-playbook**
 
 1. Save the automation rule.

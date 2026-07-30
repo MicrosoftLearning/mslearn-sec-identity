@@ -5,7 +5,7 @@
     "description": "Lab 2B setup template — Secure Azure SQL Database. Deploys sc500-lab2b-rg with all pre-provisioned resources required before the student starts the lab.",
     "postDeploymentSteps": [
       "Register the Microsoft.Security provider so students can enable Defender for Databases: az provider register --namespace Microsoft.Security",
-      "SQL admin credentials — document in the Skillable lab guide for use in the Query Editor: login sc500sqladmin / password SC500Lab2b!"
+      "SQL admin credentials — document in the lab guide for use in the Query Editor: login sc500sqladmin / password SC500Lab2b!"
     ],
     "queryEditorNote": "The lab guide Query Editor step must use SQL Server authentication (not Active Directory authentication). The Global Administrator account is not a member of sc500-sql-admins and will not have Entra ID access to the database. Students must select 'SQL Server authentication' and enter login sc500sqladmin with the documented password."
   },
@@ -13,7 +13,7 @@
     "location": {
       "type": "string",
       "metadata": {
-        "description": "Azure region for all resources. REQUIRED — no default is set because Azure SQL Server provisioning is restricted to specific regions depending on the subscription type. Verify SQL Server availability in the target region before deploying. Confirmed working regions for M365 E5 trial subscriptions: centralus. Regions confirmed unavailable: eastus, eastus2. To check availability: az sql server list-usages --location <region> or attempt: az sql server create --location <region> --name test-check-<unique> --resource-group <rg> --admin-user test --admin-password Test@1234."
+        "description": "Azure region for all resources. REQUIRED — no default is set because Azure SQL availability and regional capacity should be checked before deployment. Use the region recommended by the lab environment."
       }
     },
     "sqlAdminLogin": {
@@ -27,7 +27,7 @@
       "type": "string",
       "defaultValue": "SC500Lab2b!",
       "metadata": {
-        "description": "SQL Server administrator password. Document this value in the Skillable lab guide — students enter it when authenticating to the Query Editor. Must meet Azure SQL complexity requirements: 8+ characters, uppercase, lowercase, number, and special character."
+        "description": "SQL Server administrator password. Document this value in the lab guide — students enter it when authenticating to the Query Editor. Must meet Azure SQL complexity requirements: 8+ characters, uppercase, lowercase, number, and special character."
       }
     }
   },
