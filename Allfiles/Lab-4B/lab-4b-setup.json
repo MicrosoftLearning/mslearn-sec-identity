@@ -20,12 +20,12 @@
       "ACR admin user disabled",
       "ACR network access changed to selected networks with approved subnet"
     ],
-    "deployCommand": "az deployment sub create --location centralus --template-file lab-4b-setup.json"
+    "deployCommand": "az deployment sub create --location eastus --template-file lab-4b-setup.json"
   },
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "centralus",
+      "defaultValue": "eastus",
       "metadata": {
         "description": "Azure region for all resources."
       }

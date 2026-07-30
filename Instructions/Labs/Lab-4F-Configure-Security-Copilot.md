@@ -54,7 +54,7 @@ This exercise should take approximately **45** minutes to complete.
 
 1. Start the setup flow for capacity provisioning.
 
-1. Provision **1 SCU** in **Central US**.
+1. Provision **1 SCU** in **East US**, unless your lab environment directs you to use another region.
 
 1. Confirm provisioning completes and the workspace becomes available.
 
@@ -62,7 +62,7 @@ This exercise should take approximately **45** minutes to complete.
 
     | Field | Value |
     |-------|-------|
-    | Region | Central US |
+    | Region | East US, unless your lab environment directs otherwise |
     | SCU count | 1 |
 
 ---

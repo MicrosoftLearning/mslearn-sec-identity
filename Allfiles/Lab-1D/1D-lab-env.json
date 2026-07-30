@@ -15,12 +15,12 @@
       "minLength": 1,
       "maxLength": 14,
       "metadata": {
-        "description": "Suffix appended to the storage account name (sc500lab1d<suffix>) to keep it globally unique. Defaults to an 8-character hash of the subscription ID so Skillable does not need to pass a value \u2014 matches the pattern used by Labs 2A/2C/3C/3D setup templates."
+        "description": "Suffix appended to the storage account name (sc500lab1d<suffix>) to keep it globally unique. Defaults to an 8-character hash of the subscription ID so lab hosts do not need to pass a value \u2014 matches the pattern used by Labs 2A/2C/3C/3D setup templates."
       }
     },
     "location": {
       "type": "string",
-      "defaultValue": "centralus",
+      "defaultValue": "eastus",
       "metadata": {
         "description": "Azure region for all resources."
       }
@@ -28,7 +28,7 @@
     "user3ObjectId": {
       "type": "string",
       "metadata": {
-        "description": "Object ID of the Skillable User3 alias (username prefix sc500-user3-) in the Microsoft Entra tenant. This user has baseline Reader access and receives a direct Contributor assignment on sc500-lab1d-rg — the overprivileged access remediated in Section 4."
+        "description": "Object ID of the User3 alias (username prefix sc500-user3-) in the Microsoft Entra tenant. This user has baseline Reader access and receives a direct Contributor assignment on sc500-lab1d-rg — the overprivileged access remediated in Section 4."
       }
     },
     "adminPassword": {

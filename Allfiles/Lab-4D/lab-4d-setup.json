@@ -10,12 +10,12 @@
       "Defender finding population (especially CSPM secret scanning and attack path analysis) can require 24+ hours after plan enablement.",
       "If configureDefenderPlans is true, subscription-level Defender pricing resources are configured."
     ],
-    "deployCommand": "az deployment sub create --location centralus --template-file lab-4d-setup.json"
+    "deployCommand": "az deployment sub create --location eastus --template-file lab-4d-setup.json"
   },
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "centralus",
+      "defaultValue": "eastus",
       "metadata": {
         "description": "Azure region for Lab 4D resources."
       }

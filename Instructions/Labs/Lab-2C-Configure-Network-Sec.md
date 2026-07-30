@@ -75,7 +75,7 @@ Azure Firewall is a managed, stateful network firewall as a service that provide
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-lab2c-fw` |
-    | **Region** | Central US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
     | **Availability zone** | None |
     | **Firewall SKU** | Standard |
     | **Firewall management** | Use a Firewall Policy to manage this firewall |
@@ -110,7 +110,7 @@ The workload VM (**sc500-lab2c-vm**) currently has no NSG applied. Any source ca
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-asg-ai-inference` |
-    | **Region** | Central US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
 
 1. Select **Review + create**, then select **Create**.
 
@@ -138,7 +138,7 @@ The workload VM (**sc500-lab2c-vm**) currently has no NSG applied. Any source ca
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-lab2c-nsg` |
-    | **Region** | Central US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
 
 1. Select **Review + create**, then select **Create**.
 
@@ -221,7 +221,7 @@ The workload storage account (`sc500lab2cstorage`) is currently accessible via i
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-storage-pe` |
-    | **Region** | Central US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
 
 1. Select **Next: Resource**.
 
@@ -323,7 +323,7 @@ You will add an application rule collection that allows the workload VMs to reac
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-spoke-rt` |
     | **Propagate gateway routes** | No |
-    | **Region** | Central US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
 
 1. Select **Review + create**, then select **Create**.
 

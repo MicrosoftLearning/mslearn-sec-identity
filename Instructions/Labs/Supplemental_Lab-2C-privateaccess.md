@@ -78,7 +78,7 @@ The Global Secure Access connector must run on a VM inside your private network 
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Virtual machine name** | sc500-lab2c-gsa-connector-vm |
-    | **Region** | Central US |
+    | **Region** | Use the same region as `sc500-lab2c-rg` (East US unless your lab environment directed otherwise) |
     | **Image** | Windows Server 2022 Datacenter: Azure Edition |
     | **Size** | Standard_B2s |
     | **Administrator username** | sc500vmadmin |

@@ -31,13 +31,13 @@ This lab runs on a Cloud Slice. Complete these steps before starting the exercis
 
 1. Select **Build your own template in the editor**, then select **Load file**.
 
-1. Select **1D-skillable-env.json** from the **F:\AllFiles\Lab-1D** folder on the lab VM, then select **Save**.
+1. Select **1D-lab-env.json** from the **F:\AllFiles\Lab-1D** folder on the lab VM, then select **Save**.
 
 1. On the deployment page, configure the following values:
 
     | Setting | Value |
     |---------|-------|
-    | **Region** | Central US |
+    | **Region** | East US, unless your lab environment recommends another region |
     | **User3 Object ID** | Paste the object ID returned by the Cloud Shell command |
     | **Admin password** | Enter a temporary password that meets Azure complexity requirements |
 
@@ -144,13 +144,13 @@ The **sc500-lab1d-policy.bicep** file has been pre-staged in your Cloud Shell ho
     ```bash
     az deployment sub create \
       --name sc500-tag-policy \
-      --location centralus \
+      --location eastus \
       --template-file ~/sc500-lab1d-policy.bicep
     ```
 
     The deployment typically completes in under one minute. A JSON output block appears in the terminal when it succeeds.
 
-    > **Note**: The `--location centralus` flag specifies the region for the deployment metadata record, not where resources are created. Subscription-scope Bicep deployments must specify a location for the ARM metadata even when the resources they create (like policy definitions) are globally scoped.
+    > **Note**: The `--location eastus` flag specifies the region for the deployment metadata record, not where resources are created. Subscription-scope Bicep deployments must specify a location for the ARM metadata even when the resources they create (like policy definitions) are globally scoped.
 
 1. In the Azure portal, navigate to **Policy** and select **Definitions** from the left menu.
 

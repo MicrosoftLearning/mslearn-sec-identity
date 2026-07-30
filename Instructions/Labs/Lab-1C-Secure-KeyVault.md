@@ -79,7 +79,7 @@ Azure Key Vault supports two permission models: **Vault access policies** (the l
     | **Subscription** | Your lab subscription |
     | **Resource group** | sc500-lab1c-rg |
     | **Key vault name** | A globally unique name starting with `sc500-kv-` (for example, `sc500-kv-yourinitials-1234`). Record it as `<your-kv-name>` for later steps. |
-    | **Region** | Central US |
+    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
     | **Pricing tier** | Standard |
 
 5. Select the **Access configuration** tab.

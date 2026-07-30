@@ -57,8 +57,8 @@ This exercise should take approximately **45** minutes to complete.
 **Option 2 - Manual Setup**:
 - Follow the detailed instructions in `Allfiles\Lab-3A\README.md`
 
-**Option 3 - Skillable Environment**:
-- If using Skillable Cloud Slice, the site may be pre-provisioned for you
+**Option 3 - Hosted lab environment**:
+- If using a hosted lab environment, the site may be pre-provisioned for you
 - Verify by navigating to `https://YOUR-TENANT.sharepoint.com/sites/sc500-ai-datastore`
 
 **Timing Note**: Purview DSPM signals can take 24-48 hours to fully populate after site creation. In a lab environment, you can proceed immediately to explore the dashboard structure, though some risk signals may still be processing.

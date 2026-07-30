@@ -54,7 +54,7 @@ Lab 3D is a **monitoring and detection lab**, not a configuration lab. Students 
 5. Click **Save**
 6. Configure parameters:
    - **Subscription**: Select the lab subscription
-   - **Location**: Choose a region that supports Azure OpenAI (e.g., Central US, West Europe)
+   - **Location**: Choose a region that supports Azure OpenAI (e.g., East US, West Europe)
    - **Lab Instance Id**: **Leave blank** to auto-generate an 8-character hash from the subscription ID. Only enter a value if you want a specific override.
    - **Enable Defender For AI**: Leave as `true` (enables Defender for AI Services on the subscription)
 7. Click **Review + create**, then **Create**
@@ -65,7 +65,7 @@ Lab 3D is a **monitoring and detection lab**, not a configuration lab. Students 
 
 ```bash
 # Set variables
-LOCATION="centralus"
+LOCATION="eastus"
 
 # Deploy the template (labInstanceId defaults to a hash of the subscription ID)
 az deployment sub create \
@@ -78,7 +78,7 @@ az deployment sub create \
 
 ```powershell
 # Set variables
-$Location = "centralus"
+$Location = "eastus"
 
 # Deploy the template (labInstanceId defaults to a hash of the subscription ID)
 New-AzSubscriptionDeployment `
@@ -222,7 +222,7 @@ Students do NOT configure or fix anything in this lab - they only observe and in
 
 ## Cleanup
 
-The lab environment is typically auto-reset by Skillable. If manual cleanup is needed:
+Your lab host may reset the environment automatically. If manual cleanup is needed:
 
 ```bash
 az group delete --name sc500-lab3d-rg --yes --no-wait
