@@ -22,12 +22,12 @@
       "Access restrictions for App Service and Function App",
       "API subscription requirement enabled and key-based test validation"
     ],
-    "deployCommand": "az deployment sub create --location eastus --template-file lab-4c-setup.json"
+    "deployCommand": "az deployment sub create --location centralus --template-file lab-4c-setup.json"
   },
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "eastus",
+      "defaultValue": "centralus",
       "metadata": {
         "description": "Azure region for Lab 4C resources."
       }

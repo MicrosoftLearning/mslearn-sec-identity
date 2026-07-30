@@ -21,14 +21,14 @@
       "sc500-storage-pe (Private Endpoint for blob storage in workload-subnet)",
       "sc500-spoke-rt (Route Table with DefaultToFirewall route)"
     ],
-    "deployCommand": "az deployment sub create --location eastus --template-file lab-2c-setup.json"
+    "deployCommand": "az deployment sub create --location centralus --template-file lab-2c-setup.json"
   },
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "eastus",
+      "defaultValue": "centralus",
       "metadata": {
-        "description": "Azure region for all resources. East US is the default. Central US also works. No SQL regional restrictions apply to this lab."
+        "description": "Azure region for all resources. Central US is the default. No SQL regional restrictions apply to this lab."
       }
     },
     "vmAdminUsername": {

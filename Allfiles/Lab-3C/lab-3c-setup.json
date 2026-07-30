@@ -7,8 +7,9 @@
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "eastus",
+      "defaultValue": "centralus",
       "allowedValues": [
+        "centralus",
         "eastus",
         "eastus2",
         "westus",

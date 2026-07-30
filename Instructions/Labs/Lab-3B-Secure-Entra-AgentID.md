@@ -35,7 +35,7 @@ In this lab, you will:
 
 This exercise should take approximately **60** minutes to complete.
 
-> **Note**: This lab uses one account — your **Global Administrator** credentials — to access four different portals: the Microsoft Entra admin center, Microsoft Defender XDR, the Microsoft 365 admin center, and Copilot Studio. Credentials are in the **Resources** tab of your lab environment.
+> **Note**: This lab uses one account — **User1** (`sc500-user1-`), which is the seeded Global Administrator — to access four different portals: the Microsoft Entra admin center, Microsoft Defender XDR, the Microsoft 365 admin center, and Copilot Studio. Credentials are in the **Resources** tab of your lab environment.
 
 ---
 
@@ -43,7 +43,7 @@ This exercise should take approximately **60** minutes to complete.
 
 1. Open the **Azure Portal** at `https://portal.azure.com`
 
-1. Log in as **User-1** using the provided credentials.
+1. Log in as **User1** using the provided credentials.
 
 1. Select **Yes** one the **Stay signed in?** dialog.
 

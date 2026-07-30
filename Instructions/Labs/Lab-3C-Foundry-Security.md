@@ -17,7 +17,7 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
 
-1. Log in with the **User-1** administrator role.
+1. Log in with the **User1** administrator role.
 
 1. In the **Search** bar find and open **Deploy a custom template**.
    
@@ -73,7 +73,7 @@ Before applying any controls, confirm the current state of the pre-provisioned e
 
 > **Note**: The pre-provisioned API Management instance name begins with **`sc500-lab3c-apim-`** followed by an 8-character suffix that is unique to your lab subscription. Throughout this lab, `<apim-name>` refers to that instance. The `sc500-lab3c-rg` resource group contains exactly one API Management instance — select it whenever the lab asks for `<apim-name>`.
 
-1. Sign in to the [Azure portal](https://portal.azure.com) using your **Global Administrator** credentials.
+1. Sign in to the [Azure portal](https://portal.azure.com) using your **User1** credentials.
 
 1. In the search bar, search for and select **API Management services**.
 

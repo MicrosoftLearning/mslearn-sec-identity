@@ -15,17 +15,17 @@
     "studentCreatedOrModifiedResources": [
       "Defender for Containers plan enabled at subscription scope",
       "Defender recommendations review for sc500-lab4b-aks",
-      "AcrPull role assignment for sc500-user08",
-      "AcrPush role assignment for sc500-user09",
+      "AcrPull role assignment for User2 (sc500-user2-)",
+      "AcrPush role assignment for User3 (sc500-user3-)",
       "ACR admin user disabled",
       "ACR network access changed to selected networks with approved subnet"
     ],
-    "deployCommand": "az deployment sub create --location eastus --template-file lab-4b-setup.json"
+    "deployCommand": "az deployment sub create --location centralus --template-file lab-4b-setup.json"
   },
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "eastus",
+      "defaultValue": "centralus",
       "metadata": {
         "description": "Azure region for all resources."
       }

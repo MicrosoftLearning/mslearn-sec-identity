@@ -1,7 +1,7 @@
 ---
 lab:
     title: 'Deploy and Secure Azure Key Vault'
-    description: 'Deploy an Azure Key Vault using the RBAC authorization model, configure role assignments for an App Service managed identity and a test user, store secrets and cryptographic keys, retrieve a secret using the managed identity via the IMDS token endpoint, apply network firewall rules, and enable the Defender for Key Vault protection plan.'
+    description: 'Deploy an Azure Key Vault using the RBAC authorization model, configure role assignments for an App Service managed identity and a test user, store secrets and cryptographic keys, retrieve a secret using the App Service managed identity token endpoint, apply network firewall rules, and enable the Defender for Key Vault protection plan.'
     level: 300
     duration: 60
     islab: true
@@ -17,7 +17,7 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
 
-1. Log in with the **User-1** administrator role.
+1. Log in with the **User1** administrator role.
 
 1. In the **Search** bar find and open **Deploy a custom template**.
    
@@ -56,7 +56,7 @@ In this lab, you will:
 
 This exercise should take approximately **60** minutes to complete.
 
-> **Note**: This lab uses two accounts: your **User-1** account (your primary lab credentials and Administrator) and **User-2** (used to verify that role-based access boundaries are enforced at the data plane). Credentials for both accounts are in the **Resources** tab of your lab environment.
+> **Note**: This lab uses two accounts: your **User1** account (your primary lab credentials and Administrator) and **User2** (used to verify that role-based access boundaries are enforced at the data plane). Credentials for both accounts are in the **Resources** tab of your lab environment.
 
 ---
 
@@ -66,7 +66,7 @@ Azure Key Vault supports two permission models: **Vault access policies** (the l
 
 > **Note**: Key Vault names must be globally unique across all Azure subscriptions. In the next step you will pick your own name that begins with **`sc500-kv-`** (for example, `sc500-kv-yourinitials-1234`). Throughout the rest of this lab, `<your-kv-name>` refers to whatever name you entered here — write it down or leave a Notepad window open with it, since you will reuse it in later sections.
 
-1. Sign in to the **Azure portal** using `https://portal.azure.com` using your **Global Administrator** credentials.
+1. Sign in to the **Azure portal** using `https://portal.azure.com` using your **User1** credentials.
 
 2. In the search bar, search for and select **Key vaults**.
 
@@ -79,7 +79,7 @@ Azure Key Vault supports two permission models: **Vault access policies** (the l
     | **Subscription** | Your lab subscription |
     | **Resource group** | sc500-lab1c-rg |
     | **Key vault name** | A globally unique name starting with `sc500-kv-` (for example, `sc500-kv-yourinitials-1234`). Record it as `<your-kv-name>` for later steps. |
-    | **Region** | East US |
+    | **Region** | Central US |
     | **Pricing tier** | Standard |
 
 5. Select the **Access configuration** tab.
@@ -112,7 +112,7 @@ Azure Key Vault supports two permission models: **Vault access policies** (the l
 
 ## Configure access using Azure RBAC
 
-With the vault created, you will assign four RBAC roles following the principle of least privilege. Rather than granting a broad administrator role to your **User-1** Administrator account, you will assign two targeted roles: **Key Vault Secrets Officer** (to create and manage secrets) and **Key Vault Crypto Officer** (to create and manage keys). You will then grant the **Key Vault Secrets User** role to the App Service managed identity (which will retrieve secrets at runtime), and the **Key Vault Reader** role to **User-2** (which you will use to verify that management-plane access does not grant data-plane access to secret values).
+With the vault created, you will assign four RBAC roles following the principle of least privilege. Rather than granting a broad administrator role to your **User1** Administrator account, you will assign two targeted roles: **Key Vault Secrets Officer** (to create and manage secrets) and **Key Vault Crypto Officer** (to create and manage keys). You will then grant the **Key Vault Secrets User** role to the App Service managed identity (which will retrieve secrets at runtime), and the **Key Vault Reader** role to **User2** (which you will use to verify that management-plane access does not grant data-plane access to secret values).
 
 > **Note**: When a Key Vault uses the RBAC authorization model, data-plane access is controlled entirely by role assignments — including for the account that created the vault. The subscription Owner role and the Global Administrator role do not grant any data-plane rights to Key Vault. Without an explicit assignment, your admin account cannot create, read, or delete secrets or keys.
 
@@ -128,7 +128,7 @@ The `sc500-lab1c-app` App Service has a system-assigned managed identity that wa
 
 1. On the **Members** tab, confirm **Assign access to** is set to **User, group, or service principal**.
 
-1. Select **+ Select members**, search for and select your **User-1** account (the account you are currently signed in with), then select **Select**.
+1. Select **+ Select members**, search for and select your **User1** account (the account you are currently signed in with), then select **Select**.
 
 1. Select **Review + assign**, then select **Review + assign** again to save.
 
@@ -140,7 +140,7 @@ The `sc500-lab1c-app` App Service has a system-assigned managed identity that wa
 
 1. On the **Members** tab, confirm **Assign access to** is set to **User, group, or service principal**.
 
-1. Select **+ Select members**, search for and select your **User-1** account (the account you are currently signed in with), then select **Select**.
+1. Select **+ Select members**, search for and select your **User1** account (the account you are currently signed in with), then select **Select**.
 
 1. Select **Review + assign**, then select **Review + assign** again to save.
 
@@ -166,7 +166,7 @@ The `sc500-lab1c-app` App Service has a system-assigned managed identity that wa
 
 1. On the **Members** tab, set **Assign access to** to **User, group, or service principal**.
 
-1. Select **+ Select members**, search for and select **User-2**, then select **Select**.
+1. Select **+ Select members**, search for and select **User2**, then select **Select**.
 
 1. Select **Review + assign**, then select **Review + assign** again to save.
 
@@ -174,10 +174,10 @@ The `sc500-lab1c-app` App Service has a system-assigned managed identity that wa
 
     | Principal | Role |
     |-----------|------|
-    | User-1 | Key Vault Secrets Officer |
-    | User-1 | Key Vault Crypto Officer |
+    | User1 | Key Vault Secrets Officer |
+    | User1 | Key Vault Crypto Officer |
     | sc500-lab1c-app | Key Vault Secrets User |
-    | User-2 | Key Vault Reader |
+    | User2 | Key Vault Reader |
 
     > **Note**: In a production environment, consider making the **Key Vault Secrets Officer** and **Key Vault Crypto Officer** assignments eligible through Privileged Identity Management (PIM) rather than active. This removes standing data-plane access entirely — administrators activate the role just-in-time when they need to manage vault contents, and access automatically expires.
 
@@ -228,11 +228,11 @@ You will now store two objects in the vault: a secret that represents the AI app
 
 ## Verify access control enforcement
 
-The **Key Vault Reader** role grants management-plane access only — a user assigned this role can see that secrets exist and view their names, but cannot read secret values. You will sign in as **User-2** to confirm that the role boundary is enforced at the data plane.
+The **Key Vault Reader** role grants management-plane access only — a user assigned this role can see that secrets exist and view their names, but cannot read secret values. You will sign in as **User2** to confirm that the role boundary is enforced at the data plane.
 
 1. Open a new **InPrivate** or **Private** browser window.
 
-1. Navigate to the Azure Portal at `https://portal.azure.com` and sign in using the **User-2** credentials from the **Resources** tab.
+1. Navigate to the Azure Portal at `https://portal.azure.com` and sign in using the **User2** credentials from the **Resources** tab.
 
 1. In the search bar, search for and select **Key vaults**.
 
@@ -240,7 +240,7 @@ The **Key Vault Reader** role grants management-plane access only — a user ass
 
 1. In the left menu open **Objects**, then select **Secrets**.
 
-    Confirm that **foundry-api-key** appears in the list. The Key Vault Reader role grants `User3` management-plane access, so the secret name is visible.
+    Confirm that **foundry-api-key** appears in the list. The Key Vault Reader role grants **User2** management-plane access, so the secret name is visible.
 
 1. Select **foundry-api-key** to open the secret, then select the current version.
 
@@ -248,88 +248,92 @@ The **Key Vault Reader** role grants management-plane access only — a user ass
 
     Confirm that an error message appears, such as **"The operation is not allowed by RBAC. If role assignments were recently changed, please wait several minutes for role assignments to become effective."** or an access denied notification.
 
-    > **Note**: The Key Vault Reader role includes `Microsoft.KeyVault/vaults/read` (management plane) but does not include `Microsoft.KeyVault/vaults/secrets/getSecret/action` (data plane). This means `User3` can enumerate secrets but cannot retrieve their values — precisely the boundary that separates the Reader role from the Secrets User role.
+    > **Note**: The Key Vault Reader role includes `Microsoft.KeyVault/vaults/read` (management plane) but does not include `Microsoft.KeyVault/vaults/secrets/getSecret/action` (data plane). This means **User2** can enumerate secrets but cannot retrieve their values — precisely the boundary that separates the Reader role from the Secrets User role.
 
-1. Close the InPrivate browser window and return to your Global Administrator browser session.
+1. Close the InPrivate browser window and return to your User1 browser session.
 
 ---
 
 ## Retrieve a secret using the managed identity
 
-The `sc500-lab1c-app` App Service managed identity has the **Key Vault Secrets User** role, which grants data-plane access to secret values. You will use the App Service's built-in Kudu console to retrieve the `foundry-api-key` secret programmatically — using a bearer token issued to the managed identity. No user credentials are involved at any point in this retrieval.
+The `sc500-lab1c-app` App Service managed identity has the **Key Vault Secrets User** role, which grants data-plane access to secret values. The app runs on Linux, so you will open an SSH session to its container and retrieve the `foundry-api-key` secret by using a bearer token issued to the managed identity. No user credentials are involved in this retrieval.
 
-When managed identity is enabled on an App Service, the runtime injects two environment variables into the application's process: `IDENTITY_ENDPOINT` (a local token service URL) and `IDENTITY_HEADER` (a shared secret that prevents SSRF attacks). Code running inside the App Service uses these to request OAuth tokens scoped to any Azure resource the identity has been granted access to.
+When managed identity is enabled on an App Service, the runtime injects two environment variables into the application's process: `IDENTITY_ENDPOINT` (a local token service URL) and `IDENTITY_HEADER` (a shared secret that prevents SSRF attacks). Code running inside the App Service uses these values to request OAuth tokens scoped to an Azure resource.
 
-> **Note**: Managed identity requires a **Basic (B1) tier** App Service or higher. The Free (F1) tier does not support managed identities and the `IDENTITY_ENDPOINT` environment variable will be empty. If your lab environment uses a Free tier App Service, managed identity is not available and the steps in this section cannot be completed until the App Service plan is upgraded.
+> **Note**: Managed identity requires a **Basic (B1) tier** App Service or higher. The Free (F1) tier does not support managed identities. The setup template deploys this app on B1.
 
-1. Confirm you are signed in to the Azure portal at `https://portal.azure.com` as your **User-1** account. If the InPrivate window from the previous section is still active, close it first.
+1. Confirm you are signed in to the Azure portal at `https://portal.azure.com` as **User1**. If the InPrivate window from the previous section is still active, close it first.
 
-1. In the search bar, search for and select **App Services**.
+1. Select the **Cloud Shell** icon (>_) in the Azure portal top bar. If prompted to select a shell type, select **Bash**.
 
-1. Select **sc500-lab1c-app**.
+1. Run the following command to open an SSH session in the Linux App Service container:
 
-1. In the left menu, under **Development Tools**, select **Advanced Tools**.
+    ```bash
+    az webapp ssh --resource-group sc500-lab1c-rg --name sc500-lab1c-app
+    ```
 
-1. Select **Go →** to open the Kudu service console in a new browser tab.
+    Wait until the prompt changes, indicating that commands now run inside the App Service container.
 
-1. In the Kudu top navigation bar, select **Debug console**, then select **PowerShell**.
+1. Run the following commands to verify the managed identity environment variables are present:
 
-    A PowerShell terminal opens. This runs inside the App Service's compute environment.
-
-1. In the PowerShell terminal, run the following two commands to verify the managed identity environment variables are present:
-
-    ```powershell
-    Write-Output "IDENTITY_ENDPOINT: $env:IDENTITY_ENDPOINT"
-    Write-Output "IDENTITY_HEADER is set: $(-not [string]::IsNullOrEmpty($env:IDENTITY_HEADER))"
+    ```bash
+    printf 'IDENTITY_ENDPOINT: %s\n' "$IDENTITY_ENDPOINT"
+    if [ -n "$IDENTITY_HEADER" ]; then
+      echo 'IDENTITY_HEADER is set: True'
+    else
+      echo 'IDENTITY_HEADER is set: False'
+    fi
     ```
 
     Expected output:
-    ```
+
+    ```text
     IDENTITY_ENDPOINT: http://127.0.0.1:<port>/MSI/token
     IDENTITY_HEADER is set: True
     ```
 
-    > **Important**: If `IDENTITY_ENDPOINT` is blank or `IDENTITY_HEADER is set: False`, stop here. Navigate to **sc500-lab1c-app → Settings → Identity** in the Azure portal and confirm the **System assigned** status is **On**. If the App Service is on the **Free (F1)** pricing tier, managed identity is not supported — the App Service plan must be upgraded to **Basic (B1)** or higher before continuing. Raise this with your instructor.
+    > **Important**: If `IDENTITY_ENDPOINT` is blank or `IDENTITY_HEADER is set: False`, exit the SSH session. Navigate to **sc500-lab1c-app > Settings > Identity** and confirm the **System assigned** status is **On**. Also confirm the App Service plan uses the **Basic (B1)** tier or higher.
 
-1. Run the following commands to request a bearer token for the managed identity, scoped to Azure Key Vault:
+1. Run the following commands to request a bearer token for Azure Key Vault and extract it with the Node.js runtime already installed in the container:
 
-    ```powershell
-    $tokenEndpoint = $env:IDENTITY_ENDPOINT
-    $identityHeader = $env:IDENTITY_HEADER
-    $response = Invoke-RestMethod `
-        -Uri "${tokenEndpoint}?resource=https://vault.azure.net&api-version=2019-08-01" `
-        -Method GET `
-        -Headers @{"X-IDENTITY-HEADER" = $identityHeader}
-    $token = $response.access_token
-    Write-Output "Token acquired: $($token.Substring(0, 20))..."
+    ```bash
+    token_response=$(curl --silent --show-error --fail \
+      "${IDENTITY_ENDPOINT}?resource=https%3A%2F%2Fvault.azure.net&api-version=2019-08-01" \
+      -H "X-IDENTITY-HEADER: ${IDENTITY_HEADER}")
+
+    token=$(printf '%s' "$token_response" | node -e \
+      'let input=""; process.stdin.on("data", c => input += c); process.stdin.on("end", () => process.stdout.write(JSON.parse(input).access_token));')
+
+    echo "Token acquired: ${token:0:20}..."
     ```
 
-    If successful, a partial token value is displayed, confirming the managed identity is active and returned a valid token.
+    A partial token value confirms that the managed identity returned a valid token.
 
-    > **Note**: The `$env:` provider variables are captured into local variables first. The Kudu PowerShell console does not expand `$env:` references reliably when they appear inline inside multi-line backtick-continued commands — pre-assigning them is the correct pattern for Kudu scripts.
+    > **Note**: App Services use a local token endpoint instead of the virtual-machine IMDS address (`169.254.169.254`). The `X-IDENTITY-HEADER` value prevents unauthorized processes from requesting tokens through that endpoint.
 
-    > **Note**: App Services use a different token endpoint than virtual machines. Rather than calling the VM-specific IMDS address (`169.254.169.254`), App Services expose two environment variables: `IDENTITY_ENDPOINT` (the local token service URL) and `IDENTITY_HEADER` (a secret value that prevents SSRF attacks). The `X-IDENTITY-HEADER` header serves the same security purpose as the `Metadata: true` header on the VM IMDS endpoint. The token returned is a JWT issued by Microsoft Entra ID for the `sc500-lab1c-app` managed identity.
+1. Run the following commands. Replace `<your-kv-name>` with the Key Vault name you recorded earlier:
 
-1. Run the following command to call the Key Vault REST API and retrieve the secret value. Replace `<your-vault-uri>` with the Vault URI you copied from the Key Vault Overview page earlier (for example, `https://<your-kv-name>.vault.azure.net`):
+    ```bash
+    kv_uri="https://<your-kv-name>.vault.azure.net"
+    secret_response=$(curl --silent --show-error --fail \
+      "${kv_uri}/secrets/foundry-api-key?api-version=7.4" \
+      -H "Authorization: Bearer ${token}")
 
-    ```powershell
-    $kvUri = "<your-vault-uri>"
-    $result = Invoke-RestMethod `
-        -Uri "$kvUri/secrets/foundry-api-key?api-version=2016-10-01" `
-        -Method GET `
-        -Headers @{Authorization = "Bearer $token"}
-    Write-Output "Secret value: $($result.value)"
+    secret_value=$(printf '%s' "$secret_response" | node -e \
+      'let input=""; process.stdin.on("data", c => input += c); process.stdin.on("end", () => process.stdout.write(JSON.parse(input).value));')
+
+    echo "Secret value: ${secret_value}"
     ```
 
-    The output should display the secret value you stored in the previous section:
+    The output should display the secret value you stored earlier:
 
-    ```
+    ```text
     Secret value: sk-foundry-demo-00000000000000000000000000000001
     ```
 
-    > **Note**: The bearer token identifies the managed identity of `sc500-lab1c-app` to Key Vault. Key Vault validates the token against Microsoft Entra ID, confirms that the identity holds the **Key Vault Secrets User** role, and returns the secret value. No username, password, or stored credential was used — authentication was handled entirely by the managed identity and the App Service token endpoint.
+    > **Note**: The bearer token identifies the `sc500-lab1c-app` managed identity to Key Vault. Key Vault confirms that the identity holds the **Key Vault Secrets User** role before returning the value.
 
-1. Close the Kudu browser tab and return to the Azure portal.
+1. Run `exit` to close the App Service SSH session, then close Cloud Shell.
 
 ---
 
@@ -411,7 +415,7 @@ Microsoft Defender for Key Vault detects unusual and potentially harmful access 
 
 ## Summary
 
-In this lab, you secured an Azure Key Vault from end to end. You deployed the vault using the RBAC authorization model, ensuring access governance integrates with the same role assignment system used across all Azure resources. You granted the App Service managed identity the minimum required permission — **Key Vault Secrets User** — and confirmed that the **Key Vault Reader** role assigned to `User3` enforces the management-plane and data-plane boundary: the user can see that a secret exists but cannot read its value. You stored a simulated AI application API key and a cryptographic key, then retrieved the secret programmatically from the App Service using a managed identity bearer token acquired from the IMDS endpoint — with no stored credentials involved at any step. Finally, you applied a network firewall to restrict vault access to an authorized virtual network, enabled the Defender for Key Vault protection plan, and configured audit log forwarding to a Log Analytics workspace.
+In this lab, you secured an Azure Key Vault from end to end. You deployed the vault using the RBAC authorization model, ensuring access governance integrates with the same role assignment system used across all Azure resources. You granted the App Service managed identity the minimum required permission — **Key Vault Secrets User** — and confirmed that the **Key Vault Reader** role assigned to **User2** enforces the management-plane and data-plane boundary: the user can see that a secret exists but cannot read its value. You stored a simulated AI application API key and a cryptographic key, then retrieved the secret programmatically from the App Service using a managed identity bearer token acquired from the App Service managed identity endpoint — with no stored credentials involved at any step. Finally, you applied a network firewall to restrict vault access to an authorized virtual network, enabled the Defender for Key Vault protection plan, and configured audit log forwarding to a Log Analytics workspace.
 
 You have successfully completed this exercise.
 

@@ -10,7 +10,7 @@
 // Student deployment command (run in Cloud Shell — Bash):
 //   az deployment sub create \
 //     --name sc500-tag-policy \
-//     --location eastus \
+//     --location centralus \
 //     --template-file ~/sc500-lab1d-policy.bicep
 //
 // Required permissions:

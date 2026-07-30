@@ -50,11 +50,11 @@ This exercise should take approximately **45** minutes to complete.
 
 ## Provision Security Copilot Capacity
 
-1. Sign in to [https://securitycopilot.microsoft.com](https://securitycopilot.microsoft.com) using your Global Administrator account.
+1. Sign in to [https://securitycopilot.microsoft.com](https://securitycopilot.microsoft.com) using your **User1** account.
 
 1. Start the setup flow for capacity provisioning.
 
-1. Provision **1 SCU** in **East US**.
+1. Provision **1 SCU** in **Central US**.
 
 1. Confirm provisioning completes and the workspace becomes available.
 
@@ -62,7 +62,7 @@ This exercise should take approximately **45** minutes to complete.
 
     | Field | Value |
     |-------|-------|
-    | Region | East US |
+    | Region | Central US |
     | SCU count | 1 |
 
 ---

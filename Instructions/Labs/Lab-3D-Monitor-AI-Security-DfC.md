@@ -19,7 +19,7 @@ This lab runs on a Cloud Slice. Follow these steps to build out your lab scenari
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
 
-1. Log in with the **User-1** administrator role.
+1. Log in with the **User1** administrator role.
 
 1. In the **Search** bar find and open **Deploy a custom template**.
    
@@ -60,7 +60,7 @@ This exercise should take approximately **15** minutes to complete.
 
 ## Open the Data and AI security dashboard
 
-1. Sign in to the [Azure portal](https://portal.azure.com) using your **Global Administrator** credentials.
+1. Sign in to the [Azure portal](https://portal.azure.com) using your **User1** credentials.
 
 1. In the search bar, search for and select **Microsoft Defender for Cloud**.
 
