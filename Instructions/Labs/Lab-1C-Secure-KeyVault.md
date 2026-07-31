@@ -13,7 +13,7 @@ lab:
 
 # Lab Setup
 
-This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
+Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
 
@@ -56,7 +56,7 @@ In this lab, you will:
 
 This exercise should take approximately **60** minutes to complete.
 
-> **Note**: This lab uses two accounts: your **User1** account (your primary lab credentials and Administrator) and **User2** (used to verify that role-based access boundaries are enforced at the data plane). Credentials for both accounts are in the **Resources** tab of your lab environment.
+> **Note**: This lab uses two accounts: your **User1** account (your primary lab credentials and Administrator) and **User2** (used to verify that role-based access boundaries are enforced at the data plane). Use the credentials provided for both accounts.
 
 ---
 
@@ -232,7 +232,7 @@ The **Key Vault Reader** role grants management-plane access only — a user ass
 
 1. Open a new **InPrivate** or **Private** browser window.
 
-1. Navigate to the Azure Portal at `https://portal.azure.com` and sign in using the **User2** credentials from the **Resources** tab.
+1. Navigate to the Azure Portal at `https://portal.azure.com` and sign in using the credentials provided for **User2**.
 
 1. In the search bar, search for and select **Key vaults**.
 

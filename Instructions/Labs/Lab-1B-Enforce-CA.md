@@ -123,7 +123,7 @@ The simulation confirmed the policy is correctly configured. You will now switch
 
 1. Navigate to Microsoft Forms at `https://forms.microsoft.com`.
 
-1. Sign in using the **Adele Vance** credentials from the **Resources** tab.
+1. Sign in to the **Adele Vance** account using the credentials provided.
 
 1. After entering the password, confirm that Entra ID prompts Adele with a **"More information required"** screen requesting an MFA method. This confirms the Conditional Access policy is active and requiring step-up authentication.
 

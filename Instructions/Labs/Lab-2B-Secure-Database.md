@@ -14,7 +14,7 @@ lab:
 
 # Lab Setup
 
-This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
+Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
 
@@ -62,7 +62,7 @@ Using a SQL-only administrator account means database access cannot be governed 
 
 You will create a security group named `sc500-sql-admins`, add `User3` as a member, and configure the group as the Entra ID administrator for `sc500-lab2b-sql`.
 
-1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` as **User1** (the seeded Global Administrator for this Cloud Slice profile — the username starts with `sc500-user1-` and the account alias is `User1`; use the password provided by your authorized lab host).
+1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` as **User1** (the seeded Global Administrator for this hosted lab profile — the username starts with `sc500-user1-` and the account alias is `User1`; use the password provided by your authorized lab host).
 
 1. In the left menu, expand **Groups** and select **All groups**.
 

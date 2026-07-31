@@ -13,13 +13,13 @@ lab:
 
 # Lab Setup
 
-This lab runs on a Cloud Slice. Complete these steps before starting the exercise to deploy the resources and seed the role assignment used by the access review scenario:
+Complete these steps before starting the exercise to deploy the resources and seed the role assignment used by the access review scenario:
 
 1. Open the **Azure portal** at `https://portal.azure.com` and sign in with **User1**.
 
 1. Select the **Cloud Shell** icon (>_) in the portal top bar. If prompted, select **Bash**.
 
-1. In the **Resources** tab of the lab environment, copy the username for **User3**. In Cloud Shell, replace `<User3-UPN>` with that username and run:
+1. Copy the username provided for **User3**. In Cloud Shell, replace `<User3-UPN>` with that username and run:
 
     ```bash
     az ad user show --id '<User3-UPN>' --query id --output tsv
@@ -65,7 +65,7 @@ In this lab, you will:
 
 This exercise should take approximately **60** minutes to complete.
 
-> **Note**: This lab uses the Cloud Slice account aliases and baseline subscription permissions: **User1** (`sc500-user1-`, Owner), **User2** (`sc500-user2-`, Contributor), and **User3** (`sc500-user3-`, Reader). The Lab Setup deployment adds a direct Contributor assignment for User3 on `sc500-lab1d-rg`; the access review removes that assignment while preserving User3's inherited Reader access. Credentials for all three accounts are in the **Resources** tab.
+> **Note**: This lab uses the provided account aliases and baseline subscription permissions: **User1** (`sc500-user1-`, Owner), **User2** (`sc500-user2-`, Contributor), and **User3** (`sc500-user3-`, Reader). The Lab Setup deployment adds a direct Contributor assignment for User3 on `sc500-lab1d-rg`; the access review removes that assignment while preserving User3's inherited Reader access. Use the credentials provided for all three accounts.
 
 ---
 
@@ -243,7 +243,7 @@ Built-in Azure roles such as **Reader** grant broad read access across all resou
 
 1. Select **Review + assign**, then select **Review + assign** again to save.
 
-    > **Note**: The `sc500-Security-Reviewer` role itself grants only the defined read permissions. In this Cloud Slice, **User2** also inherits the **Contributor** role from the subscription, so User2's effective permissions are broader than this custom role. The exercise demonstrates custom-role definition and assignment; in production, assign this role to a principal without a broader inherited role. User2 is also the designated reviewer in the next section.
+    > **Note**: The `sc500-Security-Reviewer` role itself grants only the defined read permissions. In this lab environment, **User2** also inherits the **Contributor** role from the subscription, so User2's effective permissions are broader than this custom role. The exercise demonstrates custom-role definition and assignment; in production, assign this role to a principal without a broader inherited role. User2 is also the designated reviewer in the next section.
 
 ---
 
@@ -296,7 +296,7 @@ A Microsoft Entra access review provides a structured, auditable process for dec
 
 1. Select **Start** to create and activate the access review.
 
-1. Open a new **InPrivate** or **Private** browser window and sign in to `https://entra.microsoft.com` with the **User2** credentials from the lab **Resources** tab.
+1. Open a new **InPrivate** or **Private** browser window and sign in to `https://entra.microsoft.com` using the credentials provided for **User2**.
 
 1. Browse to **ID Governance > Privileged Identity Management > Review access**.
 
@@ -362,7 +362,7 @@ In this lab, you applied governance controls across four dimensions: policy comp
 
 You assigned the built-in **Require a tag on resources** policy to surface existing non-compliant resources missing an `Environment` tag, and triggered an on-demand compliance scan to observe results immediately rather than waiting for the standard evaluation cycle. You then deployed a complementary custom policy at the subscription scope using a pre-written Bicep template — demonstrating that governance rules, like application code, can be version-controlled and deployed repeatably through Infrastructure as Code.
 
-You created a custom Azure role — `sc500-Security-Reviewer` — whose definition contains only the read permissions needed for a security auditor function. You assigned it to **User2** and distinguished the permissions granted by the custom role from User2's broader Contributor access inherited from the Cloud Slice subscription.
+You created a custom Azure role — `sc500-Security-Reviewer` — whose definition contains only the read permissions needed for a security auditor function. You assigned it to **User2** and distinguished the permissions granted by the custom role from User2's broader Contributor access inherited from the lab subscription.
 
 You used an Entra ID Access Review to formally evaluate **User3**'s standing Contributor assignment. Rather than removing access directly, the review process created an auditable record of the decision — who reviewed, the justification, and the resulting action. This audit trail satisfies compliance requirements for periodic access certification. Finally, you applied a CanNotDelete resource lock to the platform storage account, demonstrating that identity-based access control and resource locks serve complementary functions: access control governs who can act, while locks create an explicit barrier that even highly privileged identities cannot bypass without a deliberate removal step.
 

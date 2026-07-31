@@ -13,7 +13,7 @@ lab:
 
 # Lab Setup
 
-This lab runs on a Cloud Slice. Follow these steps to build out your lab scenarios:
+Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
 
