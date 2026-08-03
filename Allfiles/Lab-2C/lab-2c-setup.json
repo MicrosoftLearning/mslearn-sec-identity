@@ -10,7 +10,7 @@
       "sc500-lab2c-hub-vnet (10.3.0.0/16 with AzureFirewallSubnet 10.3.1.0/26)",
       "sc500-lab2c-spoke-vnet (10.4.0.0/16 with workload-subnet 10.4.0.0/24)",
       "VNet peering: hub-to-spoke and spoke-to-hub",
-      "sc500-lab2c-vm (Windows Server 2022, Standard_D2s_v3, in workload-subnet, no NSG)",
+      "sc500-lab2c-vm (Windows Server 2022, Standard_D2s_v6, in workload-subnet, no NSG)",
       "sc500lab2c<hash> (storage account, public access enabled — students disable it. The <hash> suffix is derived from the subscription ID at deploy time.)",
       "privatelink.blob.core.windows.net (private DNS zone linked to spoke VNet)"
     ],
@@ -206,7 +206,7 @@
               ],
               "properties": {
                 "hardwareProfile": {
-                  "vmSize": "Standard_D2s_v3"
+                  "vmSize": "Standard_D2s_v6"
                 },
                 "osProfile": {
                   "computerName": "sc500lab2cvm",
