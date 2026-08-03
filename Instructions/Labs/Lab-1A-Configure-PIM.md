@@ -38,7 +38,7 @@ This exercise should take approximately **45** minutes to complete.
 
 In this section, you assign the Conditional Access Administrator role to **Adele Vance** as an eligible assignment. An eligible assignment means the user does not hold the role permanently — they must request and activate it each time they need it.
 
-1. Sign in to the Microsoft Entra admin center at `https://entra.microsoft.com` as **MOD Administrator** — sign-in name `admin@<your-tenant>.onmicrosoft.com` and the **User Password** from the Resources tab.
+1. Sign in to the Microsoft Entra admin center at `https://entra.microsoft.com` as **MOD Administrator** using the credentials provided (sign-in name `admin@<your-tenant>.onmicrosoft.com`).
 
 1. In the left navigation, expand **ID Governance** and select **Privileged Identity Management**.
 
@@ -100,7 +100,7 @@ Now you will sign in as **Adele Vance** and submit a role activation request. Th
 
 1. Open a new **InPrivate** or **Private** browser window.
 
-1. Navigate to the Entra admin center using `https://entra.microsoft.com`. Sign in as **Adele Vance** — sign-in name `AdeleV@<your-tenant>.OnMicrosoft.com` and the **User Password** from the Resources tab.
+1. Navigate to the Entra admin center using `https://entra.microsoft.com`. Sign in to the **Adele Vance** account using the credentials provided (sign-in name `AdeleV@<your-tenant>.OnMicrosoft.com`).
 
 1. In the left navigation, expand **ID Governance** and select **Privileged Identity Management**.
 
