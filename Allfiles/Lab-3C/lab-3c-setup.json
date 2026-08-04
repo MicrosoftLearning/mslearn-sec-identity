@@ -313,9 +313,6 @@
                 "path": "sc500-foundry-api",
                 "protocols": [ "https" ],
                 "serviceUrl": "[concat(variables('openAiEndpoint'), '/openai')]",
-                "apiVersion": "2024-02-01",
-                "apiVersionSetId": "",
-                "isCurrent": true,
                 "type": "http",
                 "format": "openapi+json",
                 "value": "[concat('{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"Azure OpenAI API\",\"version\":\"2024-02-01\"},\"servers\":[{\"url\":\"', variables('openAiEndpoint'), '/openai\"}],\"paths\":{\"/deployments/', parameters('modelDeploymentName'), '/chat/completions\":{\"post\":{\"summary\":\"Create chat completion\",\"operationId\":\"chatCompletions\",\"parameters\":[{\"name\":\"api-version\",\"in\":\"query\",\"required\":true,\"schema\":{\"type\":\"string\",\"default\":\"2024-02-01\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"properties\":{\"messages\":{\"type\":\"array\"},\"max_tokens\":{\"type\":\"integer\"}}}}}},\"responses\":{\"200\":{\"description\":\"Success\"}}}}}}')]"

@@ -25,7 +25,7 @@ Follow these steps to build out your lab scenarios:
 
 1. In the menu choose **Load file**.
 
-1. Select the file **lab-3c-setup.json** from the Desktop folder.
+1. Select the file **lab-3c-setup.json** from the **F:\AllFiles\Lab-3C** folder on the lab VM.
 
 1. Select **Save**.
 
