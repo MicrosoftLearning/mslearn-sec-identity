@@ -69,6 +69,8 @@ This exercise should take approximately **60** minutes to complete.
 
 1. Select the **Go to Foundry portal** button.
 
+1. On the Foundry portal resources page, select the **sc500-proj-default** project.
+
 1. Find the box **Build an agent** and select **Start building**
 
 1. Enter **Agent name** of `sc500-lab-test` into the box.
