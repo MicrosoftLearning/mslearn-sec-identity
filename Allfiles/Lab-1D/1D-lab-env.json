@@ -28,7 +28,7 @@
     "user3ObjectId": {
       "type": "string",
       "metadata": {
-        "description": "Object ID of the User3 alias (username prefix sc500-user3-) in the Microsoft Entra tenant. This user has baseline Reader access and receives a direct Contributor assignment on sc500-lab1d-rg — the overprivileged access remediated in Section 4."
+        "description": "Object ID of the User3 alias (username prefix sc500-user3-) in the Microsoft Entra tenant. This user has baseline Reader access and receives a direct Contributor assignment on the lab subscription — the overprivileged access remediated in Section 4."
       }
     },
     "adminPassword": {
@@ -74,9 +74,6 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
-          },
-          "user3ObjectId": {
-            "value": "[parameters('user3ObjectId')]"
           }
         },
         "template": {
@@ -101,12 +98,6 @@
             },
             "adminPassword": {
               "type": "securestring"
-            },
-            "user3ObjectId": {
-              "type": "string",
-              "metadata": {
-                "description": "Object ID of User3 (sc500-user3-). Receives Contributor on this resource group in addition to baseline Reader access."
-              }
             }
           },
           "variables": {
@@ -115,8 +106,7 @@
             "subnetName": "default",
             "nicName": "sc500-lab1d-nic",
             "vmName": "sc500-lab1d-vm",
-            "osDiskName": "sc500-lab1d-osdisk",
-            "contributorRoleId": "b24988ac-6180-42a0-ab88-20f7382dd24c"
+            "osDiskName": "sc500-lab1d-osdisk"
           },
           "resources": [
             {
@@ -191,7 +181,7 @@
               "location": "[parameters('location')]",
               "properties": {
                 "hardwareProfile": {
-                  "vmSize": "Standard_D2s_v3"
+                  "vmSize": "Standard_D2s_v6"
                 },
                 "storageProfile": {
                   "imageReference": {
@@ -239,17 +229,6 @@
               "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('nicName'))]"
               ]
-            },
-            {
-              "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2022-04-01",
-              "name": "[guid(resourceGroup().id, parameters('user3ObjectId'), variables('contributorRoleId'))]",
-              "properties": {
-                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', variables('contributorRoleId'))]",
-                "principalId": "[parameters('user3ObjectId')]",
-                "principalType": "User",
-                "description": "SC-500 Lab 1D: User3 Contributor — overprivileged assignment remediated via Access Review in Section 4."
-              }
             }
           ],
           "outputs": {
@@ -267,6 +246,17 @@
       "dependsOn": [
         "[subscriptionResourceId('Microsoft.Resources/resourceGroups', 'sc500-lab1d-rg')]"
       ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(subscription().id, parameters('user3ObjectId'), 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+        "principalId": "[parameters('user3ObjectId')]",
+        "principalType": "User",
+        "description": "SC-500 Lab 1D: User3 Contributor on the lab subscription — overprivileged assignment remediated via Access Review in Section 4."
+      }
     }
   ],
   "outputs": {

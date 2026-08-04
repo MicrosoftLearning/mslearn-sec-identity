@@ -74,6 +74,14 @@ You will create a stored access policy on the `training-data` container that gra
 
 1. Select the **training-data** container.
 
+1. Select **Upload**.
+
+1. On the **Upload blob** pane, select **Browse for files**, and then select **sample-1.json** from the **F:\AllFiles\Lab-2A** folder on the lab VM.
+
+1. Select **Upload**.
+
+1. Confirm that **sample-1.json** appears in the container.
+
 1. In the menu on the left, select **Settings** then **Access policy**.
 
     > **Note**: This opens the **Access policy** pane for the container — not the storage account. Stored access policies are defined at the container level.

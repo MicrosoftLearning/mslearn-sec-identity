@@ -27,7 +27,7 @@
       "value": "P@ssw0rd1234!ChangeMe"
     },
     "vmSize": {
-      "value": "Standard_D2s_v3"
+      "value": "Standard_D2s_v6"
     },
     "syntheticConnectionString": {
       "value": "Server=sc500-db.database.windows.net;Database=AiWorkload;User Id=sqladmin;Password=Contoso@2026!;"

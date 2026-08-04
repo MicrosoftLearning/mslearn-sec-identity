@@ -1,0 +1,6 @@
+{
+  "dataset": "sc500-training-data",
+  "recordId": "sample-1",
+  "classification": "confidential",
+  "description": "Sample AI training data used to validate storage access controls."
+}
