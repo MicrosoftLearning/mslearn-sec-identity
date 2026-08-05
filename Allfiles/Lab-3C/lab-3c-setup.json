@@ -27,11 +27,10 @@
     },
     "labInstanceId": {
       "type": "string",
-      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]",
       "minLength": 1,
       "maxLength": 8,
       "metadata": {
-        "description": "Suffix used to generate globally unique resource names. Defaults to an 8-character hash of the subscription ID (deterministic per subscription). Override at deploy time if you want a specific value."
+        "description": "Suffix used to generate globally unique resource names. Enter the first eight hexadecimal characters of the lab subscription ID, with hyphens removed."
       }
     },
     "publisherEmail": {
@@ -55,6 +54,7 @@
     "openAiName": "[concat('sc500-lab3c-ai-', parameters('labInstanceId'))]",
     "aiHubName": "[concat('sc500-lab3c-hub-', parameters('labInstanceId'))]",
     "aiProjectName": "sc500-lab3c-foundry",
+    "openAiConnectionName": "sc500-lab3c-openai",
     "storageAccountName": "[concat('sc500lab3c', parameters('labInstanceId'))]",
     "keyVaultName": "[concat('sc500-kv-', parameters('labInstanceId'))]",
     "appInsightsName": "sc500-lab3c-insights",
@@ -95,6 +95,7 @@
           "openAiName": { "value": "[variables('openAiName')]" },
           "aiHubName": { "value": "[variables('aiHubName')]" },
           "aiProjectName": { "value": "[variables('aiProjectName')]" },
+          "openAiConnectionName": { "value": "[variables('openAiConnectionName')]" },
           "storageAccountName": { "value": "[variables('storageAccountName')]" },
           "keyVaultName": { "value": "[variables('keyVaultName')]" },
           "appInsightsName": { "value": "[variables('appInsightsName')]" },
@@ -115,6 +116,7 @@
             "openAiName": { "type": "string" },
             "aiHubName": { "type": "string" },
             "aiProjectName": { "type": "string" },
+            "openAiConnectionName": { "type": "string" },
             "storageAccountName": { "type": "string" },
             "keyVaultName": { "type": "string" },
             "appInsightsName": { "type": "string" },
@@ -281,13 +283,35 @@
               }
             },
             {
+              "type": "Microsoft.MachineLearningServices/workspaces/connections",
+              "apiVersion": "2024-04-01-preview",
+              "name": "[concat(parameters('aiProjectName'), '/', parameters('openAiConnectionName'))]",
+              "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('aiProjectName'))]",
+                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName'))]"
+              ],
+              "properties": {
+                "category": "AzureOpenAI",
+                "target": "[variables('openAiEndpoint')]",
+                "authType": "ApiKey",
+                "isSharedToAll": true,
+                "credentials": {
+                  "key": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName')), '2024-04-01-preview').key1]"
+                },
+                "metadata": {
+                  "ApiType": "Azure",
+                  "ResourceId": "[resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName'))]"
+                }
+              }
+            },
+            {
               "type": "Microsoft.ApiManagement/service",
               "apiVersion": "2023-05-01-preview",
               "name": "[parameters('apimName')]",
               "location": "[parameters('location')]",
               "sku": {
-                "name": "Consumption",
-                "capacity": 0
+                "name": "BasicV2",
+                "capacity": 1
               },
               "identity": {
                 "type": "SystemAssigned"
@@ -315,7 +339,7 @@
                 "serviceUrl": "[concat(variables('openAiEndpoint'), '/openai')]",
                 "type": "http",
                 "format": "openapi+json",
-                "value": "[concat('{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"Azure OpenAI API\",\"version\":\"2024-02-01\"},\"servers\":[{\"url\":\"', variables('openAiEndpoint'), '/openai\"}],\"paths\":{\"/deployments/', parameters('modelDeploymentName'), '/chat/completions\":{\"post\":{\"summary\":\"Create chat completion\",\"operationId\":\"chatCompletions\",\"parameters\":[{\"name\":\"api-version\",\"in\":\"query\",\"required\":true,\"schema\":{\"type\":\"string\",\"default\":\"2024-02-01\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"properties\":{\"messages\":{\"type\":\"array\"},\"max_tokens\":{\"type\":\"integer\"}}}}}},\"responses\":{\"200\":{\"description\":\"Success\"}}}}}}')]"
+                "value": "[concat('{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"Azure OpenAI API\",\"version\":\"2024-10-21\"},\"servers\":[{\"url\":\"', variables('openAiEndpoint'), '/openai\"}],\"paths\":{\"/deployments/', parameters('modelDeploymentName'), '/chat/completions\":{\"post\":{\"summary\":\"Create chat completion\",\"operationId\":\"chatCompletions\",\"parameters\":[{\"name\":\"api-version\",\"in\":\"query\",\"required\":true,\"schema\":{\"type\":\"string\",\"default\":\"2024-10-21\"}}],\"requestBody\":{\"required\":true,\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"properties\":{\"messages\":{\"type\":\"array\"},\"max_completion_tokens\":{\"type\":\"integer\"}}}}}},\"responses\":{\"200\":{\"description\":\"Success\"}}}}}}')]"
               }
             },
             {
@@ -328,7 +352,7 @@
               ],
               "properties": {
                 "description": "Azure OpenAI backend for SC-500 Lab 3C",
-                "url": "[variables('openAiEndpoint')]",
+                "url": "[concat(variables('openAiEndpoint'), '/openai')]",
                 "protocol": "http",
                 "credentials": {
                   "header": {
@@ -336,16 +360,25 @@
                   }
                 }
               }
+            },
+            {
+              "type": "Microsoft.ApiManagement/service/apis/policies",
+              "apiVersion": "2023-05-01-preview",
+              "name": "[concat(parameters('apimName'), '/', parameters('apiName'), '/policy')]",
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apimName'), parameters('apiName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/backends', parameters('apimName'), 'openai-backend')]"
+              ],
+              "properties": {
+                "format": "rawxml",
+                "value": "<policies><inbound><base /><set-backend-service backend-id=\"openai-backend\" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>"
+              }
             }
           ],
           "outputs": {
             "openAiEndpoint": {
               "type": "string",
               "value": "[variables('openAiEndpoint')]"
-            },
-            "openAiKey": {
-              "type": "string",
-              "value": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName')), '2024-04-01-preview').key1]"
             },
             "apimGatewayUrl": {
               "type": "string",
@@ -385,9 +418,13 @@
       "type": "string",
       "value": "[variables('modelDeploymentName')]"
     },
+    "openAiConnectionName": {
+      "type": "string",
+      "value": "[variables('openAiConnectionName')]"
+    },
     "setupInstructions": {
       "type": "string",
-      "value": "The infrastructure has been deployed. IMPORTANT: The Azure AI Foundry project requires additional configuration: 1) Navigate to https://ai.azure.com and select the sc500-lab3c-foundry project. 2) Add a connection to the Azure OpenAI service. 3) Ensure the gpt-5.4-mini deployment is visible in Models + endpoints. The API Management API (sc500-foundry-api) is intentionally configured with NO subscription requirement and NO rate limit policy - students will apply these controls during the lab."
+      "value": "The infrastructure has been deployed. The sc500-lab3c-foundry project includes the sc500-lab3c-openai connection and gpt-5.4-mini deployment. The API Management API routes through the credentialed openai-backend but intentionally has no subscription requirement and no token rate limit policy; students apply those controls during the lab."
     }
   }
 }

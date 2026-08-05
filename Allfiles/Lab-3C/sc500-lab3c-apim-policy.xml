@@ -21,6 +21,8 @@
     <inbound>
         <base />
 
+        <set-backend-service backend-id="openai-backend" />
+
         <!--
           Token rate limit: restricts this API to 500 tokens per minute per subscription key.
 
@@ -28,7 +30,7 @@
           tokens-per-minute:        Maximum tokens allowed per minute per key.
           estimate-prompt-tokens:   Estimate prompt token count before the call completes,
                                     so the limit applies to both input and output tokens.
-          tokens-left-header:       Response header showing remaining token budget.
+          remaining-tokens-header-name: Response header showing remaining token budget.
 
           When the limit is exceeded, APIM returns HTTP 429 Too Many Requests.
           The Retry-After response header tells the caller when to retry.
@@ -37,12 +39,11 @@
           500 TPM is appropriate for a lab or development environment.
           Production values are typically 10,000–100,000 TPM per key.
         -->
-        <azure-openai-token-limit
+        <llm-token-limit
             counter-key="@(context.Subscription.Id)"
             tokens-per-minute="500"
             estimate-prompt-tokens="true"
-            tokens-left-header="x-ratelimit-remaining-tokens"
-            remaining-tokens-after-retry-header="x-ratelimit-tokens-after-retry" />
+            remaining-tokens-header-name="x-ratelimit-remaining-tokens" />
 
     </inbound>
     <backend>
