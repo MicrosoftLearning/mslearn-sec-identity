@@ -11,11 +11,10 @@
   "parameters": {
     "labInstanceId": {
       "type": "string",
-      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]",
       "minLength": 1,
-      "maxLength": 14,
+      "maxLength": 8,
       "metadata": {
-        "description": "Suffix appended to the storage account name (sc500lab1d<suffix>) to keep it globally unique. Defaults to an 8-character hash of the subscription ID so lab hosts do not need to pass a value \u2014 matches the pattern used by Labs 2A/2C/3C/3D setup templates."
+        "description": "Suffix appended to the storage account name (sc500lab1d<suffix>) to keep it globally unique. Enter the first eight hexadecimal characters of the lab subscription ID, with hyphens removed."
       }
     },
     "location": {
@@ -181,7 +180,7 @@
               "location": "[parameters('location')]",
               "properties": {
                 "hardwareProfile": {
-                  "vmSize": "Standard_D2s_v6"
+                  "vmSize": "Standard_D2s_v7"
                 },
                 "storageProfile": {
                   "imageReference": {
