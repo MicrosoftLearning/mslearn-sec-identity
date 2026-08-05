@@ -36,6 +36,15 @@ Complete these steps before starting the exercise to deploy the resources and se
 
 1. Copy the displayed suffix. You will provide it as the **Lab Instance Id**.
 
+1. Register the Microsoft.PolicyInsights resource provider required for on-demand policy scans:
+
+    ```bash
+    az provider register --namespace Microsoft.PolicyInsights --wait
+    az provider show --namespace Microsoft.PolicyInsights --query registrationState -o tsv
+    ```
+
+    Confirm the output is `Registered` before continuing.
+
 1. In the portal search bar, find and open **Deploy a custom template**.
 
 1. Select **Build your own template in the editor**, then select **Load file**.
@@ -49,11 +58,10 @@ Complete these steps before starting the exercise to deploy the resources and se
     | **Region** | East US, unless your lab environment recommends another region |
     | **Lab Instance Id** | Paste the eight-character suffix returned by Cloud Shell |
     | **User3 Object ID** | Paste the object ID returned by the Cloud Shell command |
-    | **Admin password** | Enter a temporary password that meets Azure complexity requirements |
 
 1. Select **Review + create**, then select **Create**.
 
-    > **Note**: Deployment may take several minutes. It creates `sc500-lab1d-rg`, the storage account and virtual machine used for policy evaluation, and an explicit Contributor assignment for **User3** on the lab subscription.
+    > **Note**: Deployment normally completes in under two minutes. It creates `sc500-lab1d-rg`, an untagged storage account and virtual network for policy evaluation, and an explicit Contributor assignment for **User3** on the lab subscription.
 
 1. When deployment succeeds, close Cloud Shell and continue to the exercise.
 
@@ -81,7 +89,7 @@ This exercise should take approximately **60** minutes to complete.
 
 ## Assign a built-in compliance policy
 
-Azure Policy evaluates resources against defined rules and reports compliance without requiring changes to existing resources. A **Deny** effect policy blocks new non-compliant resources from being created; existing resources that already violate the policy appear as **Non-compliant** in the compliance report. You will assign the built-in **Require a tag on resources** policy to `sc500-lab1d-rg`, which will flag the pre-provisioned storage account (name starts with **`sc500lab1d`**) and `sc500-lab1d-vm` (the virtual machine) as non-compliant because neither resource has an `Environment` tag. You may see one additional non-compliant resource listed — this is expected.
+Azure Policy evaluates resources against defined rules and reports compliance without requiring changes to existing resources. A **Deny** effect policy blocks new non-compliant resources from being created; existing resources that already violate the policy appear as **Non-compliant** in the compliance report. You will assign the built-in **Require a tag on resources** policy to `sc500-lab1d-rg`, which will flag the pre-provisioned storage account (name starts with **`sc500lab1d`**) and **sc500-lab1d-vnet** virtual network as non-compliant because neither resource has an `Environment` tag.
 
 1. Sign in to the Azure portal `https://portal.azure.com` using your **User1** credentials.
 
@@ -109,7 +117,7 @@ Azure Policy evaluates resources against defined rules and reports compliance wi
 
     > **Note**: Policy assignments can take up to 30 minutes to fully propagate before compliance evaluation reflects the new assignment. You will trigger an on-demand scan in the next step rather than waiting.
 
-1. Select the **Cloud Shell** icon (>_) in the Azure portal top bar. If prompted to select a shell type, select **Bash**. If prompted to create a storage account, select your subscription and select **Create**.
+1. Select the **Cloud Shell** icon (>_) in the Azure portal top bar. If prompted to select a shell type, select **Bash**. On the Getting started page, select **No storage account required**, select the lab subscription, and then select **Apply**.
 
 1. Run the following command to trigger an on-demand compliance evaluation for the resource group:
 
@@ -127,7 +135,7 @@ Azure Policy evaluates resources against defined rules and reports compliance wi
 
 1. Locate the **sc500-require-env-tag** assignment in the compliance list.
 
-1. Confirm that the storage account (name starts with **`sc500lab1d`**) and **`sc500-lab1d-vm`** (virtual machine) appear in the non-compliant resources list. You may see one additional resource listed — this is expected and does not affect the lab outcome.
+1. Confirm that the storage account (name starts with **`sc500lab1d`**) and **sc500-lab1d-vnet** virtual network appear in the non-compliant resources list.
 
     > **Note**: Both resources were deployed without an `Environment` tag and therefore violate the policy. The policy assignment also prevents any future resource deployments in `sc500-lab1d-rg` from omitting the `Environment` tag. Existing resources remain operational — compliance evaluation is non-destructive.
 
@@ -137,7 +145,7 @@ Azure Policy evaluates resources against defined rules and reports compliance wi
 
 The built-in policy you assigned enforces tag requirements on individual resources. A complementary policy at the resource group level ensures that any new resource groups created in the subscription are also tagged from the start. Rather than configuring this policy in the portal, you will deploy a pre-written Bicep template that defines and assigns the custom policy at the subscription scope. Deploying governance policy through Infrastructure as Code ensures it is version-controlled, repeatable, and auditable.
 
-The **sc500-lab1d-policy.bicep** file has been pre-staged in your Cloud Shell home directory. It defines a custom **Deny** policy that requires an **Environment** tag on all resource groups and creates a subscription-scope assignment.
+The **sc500-lab1d-policy.bicep** file is provided in the **F:\AllFiles\Lab-1D** folder. It defines a custom **Deny** policy that requires an **Environment** tag on all resource groups and creates a subscription-scope assignment.
 
 1. Open a Cloud Shell (Bash), if it is not already open.
 
