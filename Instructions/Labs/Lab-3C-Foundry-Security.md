@@ -19,19 +19,45 @@ Follow these steps to build out your lab scenarios:
 
 1. Log in with the **User1** administrator role.
 
+1. In the Azure portal top bar, select the **Cloud Shell** icon (**>_**). If prompted, select **Bash**.
+
+1. Register the Microsoft.Security resource provider so Defender plans are available later in the lab:
+
+    ```bash
+    az provider register --namespace Microsoft.Security
+    ```
+
+1. Wait until registration completes:
+
+    ```bash
+    az provider show --namespace Microsoft.Security --query "registrationState" -o tsv
+    ```
+
+    Re-run the command until the output is `Registered`.
+
+1. Generate a stable eight-character suffix from the lab subscription ID:
+
+    ```bash
+    LAB_INSTANCE_ID=$(az account show --query id -o tsv | tr -d '-' | cut -c1-8)
+    echo $LAB_INSTANCE_ID
+    ```
+
+1. Copy the displayed value, and then close Cloud Shell. You will use it as the **Lab Instance Id** during template deployment.
 1. In the **Search** bar find and open **Deploy a custom template**.
    
 1. Select **Build your own template in the editor**.
 
 1. In the menu choose **Load file**.
 
-1. Select the file **lab-3c-setup.json** from the Desktop folder.
+1. Select the file **lab-3c-setup.json** from the **F:\AllFiles\Lab-3C** folder on the lab VM.
 
 1. Select **Save**.
 
+1. On the **Basics** page, paste the value you copied from Cloud Shell into **Lab Instance Id**.
+
 1. Select **Review + create**.
 
-    > **Note**: Deployment may take a few minutes to complete.
+    > **Note**: The Basic v2 API Management instance can take 10–15 minutes to provision. Wait for the deployment to show **Succeeded** before continuing.
 
 1. Close the browser.
 
@@ -87,7 +113,7 @@ Before applying any controls, confirm the current state of the pre-provisioned e
 
 1. In the **Inbound processing** section, select the **</>Policy** icon to open the policy editor.
 
-    Confirm that the current policy is empty or contains only the `<base />` element — no token rate limit, no authentication enforcement, no content safety policy is applied. This is the unsecured state.
+    Confirm that the policy contains `<base />` and `<set-backend-service backend-id="openai-backend" />`. The backend policy supplies the Azure OpenAI credential required for routing, but no token rate limit or caller authentication is applied. This is the unsecured state.
 
 1. Select **Discard** or close the policy editor without making changes.
 
@@ -95,17 +121,23 @@ Before applying any controls, confirm the current state of the pre-provisioned e
 
 ### Review the Foundry model endpoint
 
-1. Open a new browser tab and navigate to the [Azure AI Foundry portal](https://ai.azure.com).
+1. Open a new browser tab and navigate to the [Microsoft Foundry portal](https://ai.azure.com).
 
-1. Select the **sc500-lab3c-foundry** project.
+1. If a New Foundry project opens, select the project name in the upper-left corner, and then select **View all resources**.
 
-1. In the left navigation, select **Models + endpoints** (or **Deployments**).
+1. Select the **sc500-lab3c-foundry** Hub project.
 
-1. Select the **gpt-4o-mini** deployment and review the endpoint details.
+1. On the resource details pane, select **Open in Foundry Classic**.
 
-1. In the left navigation, select **Safety + security**, then select **Content filters**.
+    > **Note**: This lab uses a Hub project. Hub projects are managed in Foundry Classic and are not supported in the New Foundry project experience.
 
-    Confirm that **no content filter** is assigned to the gpt-4o-mini deployment — the model is running with default settings and no guardrail is active. This is the second unsecured condition you will remediate in this lab.
+1. In the left navigation, under **My assets**, select **Models + endpoints**.
+
+1. Locate the **sc500-lab3c-openai** deployment row, confirm its **Model name** is **gpt-5.4-mini** and its **State** is **Succeeded**, and then review the endpoint details.
+
+1. In the left navigation, under **Protect and govern**, select **Guardrails + controls**, and then select the **Content filters** tab.
+
+    Confirm that **no custom content filter** is assigned to the gpt-5.4-mini deployment. The model uses the default filter until you create and assign a custom guardrail later in the lab.
 
 1. Return to the Azure portal tab for the next section.
 
@@ -115,7 +147,7 @@ Before applying any controls, confirm the current state of the pre-provisioned e
 
 Azure API Management provides AI Gateway policies that are purpose-built for language model endpoints. The token rate limit policy counts the tokens consumed per caller per minute and returns HTTP 429 when the limit is exceeded, protecting the endpoint against cost abuse.
 
-The policy XML for this lab is provided in the **Lab3-resources** folder. You will paste it directly into the APIM policy editor — you do not need to author policy XML from memory.
+The policy XML for this lab is provided in the **F:\AllFiles\Lab-3C** folder. You will paste it directly into the APIM policy editor — you do not need to author policy XML from memory.
 
 1. In the Azure portal, navigate back to **`<apim-name>` > APIs > sc500-foundry-api**.
 
@@ -123,7 +155,7 @@ The policy XML for this lab is provided in the **Lab3-resources** folder. You wi
 
 1. In the **Inbound processing** section, select the **</>Policy** icon to open the policy editor.
 
-1. Open the file **Lab3-resources\sc500-lab3c-apim-policy.xml** from your lab files.
+1. Open **F:\AllFiles\Lab-3C\sc500-lab3c-apim-policy.xml** on the lab VM.
 
 1. Select and copy the complete contents of the file.
 
@@ -133,10 +165,11 @@ The policy XML for this lab is provided in the **Lab3-resources** folder. You wi
 
     | Policy element | What it enforces |
     |----------------|-----------------|
-    | `azure-openai-token-limit` | 500 tokens per minute per subscription key; returns HTTP 429 when exceeded |
+    | `set-backend-service` | Preserves routing through the credentialed `openai-backend` |
+    | `llm-token-limit` | 500 tokens per minute per subscription key; returns HTTP 429 when exceeded |
     | `counter-key` | Each subscription key gets its own independent token budget |
     | `estimate-prompt-tokens` | Token counting starts before the model responds — prompt tokens count against the limit |
-    | `tokens-left-header` | The `x-ratelimit-remaining-tokens` response header shows remaining budget to callers |
+    | `remaining-tokens-header-name` | The `x-ratelimit-remaining-tokens` response header shows remaining budget to callers |
 
 1. Select **Save** to apply the policy.
 
@@ -194,7 +227,7 @@ With the token rate limit policy and subscription key authentication in place, v
 1. In the **Request body** section, paste the following test prompt:
 
     ```input
-    {"messages": [{"role": "user", "content": "What is the capital of France?"}], "max_tokens": 50}
+    {"messages": [{"role": "user", "content": "What is the capital of France?"}], "max_completion_tokens": 50}
     ```
 
 1. Select **Send** and confirm you receive **HTTP 200** with a model response — the request succeeded with a valid subscription key.
@@ -210,24 +243,24 @@ With the token rate limit policy and subscription key authentication in place, v
     1. In the Cloud Shell prompt, run the following command, replacing `<your-key>` with your subscription key and `<your-apim-gateway-url>` with your APIM gateway URL (visible on the `<apim-name>` overview page under **Gateway URL**):
 
         ```bash
-        for i in {1..10}; do curl -s -o /dev/null -w "%{http_code}\n" -X POST "https://<your-apim-gateway-url>/sc500-foundry-api/chat/completions?api-version=2024-02-01" -H "Ocp-Apim-Subscription-Key: <your-key>" -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Summarize the security risks of unprotected AI endpoints in 100 words."}],"max_tokens":100}'; done
+        for i in {1..10}; do curl -s -o /dev/null -w "%{http_code}\n" -X POST "https://<your-apim-gateway-url>/sc500-foundry-api/deployments/gpt-5.4-mini/chat/completions?api-version=2024-10-21" -H "Ocp-Apim-Subscription-Key: <your-key>" -H "Content-Type: application/json" -d '{"messages":[{"role":"user","content":"Summarize the security risks of unprotected AI endpoints in 100 words."}],"max_completion_tokens":100}'; done
         ```
 
     1. Observe the HTTP status codes returned. The first few requests return **200**. After the 500 token-per-minute limit is reached, subsequent requests return **429 Too Many Requests** — the rate limit policy is enforcing the token budget.
 
-    > **Note**: The exact request at which the 429 response appears depends on the token count of each response. With `max_tokens` set to 100 and 500 TPM configured, the limit typically fires within 5–6 requests. The rate limit counter resets after one minute.
+    > **Note**: The exact request at which the 429 response appears depends on the token count of each response. With `max_completion_tokens` set to 100 and 500 TPM configured, the limit typically fires within 5–6 requests. The rate limit counter resets after one minute.
 
 ---
 
 ## Create a content safety guardrail in Azure AI Foundry
 
-Content safety guardrails are applied at the Foundry layer — they inspect both the prompt sent to the model and the model's response, and block content that exceeds configured harm thresholds. You will create a guardrail with Prompt Shield enabled and apply it to the gpt-4o-mini deployment.
+Content safety guardrails are applied at the Foundry layer — they inspect both the prompt sent to the model and the model's response, and block content that exceeds configured harm thresholds. You will create a guardrail with Prompt Shield enabled and apply it to the gpt-5.4-mini deployment.
 
 1. Return to the **Azure AI Foundry portal** tab (or navigate to [https://ai.azure.com](https://ai.azure.com)).
 
 1. Select the **sc500-lab3c-foundry** project.
 
-1. In the left navigation, under **Safety + security**, select **Content filters**.
+1. In the left navigation, under **Guardrails + controls**, select **Content filters**.
 
 1. Select **+ Create content filter**.
 
@@ -235,57 +268,38 @@ Content safety guardrails are applied at the Foundry layer — they inspect both
 
     | Setting | Value |
     |---------|-------|
-    | **Filter name** | sc500-safety-filter |
+    | **Name** | sc500-safety-filter |
+    | **Connection** | sc500-lab3c-openai |
 
-1. Select **Next** to proceed to the input filter configuration.
+1. Select **Next**.
 
-1. On the **Input filters** step, configure thresholds for all four harm categories on the **prompt input** (what users send to the model):
+1. On the **Input filter** step, confirm all four harm categories use **Annotate and block** with **Medium blocking**:
 
-    | Category | Threshold |
-    |----------|-----------|
-    | **Hate and fairness** | Medium |
-    | **Violence** | Medium |
-    | **Sexual** | Medium |
-    | **Self-harm** | Medium |
+    | Category | Action | Blocking threshold |
+    |----------|--------|--------------------|
+    | **Violence** | Annotate and block | Medium blocking |
+    | **Hate** | Annotate and block | Medium blocking |
+    | **Sexual** | Annotate and block | Medium blocking |
+    | **Self-harm** | Annotate and block | Medium blocking |
 
-    > **Note**: At **Medium** threshold, the guardrail blocks content that is clearly harmful before forwarding the prompt to the model. **Low** is more aggressive (blocks borderline content); **High** only blocks extreme content. Medium is the recommended starting point for most production deployments.
+1. Configure Prompt Shields on the same **Input filter** step:
 
-1. Select **Next** to proceed to the output filter configuration.
+    | Setting | Value |
+    |---------|-------|
+    | **Prompt shields for jailbreak attacks** | Annotate and block |
+    | **Prompt shields for indirect attacks** | Annotate and block |
 
-1. On the **Output filters** step, configure the same Medium threshold for all four harm categories on the **completion output** (what the model returns to the caller):
+1. Leave **Blocklist** off and **Spotlighting** disabled, and then select **Next**.
 
-    | Category | Threshold |
-    |----------|-----------|
-    | **Hate and fairness** | Medium |
-    | **Violence** | Medium |
-    | **Sexual** | Medium |
-    | **Self-harm** | Medium |
+1. On the **Output filter** step, confirm **Violence**, **Hate**, **Sexual**, and **Self-harm** use **Annotate and block** with **Medium blocking**. Leave the remaining output controls at their defaults, and then select **Next**.
 
-1. Select **Next** to proceed to the Prompt Shield step.
+1. On the **Connection** step, confirm **sc500-lab3c-openai** is selected.
 
-1. On the **Prompt Shield** step, enable **Prompt Shield**:
+1. In the deployments table, select the row for **gpt-5.4-mini**, and then select **Next**.
 
-    - **Jailbreak detection**: Set to **On** — blocks prompts that attempt to override the model's system instructions
-    - **Indirect attack detection**: Set to **On** — blocks prompt injection attempts embedded in documents or context passed to the model
+1. On the **Review** step, confirm the filter name, connection, Prompt Shield settings, and deployment assignment, and then select **Create filter**.
 
-1. Select **Next**, review the configuration summary, then select **Create**.
-
-### Apply the guardrail to the model deployment
-
-1. In the left navigation, select **Models + endpoints** (or **Deployments**).
-
-1. Select the **gpt-4o-mini** deployment.
-
-1. Select **Edit** or **Update deployment settings**.
-
-1. In the **Content filter** field, select **sc500-safety-filter** from the dropdown.
-
-1. Select **Update** (or **Save**) to apply the guardrail to the deployment.
-
-1. Return to **Safety + security > Content filters** and confirm that **sc500-safety-filter** shows **gpt-4o-mini** as an assigned deployment.
-
-    > **Note**: The guardrail is now active. Any request to the gpt-4o-mini endpoint that contains content exceeding the Medium threshold — or that attempts a jailbreak — will be blocked at the Foundry layer, before the model processes the prompt. Requests that pass the guardrail are still subject to the APIM token rate limit and subscription key requirement configured earlier. These two layers operate independently and are both required.
-
+1. When creation completes, confirm **sc500-safety-filter** lists **gpt-5.4-mini** under **Applied deployment**.
 ---
 
 ## Enable Defender for AI Services
@@ -306,11 +320,9 @@ The APIM gateway and Foundry guardrail are **preventive** controls — they bloc
 
 1. Select **Save** at the top of the page.
 
-1. In the left menu, select **Workload protections**.
+1. Confirm the **AI Services** plan shows **On** before leaving the Defender plans page.
 
-1. Scroll to the **AI** section and confirm **sc500-lab3c-foundry** appears as a covered resource.
-
-    > **Note**: Coverage propagation can take 5–10 minutes. If the resource does not appear immediately, continue to the summary section and return to verify before the lab ends.
+    > **Note**: Plan status can take several minutes to propagate after the resource provider is registered. Refresh the page if the status does not update immediately.
 
 ---
 
@@ -333,7 +345,7 @@ A single preventive layer is not sufficient. An attacker who obtains a subscript
 
 In this lab, you remediated three independent security gaps in a Foundry-hosted AI endpoint. In Azure API Management, you applied a token rate limit policy to enforce a 500-tokens-per-minute consumption limit and required subscription key authentication, removing anonymous access. You tested both controls using the APIM test console and Cloud Shell.
 
-In Azure AI Foundry, you created a content safety guardrail named **sc500-safety-filter** with Medium harm thresholds across all four harm categories and Prompt Shield enabled for both jailbreak and indirect attack detection. You applied the guardrail to the gpt-4o-mini deployment.
+In Azure AI Foundry, you created a content safety guardrail named **sc500-safety-filter** with Medium harm thresholds across all four harm categories and Prompt Shield enabled for both jailbreak and indirect attack detection. You applied the guardrail to the gpt-5.4-mini deployment.
 
 In Microsoft Defender for Cloud, you enabled Defender for AI Services on the subscription, adding a behavioral detection layer on top of the prevention controls.
 
@@ -346,5 +358,5 @@ The lab environment is automatically reset at the end of the session. No manual 
 If you want to remove the content safety guardrail from the model deployment before the session ends:
 
 1. Navigate to the Azure AI Foundry portal > **sc500-lab3c-foundry** > **Models + endpoints**.
-1. Select the **gpt-4o-mini** deployment and edit the deployment settings.
+1. Select the **gpt-5.4-mini** deployment and edit the deployment settings.
 1. Set **Content filter** back to the default filter or to none, then save.

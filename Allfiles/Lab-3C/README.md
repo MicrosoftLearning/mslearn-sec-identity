@@ -8,7 +8,7 @@ This folder contains the setup resources for **Lab 3C: Configure AI Gateway and 
 
 - **lab-3c-setup.json** - ARM template for deploying the lab infrastructure via "Deploy a custom template" in Azure Portal
 - **sc500-lab3c-apim-policy.xml** - API Management token rate limit policy (students apply this during the lab)
-- **generate-adversarial-traffic.ps1** - PowerShell script for testing rate limiting with rapid requests
+
 - **README.md** - This file
 
 ## What the setup deploys
@@ -24,10 +24,11 @@ The `lab-3c-setup.json` ARM template provisions the following resources in the *
   - Hub workspace for the Foundry project
   
 - **Azure AI Foundry Project** (`sc500-lab3c-foundry`)
-  - Project workspace where students configure content safety guardrails
+  - Hub project workspace where students configure content safety guardrails in Foundry Classic
+  - Preconfigured Azure OpenAI connection: `sc500-lab3c-openai`
   
 - **Azure API Management** (`sc500-lab3c-apim-{instanceId}`)
-  - Consumption tier APIM instance
+  - Basic v2 APIM instance (required for the `llm-token-limit` policy)
   - Pre-registered API: `sc500-foundry-api`
   - **Intentionally unsecured state:**
     - ❌ No subscription key requirement (students enable this)
@@ -45,17 +46,18 @@ The `lab-3c-setup.json` ARM template provisions the following resources in the *
 ### Option 1: Deploy via Azure Portal (Recommended for hosted labs)
 
 1. Sign in to the [Azure Portal](https://portal.azure.com)
-2. Search for **Deploy a custom template**
-3. Select **Build your own template in the editor**
-4. Click **Load file** and upload `lab-3c-setup.json`
-5. Click **Save**
-6. Configure parameters:
+2. In Cloud Shell, register `Microsoft.Security`, then generate `LAB_INSTANCE_ID=$(az account show --query id -o tsv | tr -d '-' | cut -c1-8)`
+3. Search for **Deploy a custom template**
+4. Select **Build your own template in the editor**
+5. Click **Load file** and upload `lab-3c-setup.json`
+6. Click **Save**
+7. Configure parameters:
    - **Subscription**: Select the lab subscription
    - **Location**: Choose a region that supports Azure OpenAI (e.g., East US, West Europe)
-   - **Lab Instance Id**: **Leave blank** to auto-generate an 8-character hash from the subscription ID. Only enter a value if you want a specific override.
+   - **Lab Instance Id**: Paste the eight-character `LAB_INSTANCE_ID` value generated in Cloud Shell.
    - **Publisher Email**: Leave default or customize
    - **Publisher Name**: Leave default or customize
-7. Click **Review + create**, then **Create**
+8. Click **Review + create**, then **Create**
 
 **Deployment time:** Approximately 10-15 minutes
 
@@ -94,16 +96,15 @@ After the ARM template deployment completes, **verify the following before stude
 2. Select **Model deployments** (or **Deployments**)
 3. Confirm **gpt-5.4-mini** is deployed and shows "Succeeded" status
 
-### 2. Configure Azure AI Foundry Project Connection
-The ARM template creates the AI Foundry project, but the connection to Azure OpenAI may need to be verified:
+### 2. Verify Azure AI Foundry Project Connection
+The ARM template creates the AI Foundry project and its Azure OpenAI connection:
 
 1. Navigate to [Azure AI Foundry portal](https://ai.azure.com)
-2. Select the **sc500-lab3c-foundry** project
-3. In left navigation, select **Settings** or **Connected resources**
-4. Verify a connection to the Azure OpenAI service exists
-   - If missing, click **+ New connection** → **Azure OpenAI** → select `sc500-lab3c-ai-{instanceId}`
+2. Open the project switcher and select **View all resources**
+3. Select **sc500-lab3c-foundry**, then select **Open in Foundry Classic**
+4. In **Management center**, verify `sc500-lab3c-openai` is listed under connected resources
 5. Navigate to **Models + endpoints** and confirm **gpt-5.4-mini** is visible
-6. Navigate to **Safety + security** > **Content filters** and confirm no custom filter is assigned to gpt-5.4-mini (should use "Default" or "None")
+6. Navigate to **Guardrails + controls** > **Content filters** and confirm no custom filter is assigned to gpt-5.4-mini (should use "Default" or "None")
 
 ### 3. Verify API Management API Configuration
 1. Navigate to **sc500-lab3c-apim-{instanceId}** > **APIs**
@@ -111,7 +112,7 @@ The ARM template creates the AI Foundry project, but the connection to Azure Ope
 3. Verify the **Settings** tab shows:
    - ✅ **Subscription required**: **Not required** (this is intentional - students enable it)
 4. Verify the **Design** tab > **All operations** > **Inbound processing** shows:
-   - ✅ Only `<base />` tag (no rate limit policy - students apply it)
+   - ✅ `<base />` and `<set-backend-service backend-id="openai-backend" />` (credentialed routing only; students add the rate limit)
 
 ### 4. Test the Unsecured Endpoint (Optional)
 To confirm the environment is in the expected unsecured state before students begin:
@@ -121,7 +122,7 @@ To confirm the environment is in the expected unsecured state before students be
 3. **Do not add any subscription key header** (verify anonymous access works)
 4. In Request body, paste:
    ```json
-   {"messages": [{"role": "user", "content": "Hello"}], "max_tokens": 10}
+   {"messages": [{"role": "user", "content": "Hello"}], "max_completion_tokens": 10}
    ```
 5. Click **Send**
 6. Expected result: **HTTP 200** with a model response (confirms anonymous access is allowed)
@@ -144,13 +145,13 @@ Once deployment and verification are complete, students will:
 **Solution:** Verify the connection in AI Foundry project settings. Add a new Azure OpenAI connection pointing to `sc500-lab3c-ai-{instanceId}`.
 
 ### Issue: API Management deployment fails
-**Solution:** Check that the selected region supports API Management Consumption tier. Try East US, West Europe, or North Europe.
+**Solution:** Confirm the service uses Basic v2 or another tier supported by `llm-token-limit`. Consumption does not support this policy.
 
 ### Issue: gpt-5.4-mini deployment fails
 **Solution:** Check Azure OpenAI quota for the subscription. The model requires at least 10 TPM capacity. Request quota increase if needed.
 
-### Issue: Students receive 403 when testing APIM API
-**Solution:** Verify the backend configuration in APIM includes the Azure OpenAI API key in the `api-key` header. Check `sc500-lab3c-apim-{instanceId}` > **Backends** > **openai-backend**.
+### Issue: Students receive 401 when testing APIM API
+**Solution:** Verify the API policy contains `<set-backend-service backend-id="openai-backend" />` and that the backend includes the Azure OpenAI API key in the `api-key` header.
 
 ## Cleanup
 
@@ -162,7 +163,7 @@ az group delete --name sc500-lab3c-rg --yes --no-wait
 
 ## Important Notes
 
-- **Intentionally unsecured:** The API is deployed WITHOUT subscription key requirement, WITHOUT rate limit, and WITHOUT content safety guardrail. This is by design - students apply these controls during the lab.
+- **Intentionally unsecured to callers:** The API routes through a credentialed backend so inference works, but it is deployed WITHOUT a caller subscription-key requirement, WITHOUT a rate limit, and WITHOUT a custom content safety guardrail. Students apply those controls during the lab.
 - **Model version:** The template deploys `gpt-5.4-mini` version `2026-03-17` (GA model, GlobalStandard deployment type, retires March 2027).
 - **Quota requirements:** Ensure the subscription has sufficient Azure OpenAI quota. GlobalStandard deployments of gpt-5.4-mini provide 5,000 RPM and 5,000,000 TPM in Tier 1.
 - **Region availability:** GlobalStandard deployments route traffic globally. Use East US, West Europe, or other regions that support Azure OpenAI. See [Azure OpenAI region availability](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#model-summary-table-and-region-availability).
