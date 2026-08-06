@@ -4,9 +4,9 @@
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "eastus",
+      "defaultValue": "centralus",
       "metadata": {
-        "description": "Azure region for all resources"
+        "description": "Azure region for all resources. Central US is the tested default for this lab profile."
       }
     },
     "vnetName": {

@@ -13,27 +13,33 @@ lab:
 
 # Lab Setup
 
-Follow these steps to build out your lab scenarios:
+Follow these steps to deploy the resources used in the lab:
 
-1. Open the **Azure Portal** at `https://portal.azure.com`.
+1. Open the **Azure portal** at `https://portal.azure.com` and sign in with **User1**.
 
-1. Log in with the **User1** administrator role.
+1. In the portal top bar, select the **Cloud Shell** icon (**>_**). If prompted, select **Bash** and **No storage account required**.
 
-1. In the **Search** bar find and open **Deploy a custom template**.
-   
-1. Select **Build your own template in the editor**.
+1. Register the Microsoft.Security resource provider and create the resource group:
 
-1. In the menu choose **Load file**.
+    ```bash
+    az provider register --namespace Microsoft.Security --wait
+    az provider show --namespace Microsoft.Security --query registrationState -o tsv
+    az group create --name sc500-lab1c-rg --location centralus --output table
+    ```
 
-1. Select the file **deploy-lab1c-vnet.json** from the **F:\AllFiles\Lab-1C** folder on the lab VM.
+1. Confirm the provider state is `Registered`, and then close Cloud Shell.
 
-1. Select **Save**.
+1. In the portal search bar, find and open **Deploy a custom template**.
 
-1. Select **Review + create**.
+1. Select **Build your own template in the editor**, and then select **Load file**.
 
-    > **Note**: Deployment may take a few minutes to complete.
+1. Select **deploy-lab1c-vnet.json** from the **F:\AllFiles\Lab-1C** folder on the lab VM, and then select **Save**.
 
-1. Close the browser.
+1. On the **Basics** page, select the existing resource group **sc500-lab1c-rg** and confirm **Location** is `centralus`.
+
+1. Select **Review + create**, and then select **Create**.
+
+1. Wait until the deployment shows **Succeeded** before continuing.
 
 ===
 
@@ -266,15 +272,11 @@ When managed identity is enabled on an App Service, the runtime injects two envi
 
 1. Confirm you are signed in to the Azure portal at `https://portal.azure.com` as **User1**. If the InPrivate window from the previous section is still active, close it first.
 
-1. Select the **Cloud Shell** icon (>_) in the Azure portal top bar. If prompted to select a shell type, select **Bash**.
+1. Open **App Services**, and then select **<app-service-name>**.
 
-1. Run the following command to open an SSH session in the Linux App Service container:
+1. Under **Development Tools**, select **SSH**, and then select **Go**.
 
-    ```bash
-    az webapp ssh --resource-group sc500-lab1c-rg --name <app-service-name>
-    ```
-
-    Wait until the prompt changes, indicating that commands now run inside the App Service container.
+    A Web SSH tab opens and displays **SSH CONNECTION ESTABLISHED**. Run the remaining Bash commands in this Web SSH terminal.
 
 1. Run the following commands to verify the managed identity environment variables are present:
 
