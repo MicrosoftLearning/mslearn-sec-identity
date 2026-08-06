@@ -3,7 +3,7 @@ lab:
     title: 'Secure Azure App Services and API Management'
     description: 'Use WAF detection and prevention controls, configure Microsoft Entra authentication and network restrictions for app services, and enforce API subscription key protection in API Management.'
     level: 300
-    duration: 45
+    duration: 60
     islab: true
     primarytopics:
         - Web Application Firewall (WAF)
@@ -23,6 +23,8 @@ Follow these steps to deploy the resources used in the lab:
 1. Select **Build your own template in the editor**, and then select **Load file**.
 
 1. Select **lab-4c-setup.json** from the **F:\AllFiles\Lab-4C** folder on the lab VM, and then select **Save**.
+
+1. On the **Basics** page, confirm **Location** is set to `centralus`.
 
 
 1. Select **Review + create**, and then select **Create**.
@@ -50,7 +52,7 @@ In this lab, you will:
 - Configure subscription-required access in API Management.
 - Validate key-required API behavior.
 
-This exercise should take approximately **45** minutes to complete.
+This exercise should take approximately **60** minutes to complete.
 
 > **Note**: This lab uses the fixed Application Gateway `sc500-lab4c-agw` and generated services whose names begin with `sc500-lab4c-apim-`, `sc500-lab4c-webapp-`, and `sc500-lab4c-func-`. Throughout the lab, `<apim-name>`, `<web-app-name>`, and `<function-app-name>` refer to those resources. The `sc500-lab4c-rg` resource group contains exactly one of each service type.
 
@@ -101,6 +103,8 @@ This exercise should take approximately **45** minutes to complete.
     | sort by TimeGenerated desc
     ```
 
+1. Wait up to **10 minutes** for diagnostic data to arrive. Re-run the query every 1-2 minutes until the request appears.
+
 1. Confirm the request is logged in detection mode.
 
 ---
@@ -130,17 +134,73 @@ This exercise should take approximately **45** minutes to complete.
 
 1. Open **App Services** and select **<web-app-name>**.
 
-1. Open **Authentication**.
+1. Open **Authentication**, and then select **Add identity provider**.
 
-1. Turn authentication **On**.
+1. For **Identity provider**, select **Microsoft**.
 
-1. Set **Identity provider** to Microsoft Entra ID.
+1. Configure the provider:
 
-1. Set unauthenticated request behavior to redirect to sign-in.
+    | Setting | Value |
+    |---------|-------|
+    | **Tenant configuration** | Workforce configuration (current tenant) |
+    | **App registration type** | Create new app registration |
+    | **Supported account types** | Current tenant - Single tenant |
+    | **Restrict access** | Require authentication |
+    | **Unauthenticated requests** | HTTP 302 Found redirect |
+    | **Redirect to** | Microsoft |
 
-1. Save configuration.
+1. Select **Add**. Confirm the Microsoft identity provider is listed and authentication is enabled.
 
-1. Open the app URL in a private browser window and confirm sign-in is required.
+1. If provider creation fails or the page reports a missing secret, use Cloud Shell to configure the same provider. Replace `<web-app-name>` with the generated App Service name:
+
+    ```bash
+    WEB_APP_NAME='<web-app-name>'
+    TENANT_ID=$(az account show --query tenantId -o tsv)
+    APP_URL="https://$WEB_APP_NAME.azurewebsites.net"
+
+    APP_ID=$(az ad app create \
+      --display-name "$WEB_APP_NAME-auth" \
+      --sign-in-audience AzureADMyOrg \
+      --web-redirect-uris "$APP_URL/.auth/login/aad/callback" \
+      --query appId -o tsv)
+
+    CLIENT_SECRET=$(az ad app credential reset \
+      --id "$APP_ID" \
+      --append \
+      --display-name app-service-auth \
+      --query password -o tsv)
+
+    test -n "$APP_ID" || { echo "The app registration could not be created."; exit 1; }
+    test -n "$CLIENT_SECRET" || { echo "The client secret could not be created."; exit 1; }
+
+    az webapp config appsettings set \
+      --resource-group sc500-lab4c-rg \
+      --name "$WEB_APP_NAME" \
+      --settings MICROSOFT_PROVIDER_AUTHENTICATION_SECRET="$CLIENT_SECRET" \
+      --output none
+
+    SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+
+    AUTH_BODY=$(jq -n \
+      --arg clientId "$APP_ID" \
+      --arg issuer "https://sts.windows.net/$TENANT_ID/v2.0" \
+      '{properties:{platform:{enabled:true,runtimeVersion:"~1"},globalValidation:{requireAuthentication:true,unauthenticatedClientAction:"RedirectToLoginPage",redirectToProvider:"azureactivedirectory"},identityProviders:{azureActiveDirectory:{enabled:true,registration:{openIdIssuer:$issuer,clientId:$clientId,clientSecretSettingName:"MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"}}},login:{tokenStore:{enabled:true}}}}')
+
+    az rest --method put \
+      --uri "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/sc500-lab4c-rg/providers/Microsoft.Web/sites/$WEB_APP_NAME/config/authsettingsV2?api-version=2022-03-01" \
+      --body "$AUTH_BODY" \
+      --output none
+
+    az webapp auth show \
+      --resource-group sc500-lab4c-rg \
+      --name "$WEB_APP_NAME" \
+      --query '{Enabled:platform.enabled,UnauthenticatedAction:globalValidation.unauthenticatedClientAction}' \
+      --output table
+
+    unset CLIENT_SECRET AUTH_BODY
+    ```
+
+1. Open the app URL in a private browser window and confirm it redirects to Microsoft sign-in.
 
 ---
 
@@ -178,20 +238,16 @@ This exercise should take approximately **45** minutes to complete.
 
 1. Create or open a test subscription and copy a key.
 
-1. Test with key (expect success):
+1. Test with a key. Include the `Ocp-Apim-Subscription-Key` header and confirm the mock API returns HTTP **200**.
 
-    - Include header `Ocp-Apim-Subscription-Key`.
-
-1. Test without key (expect denial):
-
-    - Remove the subscription key header.
+1. Test without a key. Remove the subscription key header and confirm APIM returns HTTP **401**.
 
 1. Record results in your notes:
 
     | Request type | Expected result |
     |--------------|-----------------|
-    | With key | Success |
-    | Without key | Unauthorized/denied |
+    | With key | HTTP 200 |
+    | Without key | HTTP 401 |
 
 ---
 
