@@ -10,12 +10,12 @@
       "Defender finding population (especially CSPM secret scanning and attack path analysis) can require 24+ hours after plan enablement.",
       "If configureDefenderPlans is true, subscription-level Defender pricing resources are configured."
     ],
-    "deployCommand": "az deployment sub create --location eastus --template-file lab-4d-setup.json"
+    "deployCommand": "az deployment sub create --location centralus --template-file lab-4d-setup.json"
   },
   "parameters": {
     "location": {
       "type": "string",
-      "defaultValue": "eastus",
+      "defaultValue": "centralus",
       "metadata": {
         "description": "Azure region for Lab 4D resources."
       }
@@ -49,7 +49,7 @@
     },
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_B2s",
+      "defaultValue": "Standard_D2s_v5",
       "allowedValues": [
         "Standard_B2s",
         "Standard_B1ms",
@@ -346,6 +346,20 @@
                   "bypass": "AzureServices",
                   "defaultAction": "Allow"
                 }
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[guid(resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName')), deployer().objectId, '21090545-7ca7-4776-b22c-e363652d74d2')]",
+              "scope": "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]",
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('keyVaultName'))]"
+              ],
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '21090545-7ca7-4776-b22c-e363652d74d2')]",
+                "principalId": "[deployer().objectId]",
+                "principalType": "User"
               }
             },
             {

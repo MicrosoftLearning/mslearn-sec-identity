@@ -13,6 +13,8 @@ lab:
 
 # Lab Setup
 
+> **Note**: Defender CSPM recommendations, Secure Score, secret scanning findings, regulatory compliance results, and attack paths are generated asynchronously and can take **24 hours or longer** to appear after Defender plans are enabled and resources are deployed. To observe the full posture data used in this lab, prepare the environment at least one day before the exercise. If the expected data is not available, review the workflow and expected results rather than waiting for data to populate during the learner session.
+
 Follow these steps to build out your lab scenarios:
 
 1. Open the **Azure Portal** at `https://portal.azure.com`.
