@@ -399,7 +399,7 @@
               ],
               "properties": {
                 "format": "xml",
-                "value": "<policies><inbound><base /><mock-response status-code=\"200\" content-type=\"application/json\" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>"
+                "value": "<policies><inbound><base /><choose><when condition=\"@(context.Subscription == null)\"><return-response><set-status code=\"401\" reason=\"Unauthorized\" /><set-body>Access denied due to missing subscription key</set-body></return-response></when></choose><mock-response status-code=\"200\" content-type=\"application/json\" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>"
               }
             },
             {
