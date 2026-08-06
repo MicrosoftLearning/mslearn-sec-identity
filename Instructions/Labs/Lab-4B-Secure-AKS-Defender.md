@@ -30,16 +30,23 @@ Complete these steps before starting the exercise to deploy the resources and se
 
 1. Using the credentials provided for **User2** and **User3**, copy the exact username for each account. Keep both usernames available for the role-assignment steps.
 
-1. In Cloud Shell, replace `<User3-UPN>` with the exact **User3** username, and then resolve its directory object ID:
+1. In Cloud Shell, replace `<User2-UPN>` and `<User3-UPN>` with the exact usernames, and then resolve both directory object IDs:
 
     ```bash
+    USER2_UPN='<User2-UPN>'
     USER3_UPN='<User3-UPN>'
+
+    USER2_OBJECT_ID=$(az ad user show --id "$USER2_UPN" --query id -o tsv)
     USER3_OBJECT_ID=$(az ad user show --id "$USER3_UPN" --query id -o tsv)
+
+    test -n "$USER2_OBJECT_ID" || { echo "User2 could not be resolved in Microsoft Entra ID."; exit 1; }
     test -n "$USER3_OBJECT_ID" || { echo "User3 could not be resolved in Microsoft Entra ID."; exit 1; }
-    echo $USER3_OBJECT_ID
+
+    echo "User2 object ID: $USER2_OBJECT_ID"
+    echo "User3 object ID: $USER3_OBJECT_ID"
     ```
 
-1. Copy the returned **User3 object ID**. Keep it available in case the portal member picker doesn't return User3.
+1. Copy both object IDs. Keep them available in case the portal member picker doesn't return either account.
 
 1. Generate a stable eight-character suffix from the lab subscription ID:
 
@@ -163,7 +170,7 @@ This exercise should take approximately **45** minutes to complete.
 
 1. On the **Members** tab, select **User, group, or service principal**, and then select **+ Select members**.
 
-1. Paste the exact **User2** username copied earlier, select the matching account, and then select **Review + assign**.
+1. Paste the exact **User2** username copied earlier. If the matching account appears, select it, and then select **Review + assign**.
 
 1. Repeat the role assignment process: select **+ Add** > **Add role assignment**, choose **AcrPush**, and select **Next**.
 
@@ -171,19 +178,45 @@ This exercise should take approximately **45** minutes to complete.
 
 1. Paste the exact **User3** username copied earlier. If the matching account appears, select it, and then select **Review + assign**.
 
-1. If the member picker doesn't return User3, open Cloud Shell and run the following fallback. Replace `<acr-name>` and `<User3-object-id>` with the values you copied earlier:
+1. If either member picker doesn't return the matching account, open Cloud Shell and run the following fallback. Replace `<acr-name>`, `<User2-object-id>`, and `<User3-object-id>` with the values you copied earlier. The commands create only assignments that are missing:
 
     ```bash
     ACR_NAME='<acr-name>'
+    USER2_OBJECT_ID='<User2-object-id>'
     USER3_OBJECT_ID='<User3-object-id>'
     ACR_ID=$(az acr show --name "$ACR_NAME" --query id -o tsv)
     test -n "$ACR_ID" || { echo "The container registry could not be resolved."; exit 1; }
 
-    az role assignment create \
-      --assignee-object-id "$USER3_OBJECT_ID" \
-      --assignee-principal-type User \
-      --role AcrPush \
-      --scope "$ACR_ID"
+    USER2_ASSIGNMENT_COUNT=$(az role assignment list \
+      --scope "$ACR_ID" \
+      --query "[?principalId=='$USER2_OBJECT_ID' && roleDefinitionName=='AcrPull'] | length(@)" \
+      -o tsv)
+
+    if [ "$USER2_ASSIGNMENT_COUNT" = "0" ]; then
+      az role assignment create \
+        --assignee-object-id "$USER2_OBJECT_ID" \
+        --assignee-principal-type User \
+        --role AcrPull \
+        --scope "$ACR_ID"
+    fi
+
+    USER3_ASSIGNMENT_COUNT=$(az role assignment list \
+      --scope "$ACR_ID" \
+      --query "[?principalId=='$USER3_OBJECT_ID' && roleDefinitionName=='AcrPush'] | length(@)" \
+      -o tsv)
+
+    if [ "$USER3_ASSIGNMENT_COUNT" = "0" ]; then
+      az role assignment create \
+        --assignee-object-id "$USER3_OBJECT_ID" \
+        --assignee-principal-type User \
+        --role AcrPush \
+        --scope "$ACR_ID"
+    fi
+
+    az role assignment list \
+      --scope "$ACR_ID" \
+      --query "[?roleDefinitionName=='AcrPull' || roleDefinitionName=='AcrPush'].{Role:roleDefinitionName,Principal:principalName}" \
+      -o table
     ```
 
 1. Return to **Access control (IAM)** > **Role assignments**, select **Refresh**, and verify both assignments:
