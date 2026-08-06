@@ -2,25 +2,25 @@
   "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "metadata": {
-    "description": "Lab 4B setup template - pre-provisions AKS, ACR, and VNet resources for the Secure Container Workloads with AKS and Defender for Containers lab. Students enable Defender for Containers, review recommendations, configure ACR RBAC for user accounts, and restrict ACR network access during the lab. In tenants that block deployment script storage key auth, seed the sample image with the output az acr import command after deployment.",
+    "description": "Lab 4B setup template - pre-provisions AKS, ACR, and VNet resources for the Secure Container Workloads with AKS and Defender for Containers lab. Students register Microsoft.Security before deployment, enable Defender for Containers, verify deterministic monitoring settings, configure ACR RBAC, and restrict ACR network access. The learner imports the sample image after deployment because some hosted tenants block deployment script storage key authentication.",
     "lab": "SC500-Lab4B",
     "deployScope": "subscription",
     "preProvisionedResources": [
       "sc500-lab4b-rg (resource group)",
       "sc500-lab4b-vnet (10.44.0.0/16 with aks-subnet 10.44.1.0/24)",
-      "sc500-lab4b-acr (Premium SKU, public network access enabled)",
-      "ACR ready for nginx:1.19.0-alpine import via post-deployment command",
+      "sc500lab4bacr<suffix> (Premium SKU, public network access enabled)",
+      "ACR ready for the learner-run nginx:1.19.0-alpine import command",
       "sc500-lab4b-aks (single-node AKS cluster in aks-subnet)"
     ],
     "studentCreatedOrModifiedResources": [
       "Defender for Containers plan enabled at subscription scope",
-      "Defender recommendations review for sc500-lab4b-aks",
+      "Registry access and security findings verified for the Containers plan",
       "AcrPull role assignment for User2 (sc500-user2-)",
       "AcrPush role assignment for User3 (sc500-user3-)",
       "ACR admin user disabled",
-      "ACR network access changed to selected networks with approved subnet"
+      "ACR network access changed to selected networks with an approved client IP firewall rule"
     ],
-    "deployCommand": "az deployment sub create --location eastus --template-file lab-4b-setup.json"
+    "deployCommand": "az deployment sub create --location eastus --template-file lab-4b-setup.json --parameters labInstanceId=<lab-instance-id>"
   },
   "parameters": {
     "location": {
@@ -28,6 +28,14 @@
       "defaultValue": "eastus",
       "metadata": {
         "description": "Azure region for all resources."
+      }
+    },
+    "labInstanceId": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 8,
+      "metadata": {
+        "description": "Stable suffix used for globally unique resource names. Enter the first eight hexadecimal characters of the lab subscription ID, with hyphens removed."
       }
     },
     "resourceGroupName": {
@@ -42,13 +50,6 @@
       "defaultValue": "sc500-lab4b-aks",
       "metadata": {
         "description": "AKS cluster name."
-      }
-    },
-    "acrName": {
-      "type": "string",
-      "defaultValue": "sc500lab4bacr",
-      "metadata": {
-        "description": "ACR name (5-50 chars, alphanumeric only, globally unique)."
       }
     },
     "vnetName": {
@@ -72,13 +73,6 @@
         "description": "Optional AKS version. Leave blank to use the region default."
       }
     },
-    "dnsPrefix": {
-      "type": "string",
-      "defaultValue": "sc500lab4b",
-      "metadata": {
-        "description": "DNS prefix for AKS API server endpoint."
-      }
-    },
     "agentPoolVmSize": {
       "type": "string",
       "defaultValue": "Standard_DC2as_v5",
@@ -86,6 +80,10 @@
         "description": "AKS system node pool VM size. Set this to a size allowed in the target subscription and region."
       }
     }
+  },
+  "variables": {
+    "acrName": "[concat('sc500lab4bacr', toLower(parameters('labInstanceId')))]",
+    "dnsPrefix": "[concat('sc500lab4b-', toLower(parameters('labInstanceId')))]"
   },
   "resources": [
     {
@@ -119,7 +117,7 @@
             "value": "[parameters('aksName')]"
           },
           "acrName": {
-            "value": "[toLower(parameters('acrName'))]"
+            "value": "[variables('acrName')]"
           },
           "vnetName": {
             "value": "[parameters('vnetName')]"
@@ -131,7 +129,7 @@
             "value": "[parameters('kubernetesVersion')]"
           },
           "dnsPrefix": {
-            "value": "[parameters('dnsPrefix')]"
+            "value": "[variables('dnsPrefix')]"
           },
           "agentPoolVmSize": {
             "value": "[parameters('agentPoolVmSize')]"
@@ -287,7 +285,7 @@
     },
     "acrName": {
       "type": "string",
-      "value": "[toLower(parameters('acrName'))]"
+      "value": "[variables('acrName')]"
     },
     "vnetName": {
       "type": "string",
@@ -295,7 +293,7 @@
     },
     "seedImageCommand": {
       "type": "string",
-      "value": "[format('az acr import --name {0} --source docker.io/library/nginx:1.19.0-alpine --image nginx:1.19.0-alpine --force', toLower(parameters('acrName')))]"
+      "value": "[format('az acr import --name {0} --source docker.io/library/nginx:1.19.0-alpine --image nginx:1.19.0-alpine --force', variables('acrName'))]"
     }
   }
 }

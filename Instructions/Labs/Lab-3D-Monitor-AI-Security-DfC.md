@@ -13,7 +13,7 @@ lab:
 
 # Lab Setup
 
-   > **Note**: This lab has a 24-hour delay if you want to do more than simple configuration, with no output. The way the Defender for Cloud event collection works, it takes between 6 and 24 hours to process. If you want the full benefits of this lab the setup instructions in the README.md file in the Lab-3D folder have to be run a day in advance. This may not be possible in the classroom setting.  It will working in a Bring Your Own Subscription (BYOS) scenario, with the 24-hour delay.
+   > **Note**: Defender for Cloud event processing can take 6?24 hours. To observe the full detection results, run the setup instructions in `Allfiles\Lab-3D\README.md` at least one day before the exercise. If advance setup is not possible, complete the configuration steps and review the expected-result guidance.
 
 Follow these steps to build out your lab scenarios:
 

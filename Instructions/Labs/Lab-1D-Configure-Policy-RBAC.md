@@ -83,7 +83,7 @@ In this lab, you will:
 
 This exercise should take approximately **60** minutes to complete.
 
-> **Note**: This hosted lab uses the provided account aliases and baseline subscription roles: **User1** (`sc500-user1-`, LOD Owner), **User2** (`sc500-user2-`, LOD Contributor), and **User3** (`sc500-user3-`, LOD Reader). The Lab Setup deployment adds a built-in Contributor assignment for User3 on the lab subscription; the access review removes that assignment while preserving User3's baseline LOD Reader access. Use the credentials provided for all three accounts.
+> **Note**: This lab uses the provided account aliases and baseline subscription permissions: **User1** has owner-level access, **User2** has contributor-level access, and **User3** has read-only access. The Lab Setup deployment adds a built-in Contributor assignment for User3 on the lab subscription; the access review removes that assignment while preserving User3's baseline read-only access. Use the credentials provided for all three accounts.
 
 ---
 
@@ -261,7 +261,7 @@ Built-in Azure roles such as **Reader** grant broad read access across all resou
 
 1. Select **Review + assign**, then select **Review + assign** again to save.
 
-    > **Note**: The `sc500-Security-Reviewer` role itself grants only the defined read permissions. In this lab environment, **User2** also holds the hosted **LOD Contributor** role on the subscription, so User2's effective permissions are broader than this custom role. The exercise demonstrates custom-role definition and assignment; in production, assign this role to a principal without a broader inherited role. User2 is also the designated reviewer in the next section.
+    > **Note**: The `sc500-Security-Reviewer` role itself grants only the defined read permissions. In this lab environment, **User2** also has baseline contributor-level access on the subscription, so User2's effective permissions are broader than this custom role. The exercise demonstrates custom-role definition and assignment; in production, assign this role to a principal without a broader inherited role. User2 is also the designated reviewer in the next section.
 
 ---
 
@@ -275,7 +275,7 @@ A Microsoft Entra access review provides a structured, auditable process for dec
 
 1. Select **Access control (IAM)**, and then select the **Role assignments** tab.
 
-1. Search for **User3** and confirm that **User3** has both **Contributor** and **LOD Reader** assignments with scope **This resource**.
+1. Search for **User3** and confirm that **User3** has both the **Contributor** assignment and a baseline read-only assignment with scope **This resource**.
 
     > **Important**: If the Contributor assignment is missing, stop here. The Lab Setup deployment did not receive the correct **User3 Object ID**, and there is no assignment to review. This is a setup issue, not role-assignment propagation.
 
@@ -291,7 +291,7 @@ A Microsoft Entra access review provides a structured, auditable process for dec
 
 1. Under **Manage**, select **Access reviews**.
 
-    > **Important**: Azure resource role access reviews require Microsoft Entra ID P2 or Microsoft Entra ID Governance. The user creating the review must also have Owner or User Access Administrator permissions. In this hosted lab, **User1** has the **LOD Owner** role. If the page displays **You don't have access**, waiting for role propagation will not resolve the message. Skip to **Fallback: remove the assignment directly**.
+    > **Important**: Azure resource role access reviews require Microsoft Entra ID P2 or Microsoft Entra ID Governance. The user creating the review must also have Owner or User Access Administrator permissions. In this lab, **User1** has the required subscription permissions. If the page displays **You don't have access**, waiting for role propagation will not resolve the message. Skip to **Fallback: remove the assignment directly**.
 
 ### Create and complete the access review
 
@@ -362,7 +362,7 @@ Complete this subsection if the **Access reviews** page displays **You don't hav
 
 1. In the lab subscription, return to **Access control (IAM) > Role assignments**. Refresh the page and search for **User3**.
 
-1. Confirm that **User3** no longer has the **Contributor** role. The baseline **LOD Reader** assignment remains and is expected.
+1. Confirm that **User3** no longer has the **Contributor** role. The baseline read-only assignment remains and is expected.
 
     > **Note**: If you completed the access-review path, the completed review preserves an auditable, timestamped record of the reviewer, decision, justification, and resulting access change.
 
@@ -412,7 +412,7 @@ In this lab, you applied governance controls across four dimensions: policy comp
 
 You assigned the built-in **Require a tag on resources** policy to surface existing non-compliant resources missing an `Environment` tag, and triggered an on-demand compliance scan to observe results immediately rather than waiting for the standard evaluation cycle. You then deployed a complementary custom policy at the subscription scope using a pre-written Bicep template — demonstrating that governance rules, like application code, can be version-controlled and deployed repeatably through Infrastructure as Code.
 
-You created a custom Azure role — `sc500-Security-Reviewer` — whose definition contains only the read permissions needed for a security auditor function. You assigned it to **User2** and distinguished the permissions granted by the custom role from User2's broader LOD Contributor access on the lab subscription.
+You created a custom Azure role — `sc500-Security-Reviewer` — whose definition contains only the read permissions needed for a security auditor function. You assigned it to **User2** and distinguished the permissions granted by the custom role from User2's broader baseline contributor-level access on the lab subscription.
 
 Where the tenant supported Entra ID Governance, you used an Entra ID Access Review to formally evaluate **User3**'s standing Contributor assignment. That review path created an auditable record of the reviewer, justification, decision, and resulting action. Where access reviews were unavailable, you used Azure RBAC to remove the assignment directly and documented why formal access certification requires the additional governance capability. Finally, you applied a CanNotDelete resource lock to the platform storage account, demonstrating that identity-based access control and resource locks serve complementary functions: access control governs who can act, while locks create an explicit barrier that even highly privileged identities cannot bypass without a deliberate removal step.
 

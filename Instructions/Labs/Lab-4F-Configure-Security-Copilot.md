@@ -13,9 +13,7 @@ lab:
 
 # Lab Setup
 
-Lab profile - Bring Your Own Subscription (BYOS). 
-
-This lab requires both a Security Admin role and a Global Admin role to run. Additionally, it requires access to SCUs, and a Microsoft Security Copilot license. Most ALH hosted environments cannot provide this within their hosted lab environment. Please feel free to read over the steps to learn about the features and capabilities. If you have a personally available subscription that meets the requirements, the lab will work as built. Please use as needed. The Global Admin and Security Admin roles have privileged access that can be used to exploit systems, so its use has to be limited.
+Use an Azure subscription and Microsoft Entra tenant that you are authorized to administer. This lab requires the **Security Administrator** and **Global Administrator** roles, Security Compute Units (SCUs), and a Microsoft Security Copilot license. Use privileged roles only for the duration of the exercise and follow your organization's least-privilege practices.
 
 ===
 
