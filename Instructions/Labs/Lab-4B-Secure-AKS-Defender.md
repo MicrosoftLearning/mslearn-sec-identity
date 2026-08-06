@@ -48,14 +48,6 @@ Complete these steps before starting the exercise to deploy the resources and se
 
 1. Copy both object IDs. Keep them available in case the portal member picker doesn't return either account.
 
-1. Generate a stable eight-character suffix from the lab subscription ID:
-
-    ```bash
-    LAB_INSTANCE_ID=$(az account show --query id -o tsv | tr -d '-' | cut -c1-8)
-    echo $LAB_INSTANCE_ID
-    ```
-
-1. Copy the displayed value, and then close Cloud Shell. You will use it as the **Lab Instance Id** during template deployment.
 
 1. In the portal search bar, find and open **Deploy a custom template**.
 
@@ -63,7 +55,6 @@ Complete these steps before starting the exercise to deploy the resources and se
 
 1. Select **lab-4b-setup.json** from the **F:\AllFiles\Lab-4B** folder on the lab VM, and then select **Save**.
 
-1. On the **Basics** page, paste the suffix you copied into **Lab Instance Id**.
 
 1. Select **Review + create**, and then select **Create**.
 

@@ -27,12 +27,12 @@
     },
     "labInstanceId": {
       "type": "string",
-      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]",
       "minLength": 1,
       "maxLength": 8,
       "metadata": {
-        "description": "Suffix used to generate globally unique resource names. Defaults to an 8-character hash of the subscription ID (deterministic per subscription). Override at deploy time if you want a specific value."
-      }
+        "description": "Suffix used to generate globally unique resource names. Defaults to a deterministic eight-character value derived from the subscription ID."
+      },
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]"
     },
     "enableDefenderForAI": {
       "type": "bool",
@@ -82,33 +82,77 @@
           "scope": "inner"
         },
         "parameters": {
-          "location": { "value": "[parameters('location')]" },
-          "openAiName": { "value": "[variables('openAiName')]" },
-          "aiHubName": { "value": "[variables('aiHubName')]" },
-          "aiProjectName": { "value": "[variables('aiProjectName')]" },
-          "storageAccountName": { "value": "[variables('storageAccountName')]" },
-          "keyVaultName": { "value": "[variables('keyVaultName')]" },
-          "appInsightsName": { "value": "[variables('appInsightsName')]" },
-          "logAnalyticsName": { "value": "[variables('logAnalyticsName')]" },
-          "modelDeploymentName": { "value": "[variables('modelDeploymentName')]" },
-          "modelName": { "value": "[variables('modelName')]" },
-          "modelVersion": { "value": "[variables('modelVersion')]" }
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "openAiName": {
+            "value": "[variables('openAiName')]"
+          },
+          "aiHubName": {
+            "value": "[variables('aiHubName')]"
+          },
+          "aiProjectName": {
+            "value": "[variables('aiProjectName')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountName')]"
+          },
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "appInsightsName": {
+            "value": "[variables('appInsightsName')]"
+          },
+          "logAnalyticsName": {
+            "value": "[variables('logAnalyticsName')]"
+          },
+          "modelDeploymentName": {
+            "value": "[variables('modelDeploymentName')]"
+          },
+          "modelName": {
+            "value": "[variables('modelName')]"
+          },
+          "modelVersion": {
+            "value": "[variables('modelVersion')]"
+          }
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
           "parameters": {
-            "location": { "type": "string" },
-            "openAiName": { "type": "string" },
-            "aiHubName": { "type": "string" },
-            "aiProjectName": { "type": "string" },
-            "storageAccountName": { "type": "string" },
-            "keyVaultName": { "type": "string" },
-            "appInsightsName": { "type": "string" },
-            "logAnalyticsName": { "type": "string" },
-            "modelDeploymentName": { "type": "string" },
-            "modelName": { "type": "string" },
-            "modelVersion": { "type": "string" }
+            "location": {
+              "type": "string"
+            },
+            "openAiName": {
+              "type": "string"
+            },
+            "aiHubName": {
+              "type": "string"
+            },
+            "aiProjectName": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "keyVaultName": {
+              "type": "string"
+            },
+            "appInsightsName": {
+              "type": "string"
+            },
+            "logAnalyticsName": {
+              "type": "string"
+            },
+            "modelDeploymentName": {
+              "type": "string"
+            },
+            "modelName": {
+              "type": "string"
+            },
+            "modelVersion": {
+              "type": "string"
+            }
           },
           "variables": {
             "openAiEndpoint": "[concat('https://', parameters('openAiName'), '.openai.azure.com')]"
@@ -120,7 +164,9 @@
               "name": "[parameters('logAnalyticsName')]",
               "location": "[parameters('location')]",
               "properties": {
-                "sku": { "name": "PerGB2018" },
+                "sku": {
+                  "name": "PerGB2018"
+                },
                 "retentionInDays": 30
               }
             },
@@ -143,7 +189,9 @@
               "apiVersion": "2023-01-01",
               "name": "[parameters('storageAccountName')]",
               "location": "[parameters('location')]",
-              "sku": { "name": "Standard_LRS" },
+              "sku": {
+                "name": "Standard_LRS"
+              },
               "kind": "StorageV2",
               "properties": {
                 "accessTier": "Hot",
@@ -152,8 +200,12 @@
                 "supportsHttpsTrafficOnly": true,
                 "encryption": {
                   "services": {
-                    "blob": { "enabled": true },
-                    "file": { "enabled": true }
+                    "blob": {
+                      "enabled": true
+                    },
+                    "file": {
+                      "enabled": true
+                    }
                   },
                   "keySource": "Microsoft.Storage"
                 }

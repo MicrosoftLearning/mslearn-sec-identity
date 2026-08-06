@@ -11,12 +11,12 @@
     },
     "labInstanceId": {
       "type": "string",
-      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]",
       "minLength": 1,
-      "maxLength": 10,
+      "maxLength": 8,
       "metadata": {
-        "description": "Suffix used to generate globally unique storage account name. Defaults to an 8-character hash of the subscription ID (deterministic per subscription). Override at deploy time if you want a specific value."
-      }
+        "description": "Suffix used to generate globally unique resource names. Defaults to a deterministic eight-character value derived from the subscription ID."
+      },
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]"
     }
   },
   "variables": {
@@ -44,15 +44,23 @@
           "scope": "inner"
         },
         "parameters": {
-          "location": { "value": "[parameters('location')]" },
-          "storageAccountName": { "value": "[variables('storageAccountName')]" }
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountName')]"
+          }
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
           "parameters": {
-            "location": { "type": "string" },
-            "storageAccountName": { "type": "string" }
+            "location": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            }
           },
           "resources": [
             {
@@ -60,7 +68,9 @@
               "apiVersion": "2023-01-01",
               "name": "[parameters('storageAccountName')]",
               "location": "[parameters('location')]",
-              "sku": { "name": "Standard_LRS" },
+              "sku": {
+                "name": "Standard_LRS"
+              },
               "kind": "StorageV2",
               "properties": {
                 "accessTier": "Hot",
@@ -91,7 +101,9 @@
               "location": "[parameters('location')]",
               "properties": {
                 "addressSpace": {
-                  "addressPrefixes": [ "10.1.0.0/16" ]
+                  "addressPrefixes": [
+                    "10.1.0.0/16"
+                  ]
                 },
                 "subnets": [
                   {
@@ -101,7 +113,9 @@
                       "serviceEndpoints": [
                         {
                           "service": "Microsoft.Storage",
-                          "locations": [ "*" ]
+                          "locations": [
+                            "*"
+                          ]
                         }
                       ]
                     }
@@ -115,7 +129,9 @@
               "name": "sc500-lab2a-log",
               "location": "[parameters('location')]",
               "properties": {
-                "sku": { "name": "PerGB2018" },
+                "sku": {
+                  "name": "PerGB2018"
+                },
                 "retentionInDays": 30
               }
             }

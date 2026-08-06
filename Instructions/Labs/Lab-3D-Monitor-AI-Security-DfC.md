@@ -13,29 +13,33 @@ lab:
 
 # Lab Setup
 
-   > **Note**: Defender for Cloud event processing can take 6?24 hours. To observe the full detection results, run the setup instructions in `Allfiles\Lab-3D\README.md` at least one day before the exercise. If advance setup is not possible, complete the configuration steps and review the expected-result guidance.
+> **Note**: Defender for Cloud event processing can take 6?24 hours. To observe the full detection results, run the setup instructions in `Allfiles\Lab-3D\README.md` at least one day before the exercise. If advance setup is not possible, complete the configuration steps and review the expected-result guidance.
 
-Follow these steps to build out your lab scenarios:
+Follow these steps to deploy the resources used in the lab:
 
-1. Open the **Azure Portal** at `https://portal.azure.com`.
+1. Open the **Azure portal** at `https://portal.azure.com` and sign in with **User1**.
 
-1. Log in with the **User1** administrator role.
+1. In the portal top bar, select the **Cloud Shell** icon (**>_**). If prompted, select **Bash** and **No storage account required**.
 
-1. In the **Search** bar find and open **Deploy a custom template**.
-   
-1. Select **Build your own template in the editor**.
+1. Register the Microsoft.Security resource provider:
 
-1. In the menu choose **Load file**.
+    ```bash
+    az provider register --namespace Microsoft.Security --wait
+    az provider show --namespace Microsoft.Security --query registrationState -o tsv
+    ```
 
-1. Select the file **lab-3d-setup.json** from the Desktop folder.
+1. Confirm the provider output is `Registered`, and then close Cloud Shell.
 
-1. Select **Save**.
+1. In the portal search bar, find and open **Deploy a custom template**.
 
-1. Select **Review + create**.
+1. Select **Build your own template in the editor**, and then select **Load file**.
 
-    > **Note**: Deployment may take a few minutes to complete.
+1. Select **lab-3d-setup.json** from the **F:\AllFiles\Lab-3D** folder on the lab VM, and then select **Save**.
 
-1. Close the browser.
+
+1. Select **Review + create**, and then select **Create**.
+
+1. Wait until the deployment shows **Succeeded** before continuing.
 
 ===
 

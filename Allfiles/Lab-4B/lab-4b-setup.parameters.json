@@ -5,9 +5,6 @@
     "location": {
       "value": "eastus"
     },
-    "labInstanceId": {
-      "value": "<lab-instance-id>"
-    },
     "resourceGroupName": {
       "value": "sc500-lab4b-rg"
     },

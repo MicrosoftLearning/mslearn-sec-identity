@@ -13,27 +13,21 @@ lab:
 
 # Lab Setup
 
-Follow these steps to build out your lab scenarios:
+Follow these steps to deploy the resources used in the lab:
 
-1. Open the **Azure Portal** at `https://portal.azure.com`.
+1. Open the **Azure portal** at `https://portal.azure.com` and sign in with **User1**.
 
-1. Log in with the **User1** administrator role.
 
-1. In the **Search** bar find and open **Deploy a custom template**.
-   
-1. Select **Build your own template in the editor**.
+1. In the portal search bar, find and open **Deploy a custom template**.
 
-1. In the menu choose **Load file**.
+1. Select **Build your own template in the editor**, and then select **Load file**.
 
-1. Select the file **lab-2a-setup.json** from the **F:\AllFiles\Lab-2A** folder on the lab VM.
+1. Select **lab-2a-setup.json** from the **F:\AllFiles\Lab-2A** folder on the lab VM, and then select **Save**.
 
-1. Select **Save**.
 
-1. Select **Review + create**.
+1. Select **Review + create**, and then select **Create**.
 
-    > **Note**: Deployment may take a few minutes to complete.
-
-1. Close the browser.
+1. Wait until the deployment shows **Succeeded** before continuing.
 
 ===
 

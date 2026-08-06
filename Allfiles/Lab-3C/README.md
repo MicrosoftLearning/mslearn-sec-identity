@@ -43,21 +43,20 @@ The `lab-3c-setup.json` ARM template provisions the following resources in the *
 
 ## Deployment Instructions
 
-### Option 1: Deploy via Azure Portal (Recommended for hosted labs)
+### Option 1: Deploy via Azure Portal (Recommended)
 
 1. Sign in to the [Azure Portal](https://portal.azure.com)
-2. In Cloud Shell, register `Microsoft.Security`, then generate `LAB_INSTANCE_ID=$(az account show --query id -o tsv | tr -d '-' | cut -c1-8)`
-3. Search for **Deploy a custom template**
-4. Select **Build your own template in the editor**
-5. Click **Load file** and upload `lab-3c-setup.json`
-6. Click **Save**
-7. Configure parameters:
+1. Search for **Deploy a custom template**
+1. Select **Build your own template in the editor**
+1. Click **Load file** and upload `lab-3c-setup.json`
+1. Click **Save**
+1. Configure parameters:
    - **Subscription**: Select the lab subscription
    - **Location**: Choose a region that supports Azure OpenAI (e.g., East US, West Europe)
-   - **Lab Instance Id**: Paste the eight-character `LAB_INSTANCE_ID` value generated in Cloud Shell.
+   - **Lab Instance Id**: Leave the generated default value.
    - **Publisher Email**: Leave default or customize
    - **Publisher Name**: Leave default or customize
-8. Click **Review + create**, then **Create**
+1. Click **Review + create**, then **Create**
 
 **Deployment time:** Approximately 10-15 minutes
 
@@ -67,7 +66,7 @@ The `lab-3c-setup.json` ARM template provisions the following resources in the *
 # Set variables
 LOCATION="eastus"
 
-# Deploy the template (labInstanceId defaults to a hash of the subscription ID)
+# Deploy the template; labInstanceId defaults to a deterministic subscription-derived value
 az deployment sub create \
   --location $LOCATION \
   --template-file lab-3c-setup.json \
@@ -80,7 +79,7 @@ az deployment sub create \
 # Set variables
 $Location = "eastus"
 
-# Deploy the template (labInstanceId defaults to a hash of the subscription ID)
+# Deploy the template; labInstanceId defaults to a deterministic subscription-derived value
 New-AzSubscriptionDeployment `
   -Location $Location `
   -TemplateFile .\lab-3c-setup.json `
@@ -93,51 +92,51 @@ After the ARM template deployment completes, **verify the following before stude
 
 ### 1. Verify Azure OpenAI Deployment
 1. Navigate to **Resource Groups** > **sc500-lab3c-rg** > **sc500-lab3c-ai-{instanceId}**
-2. Select **Model deployments** (or **Deployments**)
-3. Confirm **gpt-5.4-mini** is deployed and shows "Succeeded" status
+1. Select **Model deployments** (or **Deployments**)
+1. Confirm **gpt-5.4-mini** is deployed and shows "Succeeded" status
 
 ### 2. Verify Azure AI Foundry Project Connection
 The ARM template creates the AI Foundry project and its Azure OpenAI connection:
 
 1. Navigate to [Azure AI Foundry portal](https://ai.azure.com)
-2. Open the project switcher and select **View all resources**
-3. Select **sc500-lab3c-foundry**, then select **Open in Foundry Classic**
-4. In **Management center**, verify `sc500-lab3c-openai` is listed under connected resources
-5. Navigate to **Models + endpoints** and confirm **gpt-5.4-mini** is visible
-6. Navigate to **Guardrails + controls** > **Content filters** and confirm no custom filter is assigned to gpt-5.4-mini (should use "Default" or "None")
+1. Open the project switcher and select **View all resources**
+1. Select **sc500-lab3c-foundry**, then select **Open in Foundry Classic**
+1. In **Management center**, verify `sc500-lab3c-openai` is listed under connected resources
+1. Navigate to **Models + endpoints** and confirm **gpt-5.4-mini** is visible
+1. Navigate to **Guardrails + controls** > **Content filters** and confirm no custom filter is assigned to gpt-5.4-mini (should use "Default" or "None")
 
 ### 3. Verify API Management API Configuration
 1. Navigate to **sc500-lab3c-apim-{instanceId}** > **APIs**
-2. Select **sc500-foundry-api**
-3. Verify the **Settings** tab shows:
+1. Select **sc500-foundry-api**
+1. Verify the **Settings** tab shows:
    - ✅ **Subscription required**: **Not required** (this is intentional - students enable it)
-4. Verify the **Design** tab > **All operations** > **Inbound processing** shows:
+1. Verify the **Design** tab > **All operations** > **Inbound processing** shows:
    - ✅ `<base />` and `<set-backend-service backend-id="openai-backend" />` (credentialed routing only; students add the rate limit)
 
 ### 4. Test the Unsecured Endpoint (Optional)
 To confirm the environment is in the expected unsecured state before students begin:
 
 1. In APIM, go to **APIs** > **sc500-foundry-api** > **Test**
-2. Select the POST operation
-3. **Do not add any subscription key header** (verify anonymous access works)
-4. In Request body, paste:
+1. Select the POST operation
+1. **Do not add any subscription key header** (verify anonymous access works)
+1. In Request body, paste:
    ```json
    {"messages": [{"role": "user", "content": "Hello"}], "max_completion_tokens": 10}
    ```
-5. Click **Send**
-6. Expected result: **HTTP 200** with a model response (confirms anonymous access is allowed)
+1. Click **Send**
+1. Expected result: **HTTP 200** with a model response (confirms anonymous access is allowed)
 
 ## Lab Flow
 
 Once deployment and verification are complete, students will:
 
 1. **Review the unsecured state** - Confirm no rate limit, no auth, no content filter
-2. **Apply token rate limit policy** - Use `sc500-lab3c-apim-policy.xml`
-3. **Require subscription key** - Enable subscription requirement in APIM API settings
-4. **Test the configured gateway** - Verify 429 responses and 401 for missing keys
-5. **Create content safety guardrail** - Configure Prompt Shield in Foundry
-7. **Apply guardrail to deployment** - Assign custom filter to gpt-5.4-mini
-7. **Enable Defender for AI** - Turn on Defender for AI Services in Microsoft Defender for Cloud
+1. **Apply token rate limit policy** - Use `sc500-lab3c-apim-policy.xml`
+1. **Require subscription key** - Enable subscription requirement in APIM API settings
+1. **Test the configured gateway** - Verify 429 responses and 401 for missing keys
+1. **Create content safety guardrail** - Configure Prompt Shield in Foundry
+1. **Apply guardrail to deployment** - Assign custom filter to gpt-5.4-mini
+1. **Enable Defender for AI** - Turn on Defender for AI Services in Microsoft Defender for Cloud
 
 ## Troubleshooting
 

@@ -27,27 +27,6 @@
         "description": "Resource group for Lab 4D resources."
       }
     },
-    "storageAccountName": {
-      "type": "string",
-      "defaultValue": "sc500lab4dstorage",
-      "metadata": {
-        "description": "Storage account name for sc500-lab4d-storage (must be globally unique, lowercase, 3-24 chars)."
-      }
-    },
-    "webAppName": {
-      "type": "string",
-      "defaultValue": "sc500-lab4d-webapp",
-      "metadata": {
-        "description": "Web App name (must be globally unique in azurewebsites.net)."
-      }
-    },
-    "keyVaultName": {
-      "type": "string",
-      "defaultValue": "sc500-lab4d-kv",
-      "metadata": {
-        "description": "Key Vault name (must be globally unique)."
-      }
-    },
     "virtualMachineName": {
       "type": "string",
       "defaultValue": "sc500-lab4d-vm",
@@ -115,6 +94,15 @@
       "metadata": {
         "description": "App Service plan SKU for sc500-lab4d-webapp."
       }
+    },
+    "labInstanceId": {
+      "type": "string",
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]",
+      "minLength": 1,
+      "maxLength": 8,
+      "metadata": {
+        "description": "Suffix used to generate globally unique resource names. Defaults to a deterministic eight-character value derived from the subscription ID."
+      }
     }
   },
   "variables": {
@@ -129,7 +117,10 @@
     "serversPricingName": "VirtualMachines",
     "keyVaultPricingName": "KeyVaults",
     "appServicePricingName": "AppServices",
-    "cspmPricingName": "CloudPosture"
+    "cspmPricingName": "CloudPosture",
+    "storageAccountName": "[concat('sc500lab4dstore', toLower(parameters('labInstanceId')))]",
+    "webAppName": "[concat('sc500-lab4d-webapp-', toLower(parameters('labInstanceId')))]",
+    "keyVaultName": "[concat('sc500-lab4d-kv-', toLower(parameters('labInstanceId')))]"
   },
   "resources": [
     {
@@ -206,13 +197,13 @@
             "value": "[parameters('location')]"
           },
           "storageAccountName": {
-            "value": "[toLower(parameters('storageAccountName'))]"
+            "value": "[variables('storageAccountName')]"
           },
           "webAppName": {
-            "value": "[toLower(parameters('webAppName'))]"
+            "value": "[variables('webAppName')]"
           },
           "keyVaultName": {
-            "value": "[parameters('keyVaultName')]"
+            "value": "[variables('keyVaultName')]"
           },
           "virtualMachineName": {
             "value": "[parameters('virtualMachineName')]"
@@ -556,15 +547,15 @@
     },
     "storageAccountName": {
       "type": "string",
-      "value": "[toLower(parameters('storageAccountName'))]"
+      "value": "[variables('storageAccountName')]"
     },
     "webAppName": {
       "type": "string",
-      "value": "[toLower(parameters('webAppName'))]"
+      "value": "[variables('webAppName')]"
     },
     "keyVaultName": {
       "type": "string",
-      "value": "[parameters('keyVaultName')]"
+      "value": "[variables('keyVaultName')]"
     },
     "virtualMachineName": {
       "type": "string",

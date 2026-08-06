@@ -31,6 +31,15 @@
         "description": "Azure region for all resources. East US is the default. If the lab environment identifies a capacity constraint, replace this value with the region it recommends before deployment."
       }
     },
+    "labInstanceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8,
+      "metadata": {
+        "description": "Suffix used to generate globally unique resource names. Defaults to a deterministic eight-character value derived from the subscription ID."
+      },
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]"
+    },
     "vmAdminUsername": {
       "type": "string",
       "defaultValue": "sc500vmadmin",
@@ -43,13 +52,6 @@
       "defaultValue": "SC500-Lab2C-2026!",
       "metadata": {
         "description": "Local administrator password for sc500-lab2c-vm. Must be 12-123 characters and meet Azure complexity requirements."
-      }
-    },
-    "storageAccountName": {
-      "type": "string",
-      "defaultValue": "[concat('sc500lab2c', take(uniqueString(subscription().subscriptionId), 8))]",
-      "metadata": {
-        "description": "Storage account name. Must be globally unique, lowercase, no hyphens, 3-24 characters. Default is sc500lab2c + an 8-character hash of the subscription ID (deterministic per subscription). Override at deploy time if you want a specific value."
       }
     }
   },
@@ -78,19 +80,35 @@
           "scope": "inner"
         },
         "parameters": {
-          "location": { "value": "[parameters('location')]" },
-          "vmAdminUsername": { "value": "[parameters('vmAdminUsername')]" },
-          "vmAdminPassword": { "value": "[parameters('vmAdminPassword')]" },
-          "storageAccountName": { "value": "[parameters('storageAccountName')]" }
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "vmAdminUsername": {
+            "value": "[parameters('vmAdminUsername')]"
+          },
+          "vmAdminPassword": {
+            "value": "[parameters('vmAdminPassword')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountName')]"
+          }
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
           "parameters": {
-            "location": { "type": "string" },
-            "vmAdminUsername": { "type": "string" },
-            "vmAdminPassword": { "type": "securestring" },
-            "storageAccountName": { "type": "string" }
+            "location": {
+              "type": "string"
+            },
+            "vmAdminUsername": {
+              "type": "string"
+            },
+            "vmAdminPassword": {
+              "type": "securestring"
+            },
+            "storageAccountName": {
+              "type": "string"
+            }
           },
           "resources": [
             {
@@ -100,7 +118,9 @@
               "location": "[parameters('location')]",
               "properties": {
                 "addressSpace": {
-                  "addressPrefixes": [ "10.3.0.0/16" ]
+                  "addressPrefixes": [
+                    "10.3.0.0/16"
+                  ]
                 },
                 "subnets": [
                   {
@@ -125,7 +145,9 @@
               "location": "[parameters('location')]",
               "properties": {
                 "addressSpace": {
-                  "addressPrefixes": [ "10.4.0.0/16" ]
+                  "addressPrefixes": [
+                    "10.4.0.0/16"
+                  ]
                 },
                 "subnets": [
                   {
@@ -282,5 +304,8 @@
         }
       }
     }
-  ]
+  ],
+  "variables": {
+    "storageAccountName": "[concat('sc500lab2c', toLower(parameters('labInstanceId')))]"
+  }
 }

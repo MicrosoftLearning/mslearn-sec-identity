@@ -27,14 +27,6 @@ Complete these steps before starting the exercise to deploy the resources and se
 
 1. Copy the returned object ID. You will provide it to the deployment template.
 
-1. Generate a stable eight-character suffix from the lab subscription ID:
-
-    ```bash
-    LAB_INSTANCE_ID=$(az account show --query id -o tsv | tr -d '-' | cut -c1-8)
-    echo $LAB_INSTANCE_ID
-    ```
-
-1. Copy the displayed suffix. You will provide it as the **Lab Instance Id**.
 
 1. Register the Microsoft.PolicyInsights resource provider required for on-demand policy scans:
 
@@ -56,7 +48,7 @@ Complete these steps before starting the exercise to deploy the resources and se
     | Setting | Value |
     |---------|-------|
     | **Region** | East US, unless your lab environment recommends another region |
-    | **Lab Instance Id** | Paste the eight-character suffix returned by Cloud Shell |
+
     | **User3 Object ID** | Paste the object ID returned by the Cloud Shell command |
 
 1. Select **Review + create**, then select **Create**.

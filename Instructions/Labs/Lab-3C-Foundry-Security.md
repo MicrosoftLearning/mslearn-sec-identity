@@ -35,16 +35,9 @@ Follow these steps to build out your lab scenarios:
 
     Re-run the command until the output is `Registered`.
 
-1. Generate a stable eight-character suffix from the lab subscription ID:
 
-    ```bash
-    LAB_INSTANCE_ID=$(az account show --query id -o tsv | tr -d '-' | cut -c1-8)
-    echo $LAB_INSTANCE_ID
-    ```
-
-1. Copy the displayed value, and then close Cloud Shell. You will use it as the **Lab Instance Id** during template deployment.
 1. In the **Search** bar find and open **Deploy a custom template**.
-   
+
 1. Select **Build your own template in the editor**.
 
 1. In the menu choose **Load file**.
@@ -53,7 +46,7 @@ Follow these steps to build out your lab scenarios:
 
 1. Select **Save**.
 
-1. On the **Basics** page, paste the value you copied from Cloud Shell into **Lab Instance Id**.
+
 
 1. Select **Review + create**.
 

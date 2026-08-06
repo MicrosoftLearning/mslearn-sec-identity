@@ -15,27 +15,21 @@ lab:
 
 # Lab Setup
 
-Follow these steps to build out your lab scenarios:
+Follow these steps to deploy the resources used in the lab:
 
-1. Open the **Azure Portal** at `https://portal.azure.com`.
+1. Open the **Azure portal** at `https://portal.azure.com` and sign in with **User1**.
 
-1. Log in with the **User1** administrator role.
 
-1. In the **Search** bar find and open **Deploy a custom template**.
-   
-1. Select **Build your own template in the editor**.
+1. In the portal search bar, find and open **Deploy a custom template**.
 
-1. In the menu choose **Load file**.
+1. Select **Build your own template in the editor**, and then select **Load file**.
 
-1. Select the file **lab-2c-setup.json** from the **F:\AllFiles\Lab-2C** folder on the lab VM.
+1. Select **lab-2c-setup.json** from the **F:\AllFiles\Lab-2C** folder on the lab VM, and then select **Save**.
 
-1. Select **Save**.
 
-1. Select **Review + create**.
+1. Select **Review + create**, and then select **Create**.
 
-    > **Note**: Deployment may take a few minutes to complete.
-
-1. Close the browser.
+1. Wait until the deployment shows **Succeeded** before continuing.
 
 ===
 
@@ -201,11 +195,13 @@ The workload VM (**sc500-lab2c-vm**) currently has no NSG applied. Any source ca
 
 ## Configure a Private Endpoint for storage
 
-The workload storage account (`sc500lab2cstorage`) is currently accessible via its public endpoint from any network. You will create a Private Endpoint that places a private IP for the storage account directly in `workload-subnet`, then disable public access so the account is only reachable from inside the VNet.
+> **Note**: The deployed storage account name begins with **`sc500lab2c`** followed by the eight-character lab instance suffix. Throughout this lab, `<storage-account-name>` refers to that account. The `sc500-lab2c-rg` resource group contains exactly one storage account.
+
+The workload storage account (`<storage-account-name>`) is currently accessible via its public endpoint from any network. You will create a Private Endpoint that places a private IP for the storage account directly in `workload-subnet`, then disable public access so the account is only reachable from inside the VNet.
 
 1. In the Azure portal search bar, search for and select **Storage accounts**.
 
-1. Select **sc500lab2cstorage**.
+1. Select **<storage-account-name>**.
 
 1. In the left menu, under **Security + networking**, select **Networking**.
 
@@ -230,7 +226,7 @@ The workload storage account (`sc500lab2cstorage`) is currently accessible via i
     | Setting | Value |
     |---------|-------|
     | **Resource type** | Microsoft.Storage/storageAccounts |
-    | **Resource** | sc500lab2cstorage |
+    | **Resource** | <storage-account-name> |
     | **Target sub-resource** | blob |
 
 1. Select **Next: Virtual Network**.
@@ -252,7 +248,7 @@ The workload storage account (`sc500lab2cstorage`) is currently accessible via i
 
     Wait for the private endpoint to deploy (typically 1–2 minutes).
 
-1. Return to the **Networking** settings for `sc500lab2cstorage`.
+1. Return to the **Networking** settings for `<storage-account-name>`.
 
 1. On the **Public access** tab, select **Manage**.
 

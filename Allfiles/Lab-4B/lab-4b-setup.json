@@ -20,7 +20,7 @@
       "ACR admin user disabled",
       "ACR network access changed to selected networks with an approved client IP firewall rule"
     ],
-    "deployCommand": "az deployment sub create --location eastus --template-file lab-4b-setup.json --parameters labInstanceId=<lab-instance-id>"
+    "deployCommand": "az deployment sub create --location eastus --template-file lab-4b-setup.json"
   },
   "parameters": {
     "location": {
@@ -32,11 +32,12 @@
     },
     "labInstanceId": {
       "type": "string",
-      "minLength": 8,
+      "minLength": 1,
       "maxLength": 8,
       "metadata": {
-        "description": "Stable suffix used for globally unique resource names. Enter the first eight hexadecimal characters of the lab subscription ID, with hyphens removed."
-      }
+        "description": "Suffix used to generate globally unique resource names. Defaults to a deterministic eight-character value derived from the subscription ID."
+      },
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]"
     },
     "resourceGroupName": {
       "type": "string",
