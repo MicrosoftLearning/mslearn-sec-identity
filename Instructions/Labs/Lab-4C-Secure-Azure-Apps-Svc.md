@@ -191,16 +191,15 @@ This exercise should take approximately **60** minutes to complete.
       --body "$AUTH_BODY" \
       --output none
 
-    az webapp auth show \
-      --resource-group sc500-lab4c-rg \
-      --name "$WEB_APP_NAME" \
-      --query '{Enabled:platform.enabled,UnauthenticatedAction:globalValidation.unauthenticatedClientAction}' \
+    az rest --method get \
+      --uri "https://management.azure.com/subscriptions/$SUBSCRIPTION_ID/resourceGroups/sc500-lab4c-rg/providers/Microsoft.Web/sites/$WEB_APP_NAME/config/authsettingsV2?api-version=2022-03-01" \
+      --query '{Enabled:properties.platform.enabled,UnauthenticatedAction:properties.globalValidation.unauthenticatedClientAction}' \
       --output table
 
     unset CLIENT_SECRET AUTH_BODY
     ```
 
-1. Open the app URL in a private browser window and confirm it redirects to Microsoft sign-in.
+1. Wait up to **2 minutes** for authentication settings to propagate. Open the app URL in a private browser window and confirm it redirects to Microsoft sign-in.
 
 ---
 
