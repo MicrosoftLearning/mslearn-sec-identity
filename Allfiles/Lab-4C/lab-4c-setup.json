@@ -9,9 +9,9 @@
       "sc500-lab4c-rg (resource group)",
       "sc500-lab4c-log (Log Analytics workspace)",
       "sc500-lab4c-vnet with agw-subnet, appsvc-allowed-subnet, and func-allowed-subnet",
-      "sc500-lab4c-webapp (App Service)",
-      "sc500-lab4c-func (Function App)",
-      "sc500-lab4c-apim (API Management with preconfigured API)",
+      "sc500-lab4c-webapp-<suffix> (App Service)",
+      "sc500-lab4c-func-<suffix> (Function App)",
+      "sc500-lab4c-apim-<suffix> (API Management with preconfigured API)",
       "sc500-lab4c-waf (WAF policy in Detection mode)",
       "sc500-lab4c-agw (Application Gateway with WAF policy attached)",
       "Diagnostics from Application Gateway to Log Analytics workspace"
@@ -32,6 +32,15 @@
         "description": "Azure region for Lab 4C resources."
       }
     },
+    "labInstanceId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8,
+      "metadata": {
+        "description": "Suffix used to generate globally unique resource names. Defaults to a deterministic eight-character value derived from the subscription ID."
+      },
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]"
+    },
     "resourceGroupName": {
       "type": "string",
       "defaultValue": "sc500-lab4c-rg",
@@ -44,34 +53,6 @@
       "defaultValue": "sc500-lab4c-agw",
       "metadata": {
         "description": "Application Gateway name."
-      }
-    },
-    "apiManagementName": {
-      "type": "string",
-      "defaultValue": "[concat('sc500-lab4c-apim-', take(uniqueString(subscription().subscriptionId), 8))]",
-      "metadata": {
-        "description": "API Management service name. Must be globally unique in Azure API Management DNS namespace."
-      }
-    },
-    "webAppName": {
-      "type": "string",
-      "defaultValue": "[concat('sc500-lab4c-webapp-', take(uniqueString(subscription().subscriptionId), 8))]",
-      "metadata": {
-        "description": "Web App name. Must be globally unique in azurewebsites.net namespace."
-      }
-    },
-    "functionAppName": {
-      "type": "string",
-      "defaultValue": "[concat('sc500-lab4c-func-', take(uniqueString(subscription().subscriptionId), 8))]",
-      "metadata": {
-        "description": "Function App name. Must be globally unique in azurewebsites.net namespace."
-      }
-    },
-    "functionStorageAccountName": {
-      "type": "string",
-      "defaultValue": "[concat('sc500lab4cfuncsa', take(uniqueString(subscription().subscriptionId), 8))]",
-      "metadata": {
-        "description": "Storage account for Function App. Must be globally unique, lowercase, 3-24 characters."
       }
     },
     "logAnalyticsWorkspaceName": {
@@ -142,16 +123,16 @@
             "value": "[parameters('applicationGatewayName')]"
           },
           "apiManagementName": {
-            "value": "[toLower(parameters('apiManagementName'))]"
+            "value": "[variables('apiManagementName')]"
           },
           "webAppName": {
-            "value": "[toLower(parameters('webAppName'))]"
+            "value": "[variables('webAppName')]"
           },
           "functionAppName": {
-            "value": "[toLower(parameters('functionAppName'))]"
+            "value": "[variables('functionAppName')]"
           },
           "functionStorageAccountName": {
-            "value": "[toLower(parameters('functionStorageAccountName'))]"
+            "value": "[variables('functionStorageAccountName')]"
           },
           "logAnalyticsWorkspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
@@ -641,19 +622,25 @@
     },
     "apiManagementName": {
       "type": "string",
-      "value": "[toLower(parameters('apiManagementName'))]"
+      "value": "[variables('apiManagementName')]"
     },
     "webAppName": {
       "type": "string",
-      "value": "[toLower(parameters('webAppName'))]"
+      "value": "[variables('webAppName')]"
     },
     "functionAppName": {
       "type": "string",
-      "value": "[toLower(parameters('functionAppName'))]"
+      "value": "[variables('functionAppName')]"
     },
     "logAnalyticsWorkspaceName": {
       "type": "string",
       "value": "[parameters('logAnalyticsWorkspaceName')]"
     }
+  },
+  "variables": {
+    "apiManagementName": "[concat('sc500-lab4c-apim-', toLower(parameters('labInstanceId')))]",
+    "webAppName": "[concat('sc500-lab4c-webapp-', toLower(parameters('labInstanceId')))]",
+    "functionAppName": "[concat('sc500-lab4c-func-', toLower(parameters('labInstanceId')))]",
+    "functionStorageAccountName": "[concat('sc500lab4cfuncsa', toLower(parameters('labInstanceId')))]"
   }
 }

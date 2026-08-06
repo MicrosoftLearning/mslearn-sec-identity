@@ -14,8 +14,9 @@
       "minLength": 1,
       "maxLength": 8,
       "metadata": {
-        "description": "Suffix appended to the storage account name (sc500lab1d<suffix>) to keep it globally unique. Enter the first eight hexadecimal characters of the lab subscription ID, with hyphens removed."
-      }
+        "description": "Suffix used to generate globally unique resource names. Defaults to a deterministic eight-character value derived from the subscription ID."
+      },
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]"
     },
     "location": {
       "type": "string",

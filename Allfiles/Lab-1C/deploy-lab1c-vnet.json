@@ -69,11 +69,13 @@
         "description": "App Service Plan SKU (must be Basic B1 or higher for managed identity support)"
       }
     },
-    "appServiceName": {
+    "labInstanceId": {
       "type": "string",
-      "defaultValue": "sc500-lab1c-app",
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]",
+      "minLength": 1,
+      "maxLength": 8,
       "metadata": {
-        "description": "Name of the App Service (must be globally unique)"
+        "description": "Suffix used to generate globally unique resource names. Defaults to a deterministic eight-character value derived from the subscription ID."
       }
     }
   },
@@ -168,7 +170,7 @@
     {
       "type": "Microsoft.Web/sites",
       "apiVersion": "2023-01-01",
-      "name": "[parameters('appServiceName')]",
+      "name": "[variables('appServiceName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
@@ -248,31 +250,34 @@
     },
     "appServiceId": {
       "type": "string",
-      "value": "[resourceId('Microsoft.Web/sites', parameters('appServiceName'))]",
+      "value": "[resourceId('Microsoft.Web/sites', variables('appServiceName'))]",
       "metadata": {
         "description": "Resource ID of the App Service"
       }
     },
     "appServiceName": {
       "type": "string",
-      "value": "[parameters('appServiceName')]",
+      "value": "[variables('appServiceName')]",
       "metadata": {
         "description": "Name of the App Service"
       }
     },
     "appServiceUrl": {
       "type": "string",
-      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('appServiceName'))).defaultHostName)]",
+      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('appServiceName'))).defaultHostName)]",
       "metadata": {
         "description": "URL of the App Service"
       }
     },
     "appServicePrincipalId": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Web/sites', parameters('appServiceName')), '2023-01-01', 'Full').identity.principalId]",
+      "value": "[reference(resourceId('Microsoft.Web/sites', variables('appServiceName')), '2023-01-01', 'Full').identity.principalId]",
       "metadata": {
         "description": "Principal ID of the App Service managed identity"
       }
     }
+  },
+  "variables": {
+    "appServiceName": "[concat('sc500-lab1c-app-', toLower(parameters('labInstanceId')))]"
   }
 }

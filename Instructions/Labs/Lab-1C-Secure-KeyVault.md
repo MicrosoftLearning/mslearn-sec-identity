@@ -56,6 +56,8 @@ In this lab, you will:
 
 This exercise should take approximately **60** minutes to complete.
 
+> **Note**: The deployed App Service name begins with **`sc500-lab1c-app-`** followed by an automatically generated suffix. Throughout this lab, `<app-service-name>` refers to that App Service.
+
 > **Note**: This lab uses two accounts: your **User1** account (your primary lab credentials and Administrator) and **User2** (used to verify that role-based access boundaries are enforced at the data plane). Use the credentials provided for both accounts.
 
 ---
@@ -116,7 +118,7 @@ With the vault created, you will assign four RBAC roles following the principle 
 
 > **Note**: When a Key Vault uses the RBAC authorization model, data-plane access is controlled entirely by role assignments — including for the account that created the vault. The subscription Owner role and the Global Administrator role do not grant any data-plane rights to Key Vault. Without an explicit assignment, your admin account cannot create, read, or delete secrets or keys.
 
-The `sc500-lab1c-app` App Service has a system-assigned managed identity that was pre-enabled before the lab started. You do not need to configure the App Service itself — you only need to grant the identity access to this vault.
+The `<app-service-name>` App Service has a system-assigned managed identity that was pre-enabled before the lab started. You do not need to configure the App Service itself — you only need to grant the identity access to this vault.
 
 1. In the left menu of the Key Vault, select **Access control (IAM)**.
 
@@ -154,7 +156,7 @@ The `sc500-lab1c-app` App Service has a system-assigned managed identity that wa
 
 1. Select **+ Select members**.
 
-1. On the **Select managed identities** pane, set **Managed identity** to **App Service**, then select **sc500-lab1c-app** from the list.
+1. On the **Select managed identities** pane, set **Managed identity** to **App Service**, then select **<app-service-name>** from the list.
 
 1. Select **Select**, then select **Review + assign**, then select **Review + assign** again to save.
 
@@ -176,7 +178,7 @@ The `sc500-lab1c-app` App Service has a system-assigned managed identity that wa
     |-----------|------|
     | User1 | Key Vault Secrets Officer |
     | User1 | Key Vault Crypto Officer |
-    | sc500-lab1c-app | Key Vault Secrets User |
+    | <app-service-name> | Key Vault Secrets User |
     | User2 | Key Vault Reader |
 
     > **Note**: In a production environment, consider making the **Key Vault Secrets Officer** and **Key Vault Crypto Officer** assignments eligible through Privileged Identity Management (PIM) rather than active. This removes standing data-plane access entirely — administrators activate the role just-in-time when they need to manage vault contents, and access automatically expires.
@@ -256,7 +258,7 @@ The **Key Vault Reader** role grants management-plane access only — a user ass
 
 ## Retrieve a secret using the managed identity
 
-The `sc500-lab1c-app` App Service managed identity has the **Key Vault Secrets User** role, which grants data-plane access to secret values. The app runs on Linux, so you will open an SSH session to its container and retrieve the `foundry-api-key` secret by using a bearer token issued to the managed identity. No user credentials are involved in this retrieval.
+The `<app-service-name>` App Service managed identity has the **Key Vault Secrets User** role, which grants data-plane access to secret values. The app runs on Linux, so you will open an SSH session to its container and retrieve the `foundry-api-key` secret by using a bearer token issued to the managed identity. No user credentials are involved in this retrieval.
 
 When managed identity is enabled on an App Service, the runtime injects two environment variables into the application's process: `IDENTITY_ENDPOINT` (a local token service URL) and `IDENTITY_HEADER` (a shared secret that prevents SSRF attacks). Code running inside the App Service uses these values to request OAuth tokens scoped to an Azure resource.
 
@@ -269,7 +271,7 @@ When managed identity is enabled on an App Service, the runtime injects two envi
 1. Run the following command to open an SSH session in the Linux App Service container:
 
     ```bash
-    az webapp ssh --resource-group sc500-lab1c-rg --name sc500-lab1c-app
+    az webapp ssh --resource-group sc500-lab1c-rg --name <app-service-name>
     ```
 
     Wait until the prompt changes, indicating that commands now run inside the App Service container.
@@ -292,7 +294,7 @@ When managed identity is enabled on an App Service, the runtime injects two envi
     IDENTITY_HEADER is set: True
     ```
 
-    > **Important**: If `IDENTITY_ENDPOINT` is blank or `IDENTITY_HEADER is set: False`, exit the SSH session. Navigate to **sc500-lab1c-app > Settings > Identity** and confirm the **System assigned** status is **On**. Also confirm the App Service plan uses the **Basic (B1)** tier or higher.
+    > **Important**: If `IDENTITY_ENDPOINT` is blank or `IDENTITY_HEADER is set: False`, exit the SSH session. Navigate to **<app-service-name> > Settings > Identity** and confirm the **System assigned** status is **On**. Also confirm the App Service plan uses the **Basic (B1)** tier or higher.
 
 1. Run the following commands to request a bearer token for Azure Key Vault and extract it with the Node.js runtime already installed in the container:
 
@@ -331,7 +333,7 @@ When managed identity is enabled on an App Service, the runtime injects two envi
     Secret value: sk-foundry-demo-00000000000000000000000000000001
     ```
 
-    > **Note**: The bearer token identifies the `sc500-lab1c-app` managed identity to Key Vault. Key Vault confirms that the identity holds the **Key Vault Secrets User** role before returning the value.
+    > **Note**: The bearer token identifies the `<app-service-name>` managed identity to Key Vault. Key Vault confirms that the identity holds the **Key Vault Secrets User** role before returning the value.
 
 1. Run `exit` to close the App Service SSH session, then close Cloud Shell.
 

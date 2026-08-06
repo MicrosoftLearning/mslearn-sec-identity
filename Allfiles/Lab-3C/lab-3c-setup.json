@@ -30,8 +30,9 @@
       "minLength": 1,
       "maxLength": 8,
       "metadata": {
-        "description": "Suffix used to generate globally unique resource names. Enter the first eight hexadecimal characters of the lab subscription ID, with hyphens removed."
-      }
+        "description": "Suffix used to generate globally unique resource names. Defaults to a deterministic eight-character value derived from the subscription ID."
+      },
+      "defaultValue": "[take(uniqueString(subscription().subscriptionId), 8)]"
     },
     "publisherEmail": {
       "type": "string",
@@ -90,43 +91,107 @@
           "scope": "inner"
         },
         "parameters": {
-          "location": { "value": "[parameters('location')]" },
-          "apimName": { "value": "[variables('apimName')]" },
-          "openAiName": { "value": "[variables('openAiName')]" },
-          "aiHubName": { "value": "[variables('aiHubName')]" },
-          "aiProjectName": { "value": "[variables('aiProjectName')]" },
-          "openAiConnectionName": { "value": "[variables('openAiConnectionName')]" },
-          "storageAccountName": { "value": "[variables('storageAccountName')]" },
-          "keyVaultName": { "value": "[variables('keyVaultName')]" },
-          "appInsightsName": { "value": "[variables('appInsightsName')]" },
-          "logAnalyticsName": { "value": "[variables('logAnalyticsName')]" },
-          "modelDeploymentName": { "value": "[variables('modelDeploymentName')]" },
-          "modelName": { "value": "[variables('modelName')]" },
-          "modelVersion": { "value": "[variables('modelVersion')]" },
-          "apiName": { "value": "[variables('apiName')]" },
-          "publisherEmail": { "value": "[parameters('publisherEmail')]" },
-          "publisherName": { "value": "[parameters('publisherName')]" }
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "apimName": {
+            "value": "[variables('apimName')]"
+          },
+          "openAiName": {
+            "value": "[variables('openAiName')]"
+          },
+          "aiHubName": {
+            "value": "[variables('aiHubName')]"
+          },
+          "aiProjectName": {
+            "value": "[variables('aiProjectName')]"
+          },
+          "openAiConnectionName": {
+            "value": "[variables('openAiConnectionName')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('storageAccountName')]"
+          },
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "appInsightsName": {
+            "value": "[variables('appInsightsName')]"
+          },
+          "logAnalyticsName": {
+            "value": "[variables('logAnalyticsName')]"
+          },
+          "modelDeploymentName": {
+            "value": "[variables('modelDeploymentName')]"
+          },
+          "modelName": {
+            "value": "[variables('modelName')]"
+          },
+          "modelVersion": {
+            "value": "[variables('modelVersion')]"
+          },
+          "apiName": {
+            "value": "[variables('apiName')]"
+          },
+          "publisherEmail": {
+            "value": "[parameters('publisherEmail')]"
+          },
+          "publisherName": {
+            "value": "[parameters('publisherName')]"
+          }
         },
         "template": {
           "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
           "parameters": {
-            "location": { "type": "string" },
-            "apimName": { "type": "string" },
-            "openAiName": { "type": "string" },
-            "aiHubName": { "type": "string" },
-            "aiProjectName": { "type": "string" },
-            "openAiConnectionName": { "type": "string" },
-            "storageAccountName": { "type": "string" },
-            "keyVaultName": { "type": "string" },
-            "appInsightsName": { "type": "string" },
-            "logAnalyticsName": { "type": "string" },
-            "modelDeploymentName": { "type": "string" },
-            "modelName": { "type": "string" },
-            "modelVersion": { "type": "string" },
-            "apiName": { "type": "string" },
-            "publisherEmail": { "type": "string" },
-            "publisherName": { "type": "string" }
+            "location": {
+              "type": "string"
+            },
+            "apimName": {
+              "type": "string"
+            },
+            "openAiName": {
+              "type": "string"
+            },
+            "aiHubName": {
+              "type": "string"
+            },
+            "aiProjectName": {
+              "type": "string"
+            },
+            "openAiConnectionName": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "keyVaultName": {
+              "type": "string"
+            },
+            "appInsightsName": {
+              "type": "string"
+            },
+            "logAnalyticsName": {
+              "type": "string"
+            },
+            "modelDeploymentName": {
+              "type": "string"
+            },
+            "modelName": {
+              "type": "string"
+            },
+            "modelVersion": {
+              "type": "string"
+            },
+            "apiName": {
+              "type": "string"
+            },
+            "publisherEmail": {
+              "type": "string"
+            },
+            "publisherName": {
+              "type": "string"
+            }
           },
           "variables": {
             "openAiEndpoint": "[concat('https://', parameters('openAiName'), '.openai.azure.com')]"
@@ -138,7 +203,9 @@
               "name": "[parameters('logAnalyticsName')]",
               "location": "[parameters('location')]",
               "properties": {
-                "sku": { "name": "PerGB2018" },
+                "sku": {
+                  "name": "PerGB2018"
+                },
                 "retentionInDays": 30
               }
             },
@@ -161,7 +228,9 @@
               "apiVersion": "2023-01-01",
               "name": "[parameters('storageAccountName')]",
               "location": "[parameters('location')]",
-              "sku": { "name": "Standard_LRS" },
+              "sku": {
+                "name": "Standard_LRS"
+              },
               "kind": "StorageV2",
               "properties": {
                 "accessTier": "Hot",
@@ -170,8 +239,12 @@
                 "supportsHttpsTrafficOnly": true,
                 "encryption": {
                   "services": {
-                    "blob": { "enabled": true },
-                    "file": { "enabled": true }
+                    "blob": {
+                      "enabled": true
+                    },
+                    "file": {
+                      "enabled": true
+                    }
                   },
                   "keySource": "Microsoft.Storage"
                 }
@@ -335,7 +408,9 @@
                 "description": "Pre-configured API routing to Azure OpenAI gpt-5.4-mini deployment for SC-500 Lab 3C. Initially unsecured - students will apply rate limiting, subscription key authentication, and content safety controls.",
                 "subscriptionRequired": false,
                 "path": "sc500-foundry-api",
-                "protocols": [ "https" ],
+                "protocols": [
+                  "https"
+                ],
                 "serviceUrl": "[concat(variables('openAiEndpoint'), '/openai')]",
                 "type": "http",
                 "format": "openapi+json",
@@ -356,7 +431,9 @@
                 "protocol": "http",
                 "credentials": {
                   "header": {
-                    "api-key": [ "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName')), '2024-04-01-preview').key1]" ]
+                    "api-key": [
+                      "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName')), '2024-04-01-preview').key1]"
+                    ]
                   }
                 }
               }

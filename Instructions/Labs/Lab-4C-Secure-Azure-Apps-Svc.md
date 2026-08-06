@@ -13,27 +13,21 @@ lab:
 
 # Lab Setup
 
-Follow these steps to build out your lab scenarios:
+Follow these steps to deploy the resources used in the lab:
 
-1. Open the **Azure Portal** at `https://portal.azure.com`.
+1. Open the **Azure portal** at `https://portal.azure.com` and sign in with **User1**.
 
-1. Log in with the **User1** administrator role.
 
-1. In the **Search** bar find and open **Deploy a custom template**.
-   
-1. Select **Build your own template in the editor**.
+1. In the portal search bar, find and open **Deploy a custom template**.
 
-1. In the menu choose **Load file**.
+1. Select **Build your own template in the editor**, and then select **Load file**.
 
-1. Select the file **lab-4c-setup.json** from the Desktop folder.
+1. Select **lab-4c-setup.json** from the **F:\AllFiles\Lab-4C** folder on the lab VM, and then select **Save**.
 
-1. Select **Save**.
 
-1. Select **Review + create**.
+1. Select **Review + create**, and then select **Create**.
 
-    > **Note**: Deployment may take a few minutes to complete.
-
-1. Close the browser.
+1. Wait until the deployment shows **Succeeded** before continuing.
 
 ===
 
@@ -58,7 +52,7 @@ In this lab, you will:
 
 This exercise should take approximately **45** minutes to complete.
 
-> **Note**: This lab uses pre-provisioned resources in the subscription, including `sc500-lab4c-agw`, `sc500-lab4c-apim`, `sc500-lab4c-webapp`, and `sc500-lab4c-func`.
+> **Note**: This lab uses the fixed Application Gateway `sc500-lab4c-agw` and generated services whose names begin with `sc500-lab4c-apim-`, `sc500-lab4c-webapp-`, and `sc500-lab4c-func-`. Throughout the lab, `<apim-name>`, `<web-app-name>`, and `<function-app-name>` refer to those resources. The `sc500-lab4c-rg` resource group contains exactly one of each service type.
 
 ---
 
@@ -69,9 +63,9 @@ This exercise should take approximately **45** minutes to complete.
 1. Confirm the following resources are present:
 
     - **sc500-lab4c-agw**
-    - **sc500-lab4c-apim**
-    - **sc500-lab4c-webapp**
-    - **sc500-lab4c-func**
+    - **<apim-name>**
+    - **<web-app-name>**
+    - **<function-app-name>**
 
 1. Open **sc500-lab4c-agw** and confirm the attached WAF policy is currently in **Detection** mode.
 
@@ -134,7 +128,7 @@ This exercise should take approximately **45** minutes to complete.
 
 ## Enable App Service Authentication
 
-1. Open **App Services** and select **sc500-lab4c-webapp**.
+1. Open **App Services** and select **<web-app-name>**.
 
 1. Open **Authentication**.
 
@@ -152,7 +146,7 @@ This exercise should take approximately **45** minutes to complete.
 
 ## Apply Network Restrictions to App Service and Function App
 
-1. In **sc500-lab4c-webapp**, open **Networking** and then **Access restrictions**.
+1. In **<web-app-name>**, open **Networking** and then **Access restrictions**.
 
 1. Add an allow rule for the approved subnet associated with Application Gateway.
 
@@ -160,7 +154,7 @@ This exercise should take approximately **45** minutes to complete.
 
 1. Save changes.
 
-1. Open **Function Apps** and select **sc500-lab4c-func**.
+1. Open **Function Apps** and select **<function-app-name>**.
 
 1. Open **Networking** and configure access restrictions.
 
@@ -174,7 +168,7 @@ This exercise should take approximately **45** minutes to complete.
 
 ## Enforce Subscription Key Protection in API Management
 
-1. Open **API Management services** and select **sc500-lab4c-apim**.
+1. Open **API Management services** and select **<apim-name>**.
 
 1. Open **APIs** and select the pre-configured API.
 

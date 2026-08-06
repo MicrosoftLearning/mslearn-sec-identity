@@ -13,9 +13,9 @@ lab:
 
 # Optional Lab Only
 
-Lab Profile = Bring Your Own Subscription (BYOS)
+This optional lab requires a Microsoft 365 tenant that you are authorized to administer, the required Microsoft Purview licensing, and the permissions listed below.
 
-Note that this lab is still pending completion. The Purview DSPM tool will finalize in mid-September. At this time, this lab can be finalized and used with an ALH tenant.  The lab as written will function in a BYOS scenario now. So if you are working on this lab in a user owned tenant, feel free to test it.
+The Purview DSPM experience is still evolving. Validate the current portal experience before delivering the lab.
 
 Please read through to learn the steps that are required. We apologize for the delay in this lab.
 
@@ -57,9 +57,8 @@ This exercise should take approximately **45** minutes to complete.
 **Option 2 - Manual Setup**:
 - Follow the detailed instructions in `Allfiles\Lab-3A\README.md`
 
-**Option 3 - Hosted lab environment**:
-- If using a hosted lab environment, the site may be pre-provisioned for you
-- Verify by navigating to `https://YOUR-TENANT.sharepoint.com/sites/sc500-ai-datastore`
+**Option 3 - Existing setup**:
+- If the site is already configured, verify it by navigating to `https://YOUR-TENANT.sharepoint.com/sites/sc500-ai-datastore`
 
 **Timing Note**: Purview DSPM signals can take 24-48 hours to fully populate after site creation. In a lab environment, you can proceed immediately to explore the dashboard structure, though some risk signals may still be processing.
 

@@ -13,9 +13,7 @@ lab:
 
 # Lab Setup
 
-Lab profile - Bring Your Own Subscription (BYOS) recommended. 
-
-This lab requires at least a Security Admin role to run. Most ALH hosted environments cannot provide this within their hosted lab environment. Please feel free to read over the steps to learn about the features and capabilities. If you have a personally available subscription with a Security Admin role and a Microsoft Sentinel license; the lab will work as built. Please use as needed. The Security Admin role has privileged access that can be used to exploit systems, so its use has to be limited.
+Use an Azure subscription and Microsoft Entra tenant that you are authorized to administer. This lab requires the **Security Administrator** role and a Microsoft Sentinel-enabled workspace. Use privileged roles only for the duration of the exercise and follow your organization's least-privilege practices.
 
 ===
 

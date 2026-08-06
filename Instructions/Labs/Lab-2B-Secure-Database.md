@@ -62,7 +62,7 @@ Using a SQL-only administrator account means database access cannot be governed 
 
 You will create a security group named `sc500-sql-admins`, add `User3` as a member, and configure the group as the Entra ID administrator for `sc500-lab2b-sql`.
 
-1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` as **User1** (the seeded Global Administrator for this hosted lab profile — the username starts with `sc500-user1-` and the account alias is `User1`; use the password provided by your authorized lab host).
+1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using the credentials provided for **User1**. User1 must have the **Global Administrator** role.
 
 1. In the left menu, expand **Groups** and select **All groups**.
 
@@ -306,7 +306,7 @@ A task that proves the private endpoint is functional — not just configured. A
 
 ## Why it isn't in the lab yet
 
-Pre-provisioning a jump box VM adds VM compute cost and complexity to the hosted lab environment. The current lab avoids this. If cost and build time are acceptable, this is worth adding.
+Pre-provisioning a jump box VM adds compute cost and deployment complexity. The current lab avoids this. If cost and build time are acceptable, this is worth adding.
 
 ## What would need to change
 
@@ -345,4 +345,4 @@ The jump box VM is not a PaaS resource, so Defender for Databases does not cover
 
 - ARM template: ~80–120 lines (VM, NIC, public IP, NSG, CSE or Bastion resources)
 - Lab guide: ~1 new task, ~15 steps
-- Hosted lab environment provisioning time: +5–8 minutes for VM provisioning and sqlcmd install
+- Environment provisioning time: approximately 5?8 minutes for VM provisioning and sqlcmd installation

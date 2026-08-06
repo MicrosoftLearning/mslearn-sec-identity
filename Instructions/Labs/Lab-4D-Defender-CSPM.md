@@ -60,7 +60,7 @@ In this lab, you will:
 
 This exercise should take approximately **75** minutes to complete.
 
-> **Note**: This lab relies on pre-populated Defender for Cloud findings and recommendations in the environment.
+> **Note**: This lab relies on pre-populated Defender for Cloud findings and recommendations in the environment. The generated storage account, Web App, and Key Vault names begin with `sc500lab4dstore`, `sc500-lab4d-webapp-`, and `sc500-lab4d-kv-`. Throughout the lab, `<storage-account-name>`, `<web-app-name>`, and `<key-vault-name>` refer to those resources.
 
 ---
 
@@ -70,9 +70,9 @@ This exercise should take approximately **75** minutes to complete.
 
 1. Confirm the following resources are present:
 
-    - **sc500-lab4d-storage**
-    - **sc500-lab4d-webapp**
-    - **sc500-lab4d-kv**
+    - **<storage-account-name>**
+    - **<web-app-name>**
+    - **<key-vault-name>**
     - **sc500-lab4d-vm**
 
 1. Open **Microsoft Defender for Cloud** and confirm the subscription shows active posture data.
@@ -127,19 +127,19 @@ This exercise should take approximately **75** minutes to complete.
 
 1. Open **Cloud Security Posture Management** and navigate to **Secret scanning**.
 
-1. Locate the finding for **sc500-lab4d-webapp**.
+1. Locate the finding for **<web-app-name>**.
 
 1. Open finding details and record:
 
     | Field | Value |
     |-------|-------|
     | Finding type | |
-    | Affected resource | sc500-lab4d-webapp |
+    | Affected resource | <web-app-name> |
     | Detected secret category | |
 
-1. Open **sc500-lab4d-webapp** configuration and identify the exposed app setting.
+1. Open **<web-app-name>** configuration and identify the exposed app setting.
 
-1. Open **sc500-lab4d-kv** in a second tab.
+1. Open **<key-vault-name>** in a second tab.
 
 1. Confirm the Key Vault secret exists as a managed secret baseline.
 
