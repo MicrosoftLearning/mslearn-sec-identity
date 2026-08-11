@@ -20,6 +20,15 @@ Follow these steps to build out your lab scenarios:
 
 1. Log in with the **User1** administrator role.
 
+1. Open **Cloud Shell**, select **Bash**, and run the following commands to register the resource provider used by Defender for Databases:
+
+    ```bash
+    az provider register --namespace Microsoft.Security --wait
+    az provider show --namespace Microsoft.Security --query registrationState -o tsv
+    ```
+
+    Confirm that the second command returns `Registered` before continuing.
+
 1. In the **Search** bar find and open **Deploy a custom template**.
    
 1. Select **Build your own template in the editor**.
@@ -30,9 +39,11 @@ Follow these steps to build out your lab scenarios:
 
 1. Select **Save**.
 
-1. Select **Review + create**.
+1. On the **Basics** tab, confirm **Location** is set to **East US**. The template supplies this value automatically.
 
-    > **Note**: Deployment may take a few minutes to complete.
+1. Select **Review + create**, and then select **Create**.
+
+    > **Note**: Deployment typically takes **10–15 minutes** while the database initialization script runs. Wait until the deployment shows **Succeeded** before continuing. Do not continue while the top-level or nested deployment is still **Running**.
 
 1. Close the browser.
 
@@ -40,9 +51,9 @@ Follow these steps to build out your lab scenarios:
 
 # Secure Azure SQL Database
 
-A penetration test of your organization's AI application database found three critical findings. First, the database server uses SQL authentication only — there is no identity governance over who holds database credentials, and no Entra ID audit trail for administrative access. Second, the **Allow Azure services and resources to access this server** firewall exception is enabled, creating a bypass that allows any Azure-hosted service — regardless of ownership or location — to reach the database. Third, the server has no auditing configured, so there is no record of who queried what data or when.
+A penetration test of your organization's AI application database found three critical findings. First, the database server has no Microsoft Entra administrator — there is no identity governance over who holds database credentials, and no Entra ID audit trail for administrative access. Second, the **Allow Azure services and resources to access this server** firewall exception is enabled, creating a bypass that allows any Azure-hosted service — regardless of ownership or location — to reach the database. Third, the server has no auditing configured, so there is no record of who queried what data or when.
 
-Your task is to address all three findings. You will replace SQL-only authentication with a security group-backed Entra ID administrator identity, remove the Azure services firewall bypass, isolate the database to a Private Endpoint, enable auditing to a Log Analytics workspace, and turn on Defender for Databases.
+Your task is to address all three findings. You will add a security group-backed Entra ID administrator while retaining SQL authentication for a controlled verification step, remove the Azure services firewall bypass, isolate the database to a Private Endpoint, enable auditing to a Log Analytics workspace, and turn on Defender for Databases.
 
 In this lab, you will:
 
@@ -60,7 +71,7 @@ This exercise should take approximately **60** minutes to complete.
 
 Using a SQL-only administrator account means database access cannot be governed by Entra ID Conditional Access, PIM, or sign-in risk policies — and the credentials exist independently of your identity platform. Replacing the SQL admin with an Entra ID security group addresses this: group membership is managed in Entra ID, access can be audited through Entra sign-in logs, and the group itself can be governed by access reviews.
 
-You will create a security group named `sc500-sql-admins`, add `User3` as a member, and configure the group as the Entra ID administrator for `sc500-lab2b-sql`.
+You will create a security group named `sc500-sql-admins`, add `User3` as a member, and configure the group as the Entra ID administrator for the SQL server deployed in `sc500-lab2b-rg`.
 
 1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using the credentials provided for **User1**. User1 must have the **Global Administrator** role.
 
@@ -74,7 +85,7 @@ You will create a security group named `sc500-sql-admins`, add `User3` as a memb
     |---------|-------|
     | **Group type** | Security |
     | **Group name** | `sc500-sql-admins` |
-    | **Group description** | Entra ID administrator group for sc500-lab2b-sql |
+    | **Group description** | Entra ID administrator group for the Lab 2B SQL server |
     | **Membership type** | Assigned |
 
 1. Under **Members**, select **No members selected**.
@@ -87,9 +98,9 @@ You will create a security group named `sc500-sql-admins`, add `User3` as a memb
 
 1. Navigate to the **Azure portal** `https://portal.azure.com`.
 
-1. In the search bar, search for and select `SQL server`.
+1. In the search bar, search for and select **SQL servers**.
 
-1. Select **sc500-lab2b-sql**.
+1. Select the SQL server in **sc500-lab2b-rg** whose name begins with `sc500-lab2b-sql-`.
 
 1. In the left menu, under **Settings**, select **Microsoft Entra ID**.
 
@@ -111,7 +122,7 @@ The **Allow Azure services and resources to access this server** exception grant
 
 > **Important**: Complete the auditing task in the next section — specifically the step that runs a query using the portal query editor — **before** you disable the public endpoint in step 9 of this section. The portal query editor uses the public endpoint, and it will be unavailable after the public endpoint is disabled.
 
-1. In the left menu for **sc500-lab2b-sql**, under **Security**, select **Networking**.
+1. In the left menu for the SQL server, under **Security**, select **Networking**.
 
 1. At the bottom of the **Networking** page, under **Exceptions**, clear the checkbox for **Allow Azure services and resources to access this server**.
 
@@ -136,7 +147,7 @@ The **Allow Azure services and resources to access this server** exception grant
     | Setting | Value |
     |---------|-------|
     | **Resource type** | Microsoft.Sql/servers |
-    | **Resource** | sc500-lab2b-sql |
+    | **Resource** | The SQL server whose name begins with `sc500-lab2b-sql-` |
     | **Target sub-resource** | sqlServer |
 
 1. Select **Next: Virtual Network**.
@@ -171,7 +182,7 @@ SQL auditing records all database-level events — queries, logins, schema chang
 
 > **Note**: Complete this entire section — including the step that runs a SELECT query in the portal query editor — **before** returning to disable the public SQL endpoint. Once the public endpoint is disabled, the portal query editor can no longer connect.
 
-1. In the left menu for **sc500-lab2b-sql**, under **Security**, select **Auditing**.
+1. In the left menu for the SQL server, under **Security**, select **Auditing**.
 
 1. Set **Enable Azure SQL Auditing** to **On**.
 
@@ -183,22 +194,22 @@ SQL auditing records all database-level events — queries, logins, schema chang
 
     > **Note**: Server-level auditing applies to all databases on the server, including `ai-workload-db`. You do not need to configure auditing separately at the database level.
 
-1. In the left menu for `sc500-lab2b-sql`, under **Settings**, select **SQL databases**.
+1. In the left menu for the SQL server, under **Settings**, select **SQL databases**.
 
 1. Select **ai-workload-db** to open the database.
 
 1. In the left menu for `ai-workload-db`, select **Query editor (preview)**.
 
-1. In the authentication panel, select **SQL Server authentication**. Enter the following credentials:
+1. In the authentication panel, select **SQL authentication**. Enter the following credentials:
 
     | Field | Value |
     |-------|-------|
     | **Login** | sc500sqladmin |
     | **Password** | SC500Lab2b! |
 
-    If prompted to add your client IP to the firewall, select **Add client IP**, then select **OK** and authenticate again with the same credentials.
+    If the query editor reports that your IP address isn't allowed, select **Allowlist IP `<current-ip-address>`**. Wait up to 5 minutes for the firewall rule to take effect, and then select **Connect** again with the same credentials.
 
-    > **Note**: The User1 account does not have database access — only members of the `sc500-sql-admins` Entra ID admin group do. SQL Server authentication uses the built-in SQL admin account created when the server was provisioned, which has access regardless of Entra ID group membership.
+    > **Note**: The User1 account does not have database access — only members of the `sc500-sql-admins` Entra ID admin group do. SQL authentication uses the built-in SQL admin account created when the server was provisioned, which has access regardless of Entra ID group membership.
 
 1. Select **+ New Query** to open a new query pane before typing.
 
@@ -212,7 +223,7 @@ SQL auditing records all database-level events — queries, logins, schema chang
 
     > **Note**: Now that you have generated the auditable query, you can proceed to disable the public endpoint. After completing that step, the portal query editor will no longer be accessible, which is the expected secure configuration.
 
-1. Return to **sc500-lab2b-sql** in the portal.
+1. Return to the Lab 2B SQL server in the portal.
 
 1. In the left menu, under **Security**, select **Networking**.
 
@@ -276,9 +287,9 @@ Defender for Databases provides continuous threat detection for your SQL server 
 
 1. Select **Save**.
 
-    > **Note**: After enabling Defender for Databases, `sc500-lab2b-sql` may take **5–15 minutes** to appear as a protected resource in the Defender for Cloud database security view. This is expected — Defender for Cloud discovers and classifies PaaS resources asynchronously after the plan is enabled. You do not need to wait for discovery to complete before ending the lab; the plan is active even before the resource appears in the portal view.
+    > **Note**: After enabling Defender for Databases, the Lab 2B SQL server may take **5–15 minutes** to appear as a protected resource in the Defender for Cloud database security view. This is expected — Defender for Cloud discovers and classifies PaaS resources asynchronously after the plan is enabled. You do not need to wait for discovery to complete before ending the lab; the plan is active even before the resource appears in the portal view.
 
-1. Return to **sc500-lab2b-sql** in the Azure portal.
+1. Return to the Lab 2B SQL server in the Azure portal.
 
 1. In the left menu, under **Security**, select **Microsoft Defender for Cloud**.
 
@@ -290,59 +301,8 @@ Defender for Databases provides continuous threat detection for your SQL server 
 
 In this lab, you hardened an Azure SQL database that had three critical security findings from a penetration test.
 
-You replaced SQL-only authentication with a group-backed **Entra ID administrator** (`sc500-sql-admins`), removing the reliance on credential-based database access and enabling Entra ID governance — including Conditional Access, sign-in risk policies, and access reviews — to apply to database admin access.
+You added a group-backed **Entra ID administrator** (`sc500-sql-admins`), enabling Entra ID governance — including Conditional Access, sign-in risk policies, and access reviews — to apply to database admin access.
 
 You removed the **Allow Azure services** firewall exception that created a broad bypass for any Azure-hosted service, and deployed a **Private Endpoint** to restrict connectivity to the `sc500-lab2b-vnet` subnet. With the public endpoint subsequently disabled, the database is no longer reachable from the public internet or from Azure services outside the authorized VNet.
 
 You enabled **SQL auditing** to a Log Analytics workspace, generating a test query to confirm that the audit pipeline captures database activity. You then verified the audit event appeared in Log Analytics using a KQL query. Finally, you enabled **Defender for Databases** to provide real-time threat detection for SQL injection, brute-force attacks, and anomalous access patterns.
-
----
-
-# REVIEW: Add Private Endpoint Connectivity Verification Task
-
-## What this would add
-
-A task that proves the private endpoint is functional — not just configured. After disabling public access, a Cloud and AI Security Engineer needs to confirm that authorized resources inside the VNet can still reach the database, and that everything outside cannot. This mirrors the audit verification pattern already in the lab (enable → generate event → confirm it was captured).
-
-## Why it isn't in the lab yet
-
-Pre-provisioning a jump box VM adds compute cost and deployment complexity. The current lab avoids this. If cost and build time are acceptable, this is worth adding.
-
-## What would need to change
-
-### 1. ARM template (`lab-2b-setup.json`)
-
-Add the following resources to the nested resource group deployment:
-
-- **A small Windows VM** (`sc500-lab2b-jumpbox`, Standard_B1s) in the `default` subnet (`10.2.0.0/24`)
-  - Use a public IP + NSG with RDP (port 3389) allowed from any source — or replace with Azure Bastion for a cleaner, port-less approach
-  - Local admin: `sc500sqladmin` / `SC500Lab2b!` (matches SQL credentials for simplicity)
-- **Custom Script Extension** on the VM to install sqlcmd silently at provisioning time (ODBC driver 18 + sqlcmd package via `winget` or direct MSI download)
-- If using Bastion: add a `AzureBastionSubnet` (minimum /26) to `sc500-lab2b-vnet` and deploy a `Microsoft.Network/bastionHosts` resource
-
-### 2. Lab guide — new task after "Disable public endpoint"
-
-Add a task titled **"Verify private endpoint connectivity from inside the VNet"** with these steps:
-
-1. Connect to `sc500-lab2b-jumpbox` via RDP or Bastion
-2. Open Command Prompt and run:
-   ```
-   nslookup sc500-lab2b-sql.database.windows.net
-   ```
-   Confirm the resolved IP is a **10.2.0.x** address (the private endpoint NIC), not a public Azure IP. This proves the private DNS zone is routing SQL traffic through the VNet.
-3. Run the following sqlcmd query:
-   ```
-   sqlcmd -S sc500-lab2b-sql.database.windows.net -U sc500sqladmin -P "SC500Lab2b!" -d ai-workload-db -Q "SELECT * FROM AiModelMetadata"
-   ```
-   Confirm 3 rows are returned. This proves the private endpoint is forwarding traffic correctly and SQL authentication is working through the private channel.
-4. **Negative test**: Open the Azure portal Query Editor on `ai-workload-db` and attempt to connect. Confirm the connection fails. This closes the loop — access works only from inside the VNet.
-
-### 3. Defender for Databases note
-
-The jump box VM is not a PaaS resource, so Defender for Databases does not cover it. The negative test (portal Query Editor failure) is the recommended external-access proof rather than attempting a VM-external SQL connection.
-
-## Estimated additions
-
-- ARM template: ~80–120 lines (VM, NIC, public IP, NSG, CSE or Bastion resources)
-- Lab guide: ~1 new task, ~15 steps
-- Environment provisioning time: approximately 5?8 minutes for VM provisioning and sqlcmd installation

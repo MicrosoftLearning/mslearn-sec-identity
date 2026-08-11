@@ -26,6 +26,9 @@ Follow these steps to deploy the resources used in the lab:
 
 1. Select **lab-2c-setup.json** from the **F:\AllFiles\Lab-2C** folder on the lab VM, and then select **Save**.
 
+1. On the **Basics** tab, keep **Resource group location** set to **East US**, **Location** set to **Central US**, and **VM size** set to **Standard_D2s_v6**.
+
+1. For **VM admin password**, enter a strong, unique password that meets the displayed Azure complexity requirements. You will not need this password later in the lab.
 
 1. Select **Review + create**, and then select **Create**.
 
@@ -69,7 +72,7 @@ Azure Firewall is a managed, stateful network firewall as a service that provide
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-lab2c-fw` |
-    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
+    | **Region** | Central US |
     | **Availability zone** | None |
     | **Firewall SKU** | Standard |
     | **Firewall management** | Use a Firewall Policy to manage this firewall |
@@ -104,7 +107,7 @@ The workload VM (**sc500-lab2c-vm**) currently has no NSG applied. Any source ca
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-asg-ai-inference` |
-    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
+    | **Region** | Central US |
 
 1. Select **Review + create**, then select **Create**.
 
@@ -132,7 +135,7 @@ The workload VM (**sc500-lab2c-vm**) currently has no NSG applied. Any source ca
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-lab2c-nsg` |
-    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
+    | **Region** | Central US |
 
 1. Select **Review + create**, then select **Create**.
 
@@ -217,7 +220,7 @@ The workload storage account (`<storage-account-name>`) is currently accessible 
     |---------|-------|
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-storage-pe` |
-    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
+    | **Region** | Central US |
 
 1. Select **Next: Resource**.
 
@@ -319,7 +322,7 @@ You will add an application rule collection that allows the workload VMs to reac
     | **Resource group** | sc500-lab2c-rg |
     | **Name** | `sc500-spoke-rt` |
     | **Propagate gateway routes** | No |
-    | **Region** | Use the region selected during Lab Setup (East US unless your lab environment directed otherwise) |
+    | **Region** | Central US |
 
 1. Select **Review + create**, then select **Create**.
 
@@ -383,7 +386,7 @@ Network Watcher's **IP flow verify** tool tests whether a specific traffic flow 
 
     Confirm the result shows **Access denied** and identifies `DenyInboundRDP` as the rule responsible.
 
-2. Change **Local port** to `443` and select **Verify IP flow** again.
+2. Change **Local port** to `443` and **Remote IP address** to `10.4.0.250`, and then select **Verify IP flow** again.
 
     Confirm the result shows **Access allowed** and identifies `AllowInboundHTTPS` as the rule responsible.
 
