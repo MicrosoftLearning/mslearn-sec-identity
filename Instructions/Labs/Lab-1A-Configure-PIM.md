@@ -85,12 +85,14 @@ PIM role settings control how the activation process works: how long the activat
 
 1. Search for and select **MOD Administrator**, then choose **Select**.
 
+    > **Note**: If the approver pane is blank, close it and leave **No approver selected**. When no specific approver is selected, Privileged Role Administrators and Global Administrators become the default approvers. Because **MOD Administrator** is a Global Administrator, you can continue with the same approval workflow.
+
 1. Select **Update** to save the role settings.
 
 1. Verify the role settings page now shows:
     - Maximum activation duration: **1 hour**
     - Approval required: **Yes**
-    - Approver: **MOD Administrator**
+    - Approver: **MOD Administrator**, or the default Global Administrators if you used the fallback
 
 ---
 
@@ -142,6 +144,8 @@ You will now switch back to the **MOD Administrator** browser window and approve
 1. Find the pending request from **Adele Vance** for the **Conditional Access Administrator** role.
 
 1. Add a mark in the box next to the request, then select **Approve**.
+
+    > **Note**: If the approval details pane is blank, refresh the **Approve requests** page once. Select the request again, and then select **Approve**.
 
 1. In the **Justification** field, enter: `Approved for scheduled security review task.`
 
