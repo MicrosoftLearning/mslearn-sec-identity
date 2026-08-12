@@ -95,7 +95,7 @@ You will create a stored access policy on the `training-data` container that gra
 
 1. Return to the **training-data** container overview.
 
-1. In the menu on the left, select **Shared access token**.
+1. In the menu on the left, select **Shared access tokens**.
 
 1. On the **Generate SAS** panel, configure the following:
 
@@ -247,7 +247,7 @@ Defender for Storage's malware scanning feature uses Azure Event Grid to route s
 1. Register the Event Grid resource provider:
 
     ```bash
-    az provider register --namespace Microsoft.EventGrid
+    az provider register --namespace Microsoft.EventGrid --wait
     ```
 
 1. Verify the registration is complete before proceeding:
@@ -256,13 +256,13 @@ Defender for Storage's malware scanning feature uses Azure Event Grid to route s
     az provider show --namespace Microsoft.EventGrid --query "registrationState" -o tsv
     ```
 
-    Wait until the output shows `Registered`. This typically takes 1–2 minutes. Re-run the command if it still shows `Registering`.
+    Confirm the output shows `Registered` before proceeding. The `--wait` option keeps the registration command running until Azure reports a terminal registration state.
 
 1. Close the Cloud Shell.
 
 1. In the left menu for the storage account (`<storage-account-name>`), under **Security + networking**, select **Microsoft Defender for Cloud**.
 
-1. Select **Enable for Storage on this storage account**.
+1. Select **Enable on storage account**.
 
     > **Note**: Defender for Storage can also be enabled at the subscription level from **Microsoft Defender for Cloud** → **Environment settings** → your subscription → **Storage**. Subscription-level enablement automatically protects all current and future storage accounts in the subscription without requiring per-resource configuration — the recommended approach for production environments. Resource-level enablement, used here, limits protection to a single account and is useful when cost control or selective coverage is required. After enabling at the resource level, the subscription-level **Environment settings** page will still show Defender for Storage as **Off** — this is expected. The subscription plan and resource-level overrides are independent. Confirm protection status on the storage account's own **Microsoft Defender for Cloud** blade, not at the subscription level.
 
@@ -306,6 +306,6 @@ In this lab, you secured an Azure storage account that was previously open to al
 
 You created a **stored access policy** on the `training-data` container and generated a SAS token that references it. Unlike standalone SAS tokens — which cannot be revoked without rotating the account key — a policy-backed token can be invalidated instantly by modifying or deleting the policy. You verified the token worked before any network restrictions were in place.
 
-You then changed the storage account from **Allow all networks** to a VNet-only configuration, restricting data-plane access to the `sc500-lab2a-vnet` subnet and removing the **Allow Azure services** exception. You confirmed the restriction is active by running the same blob list command from Cloud Shell and observing the 403 error — and by observing that the Azure portal's Storage browser was also blocked from your current IP.
+You then changed the storage account from **Allow all networks** to a VNet-only configuration, restricting data-plane access to the `sc500-lab2a-vnet` subnet and removing the **Allow trusted Microsoft services** exception. You confirmed the restriction is active by running the same blob read request from Cloud Shell and observing the 403 error — and by observing that the Azure portal's Storage browser was also blocked from your current IP.
 
 Finally, you enabled **Defender for Storage** at the resource level to detect anomalous access patterns and data exfiltration attempts, and configured diagnostic log forwarding to a Log Analytics workspace for audit retention.

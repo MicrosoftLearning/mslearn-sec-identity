@@ -26,7 +26,8 @@ The `lab-3d-setup.json` ARM template provisions the following resources in the *
   
 - **Azure AI Foundry Project** (`sc500-lab3d-foundry`)
   - Project workspace visible in the AI Foundry portal
-  - **NO CONTENT SAFETY GUARDRAILS** (intentional - allows adversarial traffic to reach the model)
+  - Azure OpenAI connection: **sc500-lab3d-openai**
+  - **NO CUSTOM CONTENT SAFETY GUARDRAILS** (intentional - allows adversarial traffic to reach the model)
 
 ### Supporting Resources
 - **Log Analytics Workspace** (`sc500-lab3d-logs`)
@@ -104,10 +105,11 @@ New-AzSubscriptionDeployment `
 
 This is critical - content filters block adversarial queries before they reach the model, preventing Defender from seeing the attack patterns.
 
-1. Navigate to [Azure AI Foundry portal](https://ai.azure.com)
-1. Select the **sc500-lab3d-foundry** project
-1. In left navigation, select **Safety + security** > **Content filters**
-1. Verify **gpt-5.4-mini** deployment shows:
+1. Navigate to [Azure AI Foundry portal](https://ai.azure.com).
+1. Select the **sc500-lab3d-foundry** Hub project and then select **Open in Foundry Classic**.
+1. Under **My assets**, open **Models + endpoints** and confirm the **gpt-5.4-mini** deployment is visible through the **sc500-lab3d-openai** connection.
+1. Under **Protect and govern**, select **Guardrails + controls**, and then select **Content filters**.
+1. Verify **gpt-5.4-mini** shows:
    - Content filter: **Default** or **None** (NOT a custom filter with Medium/High thresholds)
    - If a custom filter is assigned, remove it or set it to "None"
 
@@ -258,10 +260,11 @@ Also disable Defender for AI Services if no longer needed:
 | Resource Type | Resource Name | Purpose |
 |--------------|---------------|---------|
 | Resource Group | sc500-lab3d-rg | Contains all lab resources |
-| Azure OpenAI | sc500-lab3d-ai-{instanceId} | Hosts gpt-4o model (NO filters) |
+| Azure OpenAI | sc500-lab3d-ai-{instanceId} | Hosts gpt-5.4-mini model deployment |
 | AI Hub | sc500-lab3d-hub-{instanceId} | Foundry hub workspace |
-| AI Project | sc500-lab3d-foundry | Foundry project (students review this) |
-| Model Deployment | gpt-4o | Language model endpoint (20 TPM capacity) |
+| AI Project | sc500-lab3d-foundry | Foundry project connected to Azure OpenAI |
+| Azure OpenAI Connection | sc500-lab3d-openai | Connects the project to the Azure OpenAI account |
+| Model Deployment | gpt-5.4-mini | Language model endpoint (20 TPM capacity) |
 
 **Last Updated:** 2026-06-30  
 **Lab Version:** 1.0  

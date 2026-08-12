@@ -47,6 +47,7 @@
     "openAiName": "[concat('sc500-lab3d-ai-', parameters('labInstanceId'))]",
     "aiHubName": "[concat('sc500-lab3d-hub-', parameters('labInstanceId'))]",
     "aiProjectName": "sc500-lab3d-foundry",
+    "openAiConnectionName": "sc500-lab3d-openai",
     "storageAccountName": "[concat('sc500lab3d', parameters('labInstanceId'))]",
     "keyVaultName": "[concat('sc500-3d-kv-', parameters('labInstanceId'))]",
     "appInsightsName": "sc500-lab3d-insights",
@@ -94,6 +95,9 @@
           "aiProjectName": {
             "value": "[variables('aiProjectName')]"
           },
+          "openAiConnectionName": {
+            "value": "[variables('openAiConnectionName')]"
+          },
           "storageAccountName": {
             "value": "[variables('storageAccountName')]"
           },
@@ -130,6 +134,9 @@
               "type": "string"
             },
             "aiProjectName": {
+              "type": "string"
+            },
+            "openAiConnectionName": {
               "type": "string"
             },
             "storageAccountName": {
@@ -315,6 +322,28 @@
                 "hubResourceId": "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('aiHubName'))]",
                 "publicNetworkAccess": "Enabled"
               }
+            },
+            {
+              "type": "Microsoft.MachineLearningServices/workspaces/connections",
+              "apiVersion": "2024-04-01-preview",
+              "name": "[concat(parameters('aiProjectName'), '/', parameters('openAiConnectionName'))]",
+              "dependsOn": [
+                "[resourceId('Microsoft.MachineLearningServices/workspaces', parameters('aiProjectName'))]",
+                "[resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName'))]"
+              ],
+              "properties": {
+                "category": "AzureOpenAI",
+                "target": "[variables('openAiEndpoint')]",
+                "authType": "ApiKey",
+                "isSharedToAll": true,
+                "credentials": {
+                  "key": "[listKeys(resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName')), '2024-04-01-preview').key1]"
+                },
+                "metadata": {
+                  "ApiType": "Azure",
+                  "ResourceId": "[resourceId('Microsoft.CognitiveServices/accounts', parameters('openAiName'))]"
+                }
+              }
             }
           ],
           "outputs": {
@@ -359,6 +388,10 @@
     "modelDeploymentName": {
       "type": "string",
       "value": "[variables('modelDeploymentName')]"
+    },
+    "openAiConnectionName": {
+      "type": "string",
+      "value": "[variables('openAiConnectionName')]"
     },
     "nextSteps": {
       "type": "string",

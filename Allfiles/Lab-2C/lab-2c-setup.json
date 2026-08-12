@@ -21,14 +21,21 @@
       "sc500-storage-pe (Private Endpoint for blob storage in workload-subnet)",
       "sc500-spoke-rt (Route Table with DefaultToFirewall route)"
     ],
-    "deployCommand": "az deployment sub create --location eastus --template-file lab-2c-setup.json"
+    "deployCommand": "az deployment sub create --location eastus --template-file lab-2c-setup.json --parameters vmAdminPassword='<secure-value>'"
   },
   "parameters": {
-    "location": {
+    "resourceGroupLocation": {
       "type": "string",
       "defaultValue": "eastus",
       "metadata": {
-        "description": "Azure region for all resources. East US is the default. If the lab environment identifies a capacity constraint, replace this value with the region it recommends before deployment."
+        "description": "Region for the lab resource group. Keep East US because the lab environment can pre-create this resource group in East US."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "centralus",
+      "metadata": {
+        "description": "Region for workload resources. Central US is verified for the default Standard_D2s_v6 VM size."
       }
     },
     "labInstanceId": {
@@ -47,9 +54,15 @@
         "description": "Local administrator username for sc500-lab2c-vm."
       }
     },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D2s_v6",
+      "metadata": {
+        "description": "VM size for sc500-lab2c-vm. Standard_D2s_v6 is verified in Central US."
+      }
+    },
     "vmAdminPassword": {
       "type": "securestring",
-      "defaultValue": "SC500-Lab2C-2026!",
       "metadata": {
         "description": "Local administrator password for sc500-lab2c-vm. Must be 12-123 characters and meet Azure complexity requirements."
       }
@@ -60,7 +73,7 @@
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2021-04-01",
       "name": "sc500-lab2c-rg",
-      "location": "[parameters('location')]",
+      "location": "[parameters('resourceGroupLocation')]",
       "tags": {
         "lab": "SC500-Lab2C",
         "purpose": "NetworkSecurityControls"
@@ -86,6 +99,9 @@
           "vmAdminUsername": {
             "value": "[parameters('vmAdminUsername')]"
           },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
           "vmAdminPassword": {
             "value": "[parameters('vmAdminPassword')]"
           },
@@ -101,6 +117,9 @@
               "type": "string"
             },
             "vmAdminUsername": {
+              "type": "string"
+            },
+            "vmSize": {
               "type": "string"
             },
             "vmAdminPassword": {
@@ -228,7 +247,7 @@
               ],
               "properties": {
                 "hardwareProfile": {
-                  "vmSize": "Standard_D2s_v6"
+                  "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
                   "computerName": "sc500lab2cvm",
