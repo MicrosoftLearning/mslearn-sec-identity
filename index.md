@@ -39,6 +39,21 @@ If you're working through the labs on your own, use a Microsoft 365 tenant and A
 
 Check each lab's **Lab Setup** section for the full list of roles and setup steps.
 
+### Azure quotas
+
+New Azure subscriptions start with low or zero quota for some of the resources these labs deploy, so a deployment can fail with a quota error even when the template is correct. These were the gaps on a new pay-as-you-go subscription (checked November 2026):
+
+| Lab | Resource | Default quota on a new subscription | What to do |
+|-----|----------|-------------------------------------|------------|
+| Configure AI Gateway and Foundry Security Controls (3C) | Azure OpenAI `gpt-5.4-mini` GlobalStandard, 10,000 TPM (`capacity: 10`) | 0 | Request quota at `https://aka.ms/oai/stuquotarequest` before you start. Requests can take time and may be declined for new subscriptions |
+| Monitor AI Security with Defender for Cloud (3D) | Azure OpenAI `gpt-5.4-mini` GlobalStandard, 20,000 TPM (`capacity: 20`) | 0 | As above. Requesting 20 covers both labs |
+| Secure Container Workloads with AKS (4B) | Standard DCASv5 Family vCPUs (default `agentPoolVmSize` is `Standard_DC2as_v5`) | 0 | Set `agentPoolVmSize` to a size your subscription has quota for, such as `Standard_D2s_v6`, or request DCASv5 quota |
+| Explore Defender for Cloud Security Posture and CSPM (4D) | Standard DSv5 Family vCPUs (default VM size is `Standard_D2s_v5`) | 0 | Choose `Standard_D2s_v6` from the allowed sizes, or request DSv5 quota |
+
+Other quotas these labs use (Total Regional vCPUs, Dsv6 vCPUs, public IP addresses) were high enough by default. To check your own limits, open **Quotas** in the Azure portal, or run `az vm list-usage --location eastus -o table` and `az cognitiveservices usage list --location eastus -o table`.
+
+> **Note**: Free trial subscriptions aren't eligible for quota increases. To request more quota you need a pay-as-you-go subscription, and the labs then create billed resources.
+
 <hr>
 
 {% assign labs = site.pages | where_exp:"page", "page.url contains '/Instructions/Labs'" %}
