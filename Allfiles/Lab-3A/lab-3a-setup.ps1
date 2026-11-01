@@ -65,6 +65,20 @@ Write-Host "  3. Upload sample HR and financial documents" -ForegroundColor Whit
 Write-Host "  4. Ensure documents have no sensitivity labels" -ForegroundColor White
 Write-Host ""
 
+# Check that SharePoint Online exists for this tenant
+# SharePoint is only provisioned when the tenant has a licence that includes it (for example Microsoft 365 E5).
+$tenantHost = ([Uri]$TenantUrl).Host
+try {
+    [System.Net.Dns]::GetHostAddresses($tenantHost) | Out-Null
+}
+catch {
+    Write-Error "$tenantHost does not exist, so SharePoint Online is not set up for this tenant."
+    Write-Host "  Check the tenant name in -TenantUrl (the part before .onmicrosoft.com in the tenant's initial domain)." -ForegroundColor Yellow
+    Write-Host "  If the name is correct, the tenant has no licence that includes SharePoint Online." -ForegroundColor Yellow
+    Write-Host "  Add one (for example a Microsoft 365 E5 trial), assign it to your admin account, and wait up to an hour for SharePoint to be set up." -ForegroundColor Yellow
+    exit 1
+}
+
 # Connect to SharePoint Online
 Write-Host "Connecting to SharePoint Online..." -ForegroundColor Yellow
 try {
