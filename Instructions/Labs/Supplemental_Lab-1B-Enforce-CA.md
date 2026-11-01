@@ -15,6 +15,11 @@ lab:
 
 This lab runs on a M365 Tenant. Security defaults must be turned off before a Conditional Access policy can be set to **On**; the lab includes a step to do this.
 
+If you use your own tenant instead of the hosted lab environment, it needs:
+
+- **Microsoft Entra ID P1 or P2** for Conditional Access.
+- A licence that includes **Microsoft Forms** (for example Microsoft 365 E5 or Microsoft 365 Business Premium) assigned to **Adele Vance**, so she can sign in to `https://forms.microsoft.com` in the MFA test. Entra ID P1 or P2 on its own does not include Forms.
+
 ===
 
 
