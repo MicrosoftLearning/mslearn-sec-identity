@@ -10,6 +10,17 @@ Lab 3A requires a pre-configured SharePoint site named **sc500-ai-datastore** wi
 - No sensitivity labels applied to documents
 - Copilot interaction signals (generated through normal Copilot usage)
 
+## Tenant Requirements
+
+The hosted lab environment already meets these requirements. If you use your own tenant, check them first:
+
+- **SharePoint Online must exist in the tenant.** It is only set up when the tenant has a licence that includes SharePoint Online, for example **Microsoft 365 E5**, Office 365 E5, or Microsoft 365 Business Premium. A tenant with only Microsoft Entra ID P1/P2 has no SharePoint, and `https://YOUR-TENANT.sharepoint.com` will not resolve. You can add a Microsoft 365 E5 trial in the Microsoft 365 admin center under **Billing** > **Purchase services** (switch from **Simplified view** to **Dashboard view** to see the full menu). SharePoint can take up to an hour to become available after the licence is added.
+- Assign the licence to the admin account you use for setup.
+- **Microsoft Purview DSPM for AI** requires Microsoft 365 E5 or E5 Compliance licensing.
+- Copilot interaction signals (section 4 of the manual setup) require a **Microsoft 365 Copilot** licence. Without it, skip that section; the oversharing and unlabeled-data findings still appear.
+
+`YOUR-TENANT` is the part before `.onmicrosoft.com` in the tenant's initial domain (for example `contoso` in `contoso.onmicrosoft.com`). You can find it in the Microsoft 365 admin center under **Settings** > **Domains** (in **Dashboard view**) or on the **Domains** page (in **Simplified view**).
+
 ## Setup Options
 
 ### Option 1: PowerShell Script (Recommended)
@@ -17,9 +28,10 @@ Lab 3A requires a pre-configured SharePoint site named **sc500-ai-datastore** wi
 Use the provided PowerShell script for automated setup.
 
 #### Prerequisites
-- PowerShell 7.x or later
+- PowerShell 7.4 or later (required by current versions of PnP.PowerShell)
 - SharePoint Administrator or Global Administrator credentials
 - Internet connection
+- An Entra ID app registration for PnP.PowerShell (see step 3). Since September 2024, PnP.PowerShell no longer provides a shared sign-in app, and `Connect-PnPOnline -Interactive` fails without a `-ClientId`.
 
 #### Steps
 
@@ -30,15 +42,22 @@ Use the provided PowerShell script for automated setup.
    cd "C:\path\to\Allfiles\Lab-3A"
    ```
 
-3. Run the setup script:
+3. Install PnP.PowerShell and register an app for it (one time per tenant). Sign in as a Global Administrator when prompted and accept the consent request:
    ```powershell
-   .\lab-3a-setup.ps1 -TenantUrl "https://YOUR-TENANT.sharepoint.com"
+   Install-Module -Name PnP.PowerShell -Scope CurrentUser
+   Register-PnPEntraIDAppForInteractiveLogin -ApplicationName "PnP Lab 3A" -Tenant YOUR-TENANT.onmicrosoft.com
    ```
-   Replace `YOUR-TENANT` with your actual tenant name.
+   Copy the **ClientId** value that the command prints.
 
-4. Authenticate when prompted using Global Administrator credentials
+4. Run the setup script:
+   ```powershell
+   .\lab-3a-setup.ps1 -TenantUrl "https://YOUR-TENANT.sharepoint.com" -ClientId "YOUR-CLIENT-ID"
+   ```
+   Replace `YOUR-TENANT` with your tenant name and `YOUR-CLIENT-ID` with the value from step 3.
 
-5. Wait for the script to complete (approximately 2-3 minutes)
+5. Authenticate when prompted using Global Administrator credentials
+
+6. Wait for the script to complete (approximately 2-3 minutes)
 
 #### What the Script Does
 - ✓ Creates a SharePoint communication site at `/sites/sc500-ai-datastore`
@@ -55,14 +74,17 @@ If you prefer not to use the PowerShell script, follow these manual steps:
 
 #### 1. Create SharePoint Site
 
-1. Sign in to [SharePoint admin center](https://admin.microsoft.com/sharepoint)
+1. Open the SharePoint admin center at `https://YOUR-TENANT-admin.sharepoint.com`. (The `admin.microsoft.com/sharepoint` link no longer opens it.) You can also reach it from the Microsoft 365 admin center: switch to **Dashboard view**, select **Show all** > **Admin centers** > **SharePoint**.
 2. Select **Sites** > **Active sites**
-3. Click **Create** > **Communication site**
+3. Select **+ Create** > **Communication site**, then choose a template such as **Standard communication**
 4. Configure:
    - **Site name**: SC500 AI Data Store
-   - **Site address**: `/sites/sc500-ai-datastore`
+   - **Site address**: `sc500-ai-datastore` (the `/sites/` prefix is filled in for you)
+   - **Site owner**: your admin account (required)
    - **Description**: Pre-seeded SharePoint site for SC-500 Lab 3A
-5. Click **Finish**
+5. Complete the wizard to create the site
+
+> **Tip**: You can also create the site from `https://YOUR-TENANT.sharepoint.com` by selecting **+ Create site** > **Communication site**.
 
 #### 2. Configure Oversharing Permissions
 
@@ -74,6 +96,8 @@ If you prefer not to use the PowerShell script, follow these manual steps:
    - Set permission level to **Read**
    - Uncheck "Send email"
 5. Click **Share**
+
+> **Note**: If **Everyone except external users** does not appear in the people picker, the tenant is configured to hide it. A SharePoint Administrator can show it with `Set-PnPTenant -ShowEveryoneExceptExternalUsersClaim $true`, or you can use the PowerShell script, which grants the permission directly.
 
 #### 3. Upload Sample Documents
 
@@ -205,12 +229,12 @@ To remove the site after lab completion:
 
 ### PowerShell Method
 ```powershell
-Connect-PnPOnline -Url "https://YOUR-TENANT-admin.sharepoint.com" -Interactive
+Connect-PnPOnline -Url "https://YOUR-TENANT-admin.sharepoint.com" -ClientId "YOUR-CLIENT-ID" -Interactive
 Remove-PnPTenantSite -Url "https://YOUR-TENANT.sharepoint.com/sites/sc500-ai-datastore" -Force
 ```
 
 ### Manual Method
-1. Go to [SharePoint admin center](https://admin.microsoft.com/sharepoint)
+1. Go to the SharePoint admin center at `https://YOUR-TENANT-admin.sharepoint.com`
 2. Select **Sites** > **Active sites**
 3. Find **sc500-ai-datastore**
 4. Click the checkbox, then click **Delete**
@@ -219,7 +243,7 @@ Remove-PnPTenantSite -Url "https://YOUR-TENANT.sharepoint.com/sites/sc500-ai-dat
 ## Support
 
 For issues or questions:
-- Review the lab instructions in `Instructions\Labs\Lab-3A-Purview-AI-Risks.md`
+- Review the lab instructions in `Instructions\Labs\Supplemental_Lab-3A-Purview-AI-Risks.md`
 - Check PowerShell execution policy: `Get-ExecutionPolicy` (should be RemoteSigned or Unrestricted)
 - Verify tenant URL format: `https://TENANT.sharepoint.com` (no trailing slash)
 

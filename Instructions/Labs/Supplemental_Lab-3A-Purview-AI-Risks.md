@@ -44,15 +44,22 @@ This exercise should take approximately **45** minutes to complete.
 
 > **Important**: This lab requires a pre-configured SharePoint site named **sc500-ai-datastore** with oversharing permissions and sample sensitive documents. 
 
+> **Note**: If you use your own tenant, it needs a licence that includes SharePoint Online and Microsoft Purview (for example **Microsoft 365 E5**). A tenant with only Microsoft Entra ID P1/P2 has no SharePoint, so the site can't be created. See **Tenant Requirements** in `Allfiles\Lab-3A\README.md`.
+
 ### Setup Required Before Starting This Lab
 
 **Option 1 - Automated Setup (Recommended)**:
 1. Download the setup script from `Allfiles\Lab-3A\lab-3a-setup.ps1`
-2. Run in PowerShell 7:
+2. Register an app for PnP.PowerShell (one time per tenant) and copy the **ClientId** it prints:
    ```powershell
-   .\lab-3a-setup.ps1 -TenantUrl "https://YOUR-TENANT.sharepoint.com"
+   Install-Module -Name PnP.PowerShell -Scope CurrentUser
+   Register-PnPEntraIDAppForInteractiveLogin -ApplicationName "PnP Lab 3A" -Tenant YOUR-TENANT.onmicrosoft.com
    ```
-3. Wait 2-3 minutes for completion
+3. Run in PowerShell 7.4 or later:
+   ```powershell
+   .\lab-3a-setup.ps1 -TenantUrl "https://YOUR-TENANT.sharepoint.com" -ClientId "YOUR-CLIENT-ID"
+   ```
+4. Wait 2-3 minutes for completion
 
 **Option 2 - Manual Setup**:
 - Follow the detailed instructions in `Allfiles\Lab-3A\README.md`
