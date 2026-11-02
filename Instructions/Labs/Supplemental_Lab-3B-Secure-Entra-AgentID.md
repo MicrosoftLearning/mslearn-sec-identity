@@ -1,26 +1,28 @@
 ---
 lab:
     title: 'Secure Microsoft Entra Agent Identities'
-    description: 'Locate a pre-provisioned Copilot Studio agent identity in Microsoft Entra ID, create Conditional Access policies scoped to agent identities and agent user accounts, analyze blast radius in Microsoft Defender XDR, manage the agent in the Microsoft 365 admin center, and enable real-time protection in Copilot Studio.'
+    description: 'Create an agent in Microsoft Foundry, locate its agent identity in Microsoft Entra ID, create Conditional Access policies scoped to agent identities and agent user accounts, and enable real-time protection in Copilot Studio.'
     level: 300
     duration: 60
     islab: true
     primarytopics:
         - Microsoft Entra Agent ID
         - Conditional Access
-        - Microsoft Defender XDR
+        - Microsoft Foundry
         - Copilot Studio
 ---
 
 # Lab Setup
 
-Follow these steps to complete the lab. **Note**: This lab is a work in progress as the technology around the Entra Agent ID is evolving almost daily. The steps as written worked on June 30, 2026. However with regular product changes you may find that the setups are not 100% accruate.  We don't have a lab setup for this lab yet, as it keeps changing. We will add a lab setup, once things stablize.
+Follow these steps to complete the lab. **Note**: This lab is a work in progress as the technology around the Entra Agent ID is evolving almost daily. The steps as written worked on June 30, 2026. However with regular product changes you may find that the setups are not 100% accurate. We don't have a lab setup for this lab yet, as it keeps changing. We will add a lab setup, once things stabilize.
+
+> **Note**: The steps refer to a hosted lab environment (**User1**, "the provided subscription", automatic reset). If you use your own tenant, you need a Global Administrator account, a licence that includes Microsoft Entra ID P1 for Conditional Access, an Azure subscription where you can create a Microsoft Foundry resource, and access to Copilot Studio for the last section.
 
 ===
 
 # Secure Microsoft Entra Agent Identities
 
-Your organization's development team deployed a Copilot Studio agent that has read access to a SharePoint site containing HR data and can send calendar invitations on behalf of users. No Conditional Access policy governs when the agent can authenticate, and no one has assessed what an attacker could do if the agent identity were compromised.
+Your organization's development team deployed an AI agent that has read access to a SharePoint site containing HR data and can send calendar invitations on behalf of users. No Conditional Access policy governs when the agent can authenticate, and no one has assessed what an attacker could do if the agent identity were compromised.
 
 A security review request asks you to apply governance controls to the agent identity and determine its blast radius before the next risk assessment cycle.
 
@@ -29,23 +31,21 @@ In this lab, you will:
 - Locate the agent identity in Microsoft Entra ID and understand how it differs from a user identity and a service principal
 - Create a risk-based Conditional Access policy targeting all agent identities
 - Create a second Conditional Access policy targeting agent user accounts, and understand why MFA is not an available grant control for this scope
-- Analyze the agent's blast radius using Microsoft Defender XDR
-- Manage the agent's configured connections in the Microsoft 365 admin center
 - Enable real-time protection for the agent in Copilot Studio
 
 This exercise should take approximately **60** minutes to complete.
 
-> **Note**: This lab uses one account — **User1** (`sc500-user1-`), which is the seeded Global Administrator — to access four different portals: the Microsoft Entra admin center, Microsoft Defender XDR, the Microsoft 365 admin center, and Copilot Studio. Use the credentials provided for this account.
+> **Note**: This lab uses one account — **User1** (`sc500-user1-`), which is the seeded Global Administrator — to access three portals: the Azure portal and Microsoft Foundry, the Microsoft Entra admin center, and Copilot Studio. Use the credentials provided for this account.
 
 ---
 
-## Create and Agent in Foundry to populate the Agent ID
+## Create an agent in Foundry to populate the Agent ID
 
 1. Open the **Azure Portal** at `https://portal.azure.com`
 
 1. Log in as **User1** using the provided credentials.
 
-1. Select **Yes** one the **Stay signed in?** dialog.
+1. Select **Yes** on the **Stay signed in?** dialog.
 
 1. In the **Search resources...** bar search for and open `Microsoft Foundry`.
 
@@ -87,23 +87,27 @@ This exercise should take approximately **60** minutes to complete.
 
 ## Locate the agent identity in Microsoft Entra ID
 
-Every Copilot Studio agent is registered in Microsoft Entra ID as a distinct identity type — separate from users, service principals, and managed identities. Before applying security controls, you need to understand what an agent identity object looks like in the directory.
+Agents created in Microsoft Foundry and Copilot Studio are registered in Microsoft Entra ID as a distinct identity type — separate from users, service principals, and managed identities. Before applying security controls, you need to understand what an agent identity object looks like in the directory.
 
 1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using your **Administrator** credentials.
 
 1. In the left navigation, browse to **Entra ID** > **Agents** > **Agent identities**.
 
-    > **Note**: **Agents** is a dedicated hub in the Entra admin center for managing non-human AI identities. It is separate from **Applications** (which contains App registrations and Enterprise applications). Under **Agents** you will find **Agent identities**, **Agent blueprints**, **Sign-in logs**, and an **Overview**. Agent identities carry additional metadata — including the agent's purpose, its configured connections, and the team that deployed it — that standard service principals do not.
+    > **Note**: **Agents** is a dedicated hub in the Entra admin center for managing non-human AI identities. It is separate from **Applications** (which contains App registrations and Enterprise applications). Under **Agents** you will find **Agent identities**, **Agent blueprints**, **Sign-in logs**, and an **Overview**. Agent identities carry additional metadata that standard service principals do not, such as the **agent blueprint** they were created from and the **sponsors** who are accountable for them.
 
 1. Locate **sc500-copilot-agent** in the list and select it to open the identity details.
 
-1. Review the agent identity properties. Note the following:
+1. On the **Overview** page, review the agent identity properties. Note the following:
 
     | Field | What it tells you |
     |-------|------------------|
-    | **Object type** | AgentIdentity — distinct from User, Application, or ServicePrincipal |
-    | **Connections** | The data sources and services this agent is authorized to access |
-    | **Created date** | When the agent was registered in the tenant |
+    | **Agent identity** badge | The object is an agent identity, distinct from a user, an app registration, or an ordinary service principal |
+    | **Sponsors** and **Owners** | The people accountable for the agent and the people who can manage it |
+    | **Agent blueprint** and **Blueprint App ID** | The blueprint (template) this agent identity was created from |
+    | **Object ID** and **Application ID** | The identifiers you use when scoping policies or searching logs |
+    | **Created on** | When the agent was registered in the tenant |
+
+1. In the **Agent identity's access** card, note the number of **Permissions** and **Entra roles** granted to the agent. Select **Granted permissions** in the left navigation to see the details.
 
 1. In the left navigation, expand **Users** and select **All users**.
 
@@ -123,7 +127,7 @@ You will create two policies: one for agent identities (the service principal ob
 
 ### Policy 1 — Block high-risk agent identity sign-ins
 
-1. In the Entra admin center, expand **Protection** and select **Conditional Access**.
+1. In the Entra admin center, browse to **Entra ID** > **Conditional Access** > **Policies**.
 
 1. Select **+ Create new policy**.
 
@@ -146,7 +150,7 @@ You will create two policies: one for agent identities (the service principal ob
     - Select **Block access**
     - Select **Select**
 
-1. Under **Enable policy**, select **On**.
+1. Under **Enable policy**, select **Report-only**.
 
     > **Note**: This policy is set to **Report-only** because triggering a medium- or high-risk agent sign-in event to verify enforcement is not practical in a lab environment. In a production tenant, switch to **On** after reviewing the What If tool output to confirm no legitimate agent operations would be blocked.
 
@@ -217,13 +221,9 @@ Real-time protection monitors agent behavior during execution and can block or f
 
 ## Summary
 
-In this lab, you worked with a Copilot Studio agent identity across four portals to apply a layered set of governance controls.
+In this lab, you created an agent in Microsoft Foundry and worked with its agent identity to apply a layered set of governance controls.
 
 In Microsoft Entra ID, you located the agent's dual-object model — the agent identity service principal and the agent's user account in All Users — and understood the CA policy design implications of that two-object structure. You created two Conditional Access policies: one risk-based blocking policy targeting all agent identities, and one block-only policy targeting agent user accounts, with a note on why MFA is not available as a grant control for non-human identities.
-
-In Microsoft Defender XDR, you analyzed the blast radius for **sc500-copilot-agent** and identified two attack paths — SharePoint access to sensitive HR data and delegated calendar access — that represent the agent's attack surface if compromised.
-
-In the Microsoft 365 admin center, you disabled the agent's SharePoint connection to **sc500-ai-datastore**, removing the higher-risk attack path identified in the blast radius analysis.
 
 In Copilot Studio, you enabled real-time protection to add a runtime behavioral monitoring layer on top of the identity governance controls.
 
@@ -235,6 +235,6 @@ The lab environment is automatically reset at the end of the session. No manual 
 
 If you want to remove the Conditional Access policies before the session ends:
 
-1. Navigate to the Entra admin center > **Protection** > **Conditional Access**.
+1. Navigate to the Entra admin center > **Entra ID** > **Conditional Access** > **Policies**.
 1. Select **sc500-agent-risk-block**, select **Delete**, and confirm.
 1. Select **sc500-agent-user-block**, select **Delete**, and confirm.
