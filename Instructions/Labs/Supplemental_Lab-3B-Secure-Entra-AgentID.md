@@ -1,7 +1,7 @@
 ---
 lab:
     title: 'Secure Microsoft Entra Agent Identities'
-    description: 'Create an agent in Microsoft Foundry, locate its agent identity in Microsoft Entra ID, create Conditional Access policies scoped to agent identities and agent user accounts, and enable real-time protection in Copilot Studio.'
+    description: 'Create an agent in Microsoft Foundry, locate its agent identity in Microsoft Entra ID, create Conditional Access policies scoped to agent identities and agent user accounts, and enable real-time protection in Microsoft Defender.'
     level: 300
     duration: 60
     islab: true
@@ -9,14 +9,14 @@ lab:
         - Microsoft Entra Agent ID
         - Conditional Access
         - Microsoft Foundry
-        - Copilot Studio
+        - Microsoft Defender XDR
 ---
 
 # Lab Setup
 
 Follow these steps to complete the lab. **Note**: This lab is a work in progress as the technology around the Entra Agent ID is evolving almost daily. The steps as written worked on June 30, 2026. However with regular product changes you may find that the setups are not 100% accurate. We don't have a lab setup for this lab yet, as it keeps changing. We will add a lab setup, once things stabilize.
 
-> **Note**: The steps refer to a hosted lab environment (**User1**, "the provided subscription", automatic reset). If you use your own tenant, you need a Global Administrator account, a **Microsoft Agent 365** licence together with Microsoft Entra ID P1 (or Microsoft 365 E7) to target agents in Conditional Access, Microsoft Entra ID P2 for the agent risk condition in Policy 1, an Azure subscription where you can create a Microsoft Foundry resource, and access to Copilot Studio for the last section.
+> **Note**: The steps refer to a hosted lab environment (**User1**, "the provided subscription", automatic reset). If you use your own tenant, you need a Global Administrator account, a **Microsoft Agent 365** licence together with Microsoft Entra ID P1 (or Microsoft 365 E7) to target agents in Conditional Access, Microsoft Entra ID P2 for the agent risk condition in Policy 1, an Azure subscription where you can create a Microsoft Foundry resource, and access to Security for AI in the Microsoft Defender portal for the last section.
 
 ===
 
@@ -31,11 +31,11 @@ In this lab, you will:
 - Locate the agent identity in Microsoft Entra ID and understand how it differs from a user identity and a service principal
 - Create a risk-based Conditional Access policy targeting all agent identities
 - Create a second Conditional Access policy targeting agent user accounts, and understand why MFA is not an available grant control for this scope
-- Enable real-time protection for the agent in Copilot Studio
+- Enable real-time protection for the agent in Microsoft Defender
 
 This exercise should take approximately **60** minutes to complete.
 
-> **Note**: This lab uses one account — **User1** (`sc500-user1-`), which is the seeded Global Administrator — to access three portals: the Azure portal and Microsoft Foundry, the Microsoft Entra admin center, and Copilot Studio. Use the credentials provided for this account.
+> **Note**: This lab uses one account — **User1** (`sc500-user1-`), which is the seeded Global Administrator — to access three portals: the Azure portal and Microsoft Foundry, the Microsoft Entra admin center, and the Microsoft Defender portal. Use the credentials provided for this account.
 
 ---
 
@@ -195,33 +195,41 @@ You will create two policies: one for agent identities (the service principal ob
 
 ---
 
-## Enable real-time protection in Copilot Studio
+## Enable real-time protection in Microsoft Defender
 
-Real-time protection monitors agent behavior during execution and can block or flag actions that fall outside defined policies. This is a runtime behavioral control — it operates when the agent is running, not at sign-in time, complementing the Conditional Access controls you configured earlier.
+Real-time protection inspects agent activity while the agent runs and can block risky actions, such as secret exfiltration or passing along malicious content, before they execute. This is a runtime behavioral control. It operates when the agent is running, not at sign-in time, and complements the Conditional Access controls you configured earlier.
 
-1. Open a new browser tab and navigate to [Copilot Studio](https://copilotstudio.microsoft.com).
+Real-time protection is configured in the Microsoft Defender portal, not in the agent's own settings. It covers Foundry agents and Copilot Studio agents (both in preview).
 
-1. From the environment selector at the top of the page, confirm you are in the correct tenant environment.
+> **Note**: The Foundry agent you created in the setup doesn't appear in Copilot Studio. Foundry and Copilot Studio are separate agent platforms, and Copilot Studio only lists agents built in a Power Platform environment.
 
-1. In the left navigation, select **Agents**, then locate and select **sc500-copilot-agent**.
+1. Open a new browser tab and sign in to the [Microsoft Defender portal](https://security.microsoft.com).
 
-1. In the agent settings, select the **Security** tab.
+1. Go to **Settings** > **Security for AI** > **Policies & rules** > **Real-time protection**.
 
-    > **Note**: Depending on the Copilot Studio version in your environment, this may appear as **Advanced settings** or within a **Security and compliance** section. Look for **Real-time protection** as the target setting.
+    > **Note**: If **Security for AI** isn't available, it must be enabled first. See [Enable security for AI agents using Microsoft Defender](https://learn.microsoft.com/defender-xdr/security-for-ai/get-started-defender-security-for-ai).
 
-1. Locate the **Real-time protection** setting and set it to **Enabled**.
+1. Review the built-in **Default** rule. It audits all agents and records matching activity as a behavior without blocking it.
 
-1. Review the protection options and confirm the following are active:
+1. Select **Create rule**.
 
-    | Protection option | What it does |
-    |------------------|-------------|
-    | **Content moderation** | Blocks agent responses that violate configured content policies at runtime |
-    | **Data loss prevention** | Prevents the agent from sharing sensitive content outside approved channels |
-    | **Anomaly detection** | Flags unusual agent behavior patterns for security team review |
+1. On the **Rule details** step, set **Status** to on, enter the **Rule name** `sc500-agent-runtime-block` and a description, and then select **Next**.
 
-1. Select **Save** to apply the real-time protection settings.
+1. Configure the rule:
 
-    > **Note**: Real-time protection builds a behavioral baseline for the agent over time. Early alerts may require review to distinguish legitimate agent behavior from anomalies. Review flagged events in Microsoft Defender XDR, where agent security alerts from Copilot Studio real-time protection appear alongside other identity alerts.
+    - **Scope**: select specific agents, and then select the agent identity you created in the setup. Only agents with a Microsoft Entra agent ID appear in the list.
+    - **Detection types**: select the threat scenarios to block, and then select **Apply**.
+
+    | Detection type | What it blocks |
+    |----------------|----------------|
+    | **Secret exfiltration** | Interactions that expose or try to transfer secrets such as API keys, credentials or access tokens |
+    | **Malicious content propagation** | Interactions where the agent receives, generates or passes along content identified as malicious |
+    | **Evasion techniques** | Interactions that hide malicious instructions, for example by encoding them |
+    | **Unsafe email domain** | Tool calls that would send email to an unsafe or untrusted domain |
+
+1. Select **Next**, review the summary, and then select **Create**.
+
+    > **Note**: When Defender audits or blocks an action, it records the event as a behavior in the `BehaviorInfo` table, including which agent, user and tool were involved. Security teams can use these records for custom detections and hunting.
 
 ---
 
@@ -231,7 +239,7 @@ In this lab, you created an agent in Microsoft Foundry and worked with its agent
 
 In Microsoft Entra ID, you located the agent's dual-object model — the agent identity service principal and the agent's user account in All Users — and understood the CA policy design implications of that two-object structure. You created two Conditional Access policies: one risk-based blocking policy targeting all agent identities, and one block-only policy targeting agent user accounts, with a note on why MFA is not available as a grant control for non-human identities.
 
-In Copilot Studio, you enabled real-time protection to add a runtime behavioral monitoring layer on top of the identity governance controls.
+In Microsoft Defender, you created a real-time protection rule that blocks risky agent actions at runtime, adding a behavioral layer on top of the identity governance controls.
 
 You have successfully completed this exercise.
 
