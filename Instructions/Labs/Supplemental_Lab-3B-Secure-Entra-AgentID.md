@@ -16,7 +16,7 @@ lab:
 
 Follow these steps to complete the lab. **Note**: This lab is a work in progress as the technology around the Entra Agent ID is evolving almost daily. The steps as written worked on June 30, 2026. However with regular product changes you may find that the setups are not 100% accurate. We don't have a lab setup for this lab yet, as it keeps changing. We will add a lab setup, once things stabilize.
 
-> **Note**: The steps refer to a hosted lab environment (**User1**, "the provided subscription", automatic reset). If you use your own tenant, you need a Global Administrator account, a licence that includes Microsoft Entra ID P1 for Conditional Access, an Azure subscription where you can create a Microsoft Foundry resource, and access to Copilot Studio for the last section.
+> **Note**: The steps refer to a hosted lab environment (**User1**, "the provided subscription", automatic reset). If you use your own tenant, you need a Global Administrator account, a **Microsoft Agent 365** licence together with Microsoft Entra ID P1 (or Microsoft 365 E7) to target agents in Conditional Access, an Azure subscription where you can create a Microsoft Foundry resource, and access to Copilot Studio for the last section.
 
 ===
 
