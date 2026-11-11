@@ -19,7 +19,8 @@ Follow these steps to build out your lab scenarios:
 
 1. Log in with the **User1** administrator role.
 
-1. In the Azure portal top bar, select the **Cloud Shell** icon (**>_**). If prompted, select **Bash**.
+1. In the Azure portal top bar, select the **Cloud Shell** icon (**>_**). If prompted to select a shell type, select **Bash**.
+On the **Getting started** page, select **No storage account required**, select the lab subscription, and then select **Apply**.
 
 1. Register the Microsoft.Security resource provider so Defender plans are available later in the lab:
 
@@ -45,8 +46,6 @@ Follow these steps to build out your lab scenarios:
 1. Select the file **lab-3c-setup.json** from the **F:\AllFiles\Lab-3C** folder on the lab VM.
 
 1. Select **Save**.
-
-
 
 1. Select **Review + create**.
 
@@ -92,7 +91,7 @@ Before applying any controls, confirm the current state of the pre-provisioned e
 
 > **Note**: The pre-provisioned API Management instance name begins with **`sc500-lab3c-apim-`** followed by an 8-character suffix that is unique to your lab subscription. Throughout this lab, `<apim-name>` refers to that instance. The `sc500-lab3c-rg` resource group contains exactly one API Management instance — select it whenever the lab asks for `<apim-name>`.
 
-1. Sign in to the [Azure portal](https://portal.azure.com) using your **User1** credentials.
+1. Sign in to the **Azure portal** at `https://portal.azure.com` using your **User1** credentials.
 
 1. In the search bar, search for and select **API Management services**.
 
@@ -114,13 +113,13 @@ Before applying any controls, confirm the current state of the pre-provisioned e
 
 ### Review the Foundry model endpoint
 
-1. Open a new browser tab and navigate to the [Microsoft Foundry portal](https://ai.azure.com).
+1. Open a new browser tab, navigate to the **Microsoft Foundry portal** at `https://ai.azure.com`, and sign in.
 
 1. If a New Foundry project opens, select the project name in the upper-left corner, and then select **View all resources**.
 
 1. Select the **sc500-lab3c-foundry** Hub project.
 
-1. On the resource details pane, select **Open in Foundry Classic**.
+1. If the **Open in Foundry Classic** option appears on the resource details pane, select it.
 
     > **Note**: This lab uses a Hub project. Hub projects are managed in Foundry Classic and are not supported in the New Foundry project experience.
 
@@ -142,7 +141,7 @@ Azure API Management provides AI Gateway policies that are purpose-built for lan
 
 The policy XML for this lab is provided in the **F:\AllFiles\Lab-3C** folder. You will paste it directly into the APIM policy editor — you do not need to author policy XML from memory.
 
-1. In the Azure portal, navigate back to **`<apim-name>` > APIs > sc500-foundry-api**.
+1. In the **Azure portal**, navigate back to **`<apim-name>` > APIs > sc500-foundry-api**.
 
 1. Select the **Design** tab and select **All operations**.
 
@@ -249,7 +248,7 @@ With the token rate limit policy and subscription key authentication in place, v
 
 Content safety guardrails are applied at the Foundry layer — they inspect both the prompt sent to the model and the model's response, and block content that exceeds configured harm thresholds. You will create a guardrail with Prompt Shield enabled and apply it to the gpt-5.4-mini deployment.
 
-1. Return to the **Azure AI Foundry portal** tab (or navigate to [https://ai.azure.com](https://ai.azure.com)).
+1. Return to the **Azure AI Foundry portal** tab (or navigate to `https://ai.azure.com`).
 
 1. Select the **sc500-lab3c-foundry** project.
 
@@ -351,5 +350,7 @@ The lab environment is automatically reset at the end of the session. No manual 
 If you want to remove the content safety guardrail from the model deployment before the session ends:
 
 1. Navigate to the Azure AI Foundry portal > **sc500-lab3c-foundry** > **Models + endpoints**.
+
 1. Select the **gpt-5.4-mini** deployment and edit the deployment settings.
+
 1. Set **Content filter** back to the default filter or to none, then save.
