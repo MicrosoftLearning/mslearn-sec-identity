@@ -39,7 +39,7 @@ This exercise should take approximately **45** minutes to complete.
 
 ## Create a Log Analytics space
 
-1. Sign in to the **Azure portal** `https://portal.azure.com` with your Administrator account.
+1. Sign in to the **Azure portal** at `https://portal.azure.com` with your Administrator account.
 
 1. In the **Search resources...** bar, find and open `Log Analytics Workspaces`.
 
