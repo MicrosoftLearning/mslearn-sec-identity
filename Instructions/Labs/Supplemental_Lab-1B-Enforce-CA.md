@@ -143,7 +143,7 @@ The simulation confirmed the policy is correctly configured. You will now switch
 
 The AI platform team needs a registered application identity in Entra ID so their application can authenticate and call APIs on behalf of users. An app registration provides a client ID and a place to define which permissions the application requires. You will register the application and add a scoped delegated permission following the principle of least privilege.
 
-1. Return to your **Global Administrator** browser window at the [Microsoft Entra admin center](https://entra.microsoft.com).
+1. Return to your **Global Administrator** browser window at the **Microsoft Entra admin center** at `https://entra.microsoft.com`.
 
 1. In the left navigation, expand **Applications** and select **App registrations**.
 
