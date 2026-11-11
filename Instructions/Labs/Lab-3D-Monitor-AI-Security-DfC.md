@@ -69,7 +69,7 @@ This exercise should take approximately **15** minutes to complete.
 
 ## Open the Data and AI security dashboard
 
-1. Sign in to the [Azure portal](https://portal.azure.com) using your **User1** credentials.
+1. Sign in to the **Azure portal** at `https://portal.azure.com` using your **User1** credentials.
 
 1. Search for and open **Microsoft Defender for Cloud**.
 
