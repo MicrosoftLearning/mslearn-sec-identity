@@ -204,7 +204,7 @@ The workload storage account (`<storage-account-name>`) is currently accessible 
 
 1. In the Azure portal search bar, search for and select **Storage accounts**.
 
-1. Select **<storage-account-name>**.
+1. Select the **sc500lab2cXXXX** storage account (where XXXX is the Lab Instance ID) from the list.
 
 1. In the left menu, under **Security + networking**, select **Networking**.
 
@@ -229,7 +229,7 @@ The workload storage account (`<storage-account-name>`) is currently accessible 
     | Setting | Value |
     |---------|-------|
     | **Resource type** | Microsoft.Storage/storageAccounts |
-    | **Resource** | <storage-account-name> |
+    | **Resource** | **sc500lab2cXXXX** storage account (where XXXX is the Lab Instance ID) |
     | **Target sub-resource** | blob |
 
 1. Select **Next: Virtual Network**.
@@ -251,7 +251,7 @@ The workload storage account (`<storage-account-name>`) is currently accessible 
 
     Wait for the private endpoint to deploy (typically 1–2 minutes).
 
-1. Return to the **Networking** settings for `<storage-account-name>`.
+1. Return to the **sc500lab2cXXXX** storage account (where XXXX is the Lab Instance ID). Under **Security + networking**, select **Networking**.
 
 1. On the **Public access** tab, select **Manage**.
 
