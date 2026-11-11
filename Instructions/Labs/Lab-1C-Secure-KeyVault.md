@@ -17,7 +17,8 @@ Follow these steps to deploy the resources used in the lab:
 
 1. Open the **Azure portal** at `https://portal.azure.com` and sign in with **User1**.
 
-1. In the portal top bar, select the **Cloud Shell** icon (**>_**). If prompted, select **Bash** and **No storage account required**.
+1. In the Azure portal top bar, select the **Cloud Shell** icon (**>_**). If prompted to select a shell type, select **Bash**.
+On the **Getting started** page, select **No storage account required**, select the lab subscription, and then select **Apply**.
 
 1. Register the Microsoft.Security resource provider and create the resource group:
 
@@ -431,7 +432,7 @@ The lab environment is automatically reset at the end of the session. No manual 
 
 If you want to clean up before the session ends:
 
-1. Navigate to the [Azure portal](https://portal.azure.com).
+1. Navigate to the **Azure portal** at `https://portal.azure.com`.
 1. Navigate to **Resource groups** and select **sc500-lab1c-rg**.
 1. Select **Delete resource group**, enter the resource group name to confirm, and select **Delete**.
 1. In **Microsoft Defender for Cloud** → **Management** → **Environment settings**, select your subscription and set the **Key Vault** plan to **Off**, then select **Save**.
