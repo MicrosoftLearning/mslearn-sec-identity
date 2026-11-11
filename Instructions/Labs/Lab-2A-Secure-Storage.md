@@ -58,7 +58,7 @@ You will create a stored access policy on the `training-data` container that gra
 
 > **Note**: The pre-provisioned storage account name begins with **`sc500lab2a`** followed by an 8-character suffix unique to your lab subscription. Throughout this lab, `<storage-account-name>` refers to that account. The `sc500-lab2a-rg` resource group contains exactly one storage account — select it whenever the lab asks for `<storage-account-name>`.
 
-1. Sign in to the Azure portal at `https://portal.azure.com` using your **User1** credentials.
+1. Sign in to the **Azure portal** at `https://portal.azure.com` using your **User1** credentials.
 
 1. In the search bar, search for and select **Storage accounts**.
 
@@ -121,7 +121,8 @@ You will create a stored access policy on the `training-data` container that gra
 
 Before restricting the storage account to a virtual network, verify that the SAS token provides data-plane access from Cloud Shell. This establishes the "before" state — open access from any network — so you can observe the contrast after the firewall rule is applied.
 
-1. In the Azure portal top bar, select the **Cloud Shell** icon (**>_**). If prompted, select **Bash**.
+1. In the Azure portal top bar, select the **Cloud Shell** icon (**>_**). If prompted to select a shell type, select **Bash**.
+On the **Getting started** page, select **No storage account required**, select the lab subscription, and then select **Apply**.
 
 1. Assign your SAS token to a variable, replacing the placeholder with the SAS token you copied in the previous section:
 
