@@ -48,7 +48,7 @@ This exercise should take approximately **45** minutes to complete.
 
 ## Provision Security Copilot Capacity
 
-1. Sign in to [https://securitycopilot.microsoft.com](https://securitycopilot.microsoft.com) using your **User1** account.
+1. Sign in to `https://securitycopilot.microsoft.com` using your **User1** account.
 
 1. Start the setup flow for capacity provisioning.
 
