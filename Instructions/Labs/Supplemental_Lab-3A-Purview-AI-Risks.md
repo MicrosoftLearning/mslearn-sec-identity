@@ -66,7 +66,7 @@ This exercise should take approximately **45** minutes to complete.
 
 ## Open the Purview Data Security Posture Management dashboard
 
-1. Sign in to the **Microsoft Purview compliance portal** `https://purview.microsoft.com` using your **User-1** credentials.
+1. Sign in to the **Microsoft Purview compliance portal** at `https://purview.microsoft.com` using your **User-1** credentials.
 
 1. Select **Solutions** > **DSPM for AI (classic)**.
 
