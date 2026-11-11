@@ -92,7 +92,7 @@ This exercise should take approximately **75** minutes to complete.
 
 ## Review Secure Score and Top Recommendations
 
-1. On **Overview**, if Secure Score data is available, record:
+1. On the **Microsoft Defender for Cloud** > **Overview** page, if Secure Score data is available, record:
 
     | Field | Value |
     |-------|-------|
@@ -111,7 +111,7 @@ This exercise should take approximately **75** minutes to complete.
 
 ## Assign and Review Regulatory Compliance
 
-1. Open **Regulatory compliance**.
+1. On the **Microsoft Defender for Cloud**, expand the **Cloud Security**, then select **Regulatory compliance**.
 
 1. Select **Add standards** and assign **NIST SP 800-53 Rev. 5** to the subscription.
 
