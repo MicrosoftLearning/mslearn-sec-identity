@@ -41,7 +41,7 @@ This exercise should take approximately **60** minutes to complete.
 
 ## Create and Agent in Foundry to populate the Agent ID
 
-1. Open the **Azure Portal** at `https://portal.azure.com`
+1. Open the **Azure Portal** at `https://portal.azure.com`.
 
 1. Log in as **User1** using the provided credentials.
 
@@ -189,7 +189,7 @@ You will create two policies: one for agent identities (the service principal ob
 
 Real-time protection monitors agent behavior during execution and can block or flag actions that fall outside defined policies. This is a runtime behavioral control — it operates when the agent is running, not at sign-in time, complementing the Conditional Access controls you configured earlier.
 
-1. Open a new browser tab and navigate to [Copilot Studio](https://copilotstudio.microsoft.com).
+1. Open a new browser tab and navigate to **Copilot Studio** at `https://copilotstudio.microsoft.com`.
 
 1. From the environment selector at the top of the page, confirm you are in the correct tenant environment.
 
