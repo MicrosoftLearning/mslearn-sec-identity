@@ -14,7 +14,6 @@ lab:
 
 This lab runs on a M365 Tenant with no special configuration needed.
 
-===
 
 # Configure Privileged Identity Management
 
@@ -38,23 +37,26 @@ This exercise should take approximately **45** minutes to complete.
 
 In this section, you assign the Conditional Access Administrator role to **Adele Vance** as an eligible assignment. An eligible assignment means the user does not hold the role permanently — they must request and activate it each time they need it.
 
-1. Sign in to the Microsoft Entra admin center at `https://entra.microsoft.com` as **MOD Administrator** using the credentials provided (sign-in name `admin@<your-tenant>.onmicrosoft.com`).
+1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` as **MOD Administrator** using the credentials provided (sign-in name `admin@<your-tenant>.onmicrosoft.com`).
 
 1. In the left navigation, expand **ID Governance** and select **Privileged Identity Management**.
 
 1. Under **Manage**, select **Microsoft Entra roles**.
 
-1. Select **Assignments**, then select **Add assignments**.
+1. Select **Assignments**, then select **+ Add assignments**.
 
-1. On the **+ Add assignments** page, configure the following:
+1. On the **Add assignments** page, under the **Membership** tab, configure the following:
 
     | Setting | Value |
     |---------|-------|
     | **Select role** | Conditional Access Administrator |
     | **Select members** | Adele Vance |
-    | **Assignment type** | Eligible (after using the Next button) |
 
-1. Select **Next**, then select **Assign** to save the assignment.
+1. Select **Next**.
+
+1. On the **Setting** tab, for **Assignment type**, select **Eligible**.
+
+1. Select **Assign** to save the assignment.
 
 1. On the **Assignments** page, confirm that **Adele Vance** appears under the **Eligible assignments** tab with the role **Conditional Access Administrator**.
 
@@ -66,7 +68,11 @@ In this section, you assign the Conditional Access Administrator role to **Adele
 
 PIM role settings control how the activation process works: how long the activation lasts, whether a justification is required, and whether an approver must approve each request. You will now configure the Conditional Access Administrator role settings.
 
-1. In **Privileged Identity Management > Microsoft Entra roles**, select **Settings**.
+1. In the left navigation, expand **ID Governance** and select **Privileged Identity Management**.
+
+1. Under **Manage**, select **Microsoft Entra roles**.
+
+1. Select **Settings**.
 
 1. Find and select **Conditional Access Administrator** from the role list.
 
@@ -75,15 +81,15 @@ PIM role settings control how the activation process works: how long the activat
 1. On the **Activation** tab, configure the following settings:
 
     | Setting | Value |
-    |---------|-------|
-    | **Activation maximum duration** | 1 hour |
-    | **On activation, require** | Justification |
-    | **Require approval to activate** | Enabled |
-    | **Other settings** | Leave at default value |
+	|---------|-------|
+	| **Activation maximum duration** | 1 hour |
+	| **Require justification on activation** | Enabled |
+	| **Require approval to activate** | Enabled |
+	| **Other settings** | Leave at default value |
 
-1. Under **Select approvers**, select **+ Select members**.
+1. Select **Select approvers**.
 
-1. Search for and select **MOD Administrator**, then choose **Select**.
+1. On the **Select a member**, search for and select **MOD Administrator**, then select **Select** button.
 
     > **Note**: If the approver pane is blank, close it and leave **No approver selected**. When no specific approver is selected, Privileged Role Administrators and Global Administrators become the default approvers. Because **MOD Administrator** is a Global Administrator, you can continue with the same approval workflow.
 
@@ -108,7 +114,7 @@ Now you will sign in as **Adele Vance** and submit a role activation request. Th
 
 1. Under **Tasks**, select **My roles**.
 
-1. Select the **Microsoft Entra roles** tab.
+1. Select the **Microsoft Entra roles**.
 
 1. Under **Eligible assignments**, find **Conditional Access Administrator** and select **Activate**.
 
@@ -117,7 +123,7 @@ Now you will sign in as **Adele Vance** and submit a role activation request. Th
     | Setting | Value |
     |---------|-------|
     | **Duration** | 1 hour |
-    | **Justification** | `Reviewing and updating Conditional Access policies as part of a scheduled security review.` |
+    | **Reason** | `Reviewing and updating Conditional Access policies as part of a scheduled security review.` |
 
 1. Select **Activate**.
 
@@ -133,7 +139,7 @@ You will now switch back to the **MOD Administrator** browser window and approve
 
 1. Return to your primary browser window (**MOD Administrator** is currently signed in).
 
-1. Navigate to the Microsoft Entra admin center.
+1. Navigate to the **Microsoft Entra admin center**.
 
 1. In the left navigation, expand **ID Governance** and select **Privileged Identity Management**.
 
@@ -149,7 +155,7 @@ You will now switch back to the **MOD Administrator** browser window and approve
 
 1. In the **Justification** field, enter: `Approved for scheduled security review task.`
 
-1. Select **Submit**.
+1. Select **Confirm**.
 
     You should see an approval message pop-up.
 
@@ -212,6 +218,9 @@ The lab environment is automatically reset at the end of the session. No manual 
 If you want to clean up the PIM assignment before the session ends:
 
 1. Sign in to the Entra admin center as your Global Administrator.
+
 1. Navigate to **Privileged Identity Management > Microsoft Entra roles > Assignments**.
+
 1. Find the **Conditional Access Administrator** eligible assignment for **Adele Vance**.
-1. Select **Remove** and confirm.
+
+1. Select **Remove**, and then select **Yes** to confirm the removal.
