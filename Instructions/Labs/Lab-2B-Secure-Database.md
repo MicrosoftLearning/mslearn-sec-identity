@@ -71,7 +71,7 @@ This exercise should take approximately **60** minutes to complete.
 
 Using a SQL-only administrator account means database access cannot be governed by Entra ID Conditional Access, PIM, or sign-in risk policies — and the credentials exist independently of your identity platform. Replacing the SQL admin with an Entra ID security group addresses this: group membership is managed in Entra ID, access can be audited through Entra sign-in logs, and the group itself can be governed by access reviews.
 
-You will create a security group named `sc500-sql-admins`, add `User3` as a member, and configure the group as the Entra ID administrator for the SQL server deployed in `sc500-lab2b-rg`.
+You will create a security group named `sc500-sql-admins`, add `User2` as a member, and configure the group as the Entra ID administrator for the SQL server deployed in `sc500-lab2b-rg`.
 
 1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using the credentials provided for **User1**. User1 must have the **Global Administrator** role.
 
