@@ -17,7 +17,8 @@ Complete these steps before starting the exercise to deploy the resources and se
 
 1. Open the **Azure portal** at `https://portal.azure.com` and sign in with **User1**.
 
-1. Select the **Cloud Shell** icon (>_) in the portal top bar. If prompted, select **Bash**.
+1. In the Azure portal top bar, select the **Cloud Shell** icon (**>_**). If prompted to select a shell type, select **Bash**.
+On the **Getting started** page, select **No storage account required**, select the lab subscription, and then select **Apply**.
 
 1. Copy the username provided for **User3**. In Cloud Shell, replace `<User3-UPN>` with that username and run:
 
@@ -57,7 +58,7 @@ Complete these steps before starting the exercise to deploy the resources and se
 
 1. When deployment succeeds, close Cloud Shell and continue to the exercise.
 
-===
+---
 
 # Configure Azure Policy and Role-Based Access Control
 
@@ -98,8 +99,8 @@ Azure Policy evaluates resources against defined rules and reports compliance wi
     | **Scope** | Select the ellipsis (**...**), then select your subscription and **sc500-lab1d-rg** as the resource group. Select **Select**. |
     | **Exclusions** | Leave blank |
     | **Policy definition** | Select the ellipsis (**...**), search for **`Require a tag on resources`**, select the result, then select **Add**. |
-    | **Assignment name** | sc500-require-env-tag |
-    | **Policy enforcement** | Enabled |
+    | **Assignment name** | `sc500-require-env-tag` |
+    | **Policy enforcement** | Default |
 
 1. Select the **Parameters** tab.
 
@@ -109,7 +110,7 @@ Azure Policy evaluates resources against defined rules and reports compliance wi
 
     > **Note**: Policy assignments can take up to 30 minutes to fully propagate before compliance evaluation reflects the new assignment. You will trigger an on-demand scan in the next step rather than waiting.
 
-1. Select the **Cloud Shell** icon (>_) in the Azure portal top bar. If prompted to select a shell type, select **Bash**. On the Getting started page, select **No storage account required**, select the lab subscription, and then select **Apply**.
+1. Select the **Cloud Shell** icon (>_) in the Azure portal top bar.
 
 1. Run the following command to trigger an on-demand compliance evaluation for the resource group:
 
@@ -121,11 +122,11 @@ Azure Policy evaluates resources against defined rules and reports compliance wi
 
     > **Note**: If the compliance state still shows **Not started** or **0 non-compliant resources** after the command completes, wait 2–3 additional minutes and select **Refresh** in the portal. Compliance state updates are written asynchronously after the scan finishes.
 
-1. In the Azure portal, return to **Policy** and select **Compliance** from the left menu.
+1. In the **Azure portal**, return to **Policy** and select **Compliance** from the left menu.
 
-1. In the scope filter at the top of the page, select `sc500-lab1d-rg` to narrow results to this resource group.
+1. In the **Search** box at the top of the **Compliance** page, enter `sc500-lab1d-rg` to locate the policy assignment for the resource group.
 
-1. Locate the **sc500-require-env-tag** assignment in the compliance list.
+1. Select the **sc500-require-env-tag** assignment in the compliance list.
 
 1. Confirm that the storage account (name starts with **`sc500lab1d`**) and **sc500-lab1d-vnet** virtual network appear in the non-compliant resources list.
 
@@ -162,9 +163,9 @@ The **sc500-lab1d-policy.bicep** file is provided in the **F:\AllFiles\Lab-1D** 
 
     > **Note**: The `--location eastus` flag specifies the region for the deployment metadata record, not where resources are created. Subscription-scope Bicep deployments must specify a location for the ARM metadata even when the resources they create (like policy definitions) are globally scoped.
 
-1. In the Azure portal, navigate to **Policy** and select **Definitions** from the left menu.
+1. In the **Azure portal**, navigate to **Policy** and select **Definitions** from the left menu.
 
-1. In the **Type** filter, select **Custom**.
+1. In the **Policy type** filter, select **Custom**.
 
     Confirm that a custom policy definition for requiring a **Require Environment tag on resource groups** policy appears in the list. This is the definition deployed by the Bicep template.
 
@@ -204,7 +205,7 @@ Built-in Azure roles such as **Reader** grant broad read access across all resou
 
 1. Select **Next** to proceed to the **Assignable scopes** tab.
 
-    Confirm that **sc500-lab1d-rg** is listed as an assignable scope. Because you opened the custom role wizard from the resource group's IAM page, the scope is pre-populated. If it is not listed, select **Add assignable scopes**, expand your subscription, select **sc500-lab1d-rg**, then select **Add**.
+    Confirm that **sc500-lab1d-rg** is listed as an assignable scope. Because you opened the custom role wizard from the resource group's IAM page, the scope is pre-populated. If it is not listed, select **+ Add assignable scopes**, expand your subscription, select **sc500-lab1d-rg**, then select **Select**.
 
 1. Select **Next** to proceed to the **JSON** tab.
 
@@ -271,7 +272,7 @@ A Microsoft Entra access review provides a structured, auditable process for dec
 
     > **Important**: If the Contributor assignment is missing, stop here. The Lab Setup deployment did not receive the correct **User3 Object ID**, and there is no assignment to review. This is a setup issue, not role-assignment propagation.
 
-1. Navigate to the [Microsoft Entra admin center](https://entra.microsoft.com).
+1. Navigate to the **Microsoft Entra admin center** at `https://entra.microsoft.com`.
 
 1. In the portal search bar, search for **Privileged Identity Management**, and then select **Privileged Identity Management Browse**.
 
@@ -299,11 +300,10 @@ Complete this subsection only if the **Access reviews** page opens successfully.
     | **Description** | `Review of Contributor access on the lab subscription` |
     | **Start date** | Today's date |
     | **Frequency** | One time |
-    | **Duration (in days)** | 3 |
 
-1. Under **Users scope**, select **Users**.
+1. Under **Users**, for **Scope**, select **All users and groups**.
 
-1. Under **Review role membership**, select **Contributor**.
+1. Under **Role**, select **Select a role**, select **Contributor**, and then select **Done**.
 
 1. For **Assignment type**, select **Active assignments only**.
 
@@ -325,6 +325,8 @@ Complete this subsection only if the **Access reviews** page opens successfully.
 1. Open a new **InPrivate** or **Private** browser window and sign in to `https://entra.microsoft.com` using the credentials provided for **User2**.
 
 1. Browse to **ID Governance > Privileged Identity Management > Review access**.
+
+1. In the left navigation menu, under **Review access**, select **Azure resources**.
 
 1. Select **sc500-contributor-review**. Select the entry for **User3**, choose **Deny**, enter `No current business need for Contributor access` as the reason, and submit the decision.
 
