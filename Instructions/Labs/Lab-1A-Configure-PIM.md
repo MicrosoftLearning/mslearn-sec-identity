@@ -37,7 +37,13 @@ This exercise should take approximately **45** minutes to complete.
 
 PIM role settings control how the activation process works: how long the activation lasts, whether a justification is required, and whether an approver must approve each request. You will now configure the Conditional Access Administrator role settings.
 
-1. In **Privileged Identity Management > Microsoft Entra roles**, select **Settings**.
+1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` as **MOD Administrator** using the credentials provided (sign-in name `admin@<your-tenant>.onmicrosoft.com`).
+
+1. In the left navigation, expand **ID Governance** and select **Privileged Identity Management**.
+
+1. Under **Manage**, select **Microsoft Entra roles**.
+
+1. Select **Settings**.
 
 1. Find and select **Conditional Access Administrator** from the role list.
 
