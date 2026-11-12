@@ -20,7 +20,10 @@ Follow these steps to build out your lab scenarios:
 
 1. Log in with the **User1** administrator role.
 
-1. Open **Cloud Shell**, select **Bash**, and run the following commands to register the resource provider used by Defender for Databases:
+1. Select the **Cloud Shell** icon (>_) in the Azure portal top bar. If prompted to select a shell type, select **Bash**.
+On the **Getting started** page, select **No storage account required**, select the lab subscription, and then select **Apply**.
+
+1. In **Cloud Shell**, run the following commands to register the resource provider used by Defender for Databases:
 
     ```bash
     az provider register --namespace Microsoft.Security --wait
@@ -75,7 +78,7 @@ You will create a security group named `sc500-sql-admins`, add `User2` as a memb
 
 1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using the credentials provided for **User1**. User1 must have the **Global Administrator** role.
 
-1. In the left menu, expand **Groups** and select **All groups**.
+1. In the left menu, expand **Entra ID**, select **Groups**, then select **All groups**.
 
 1. Select **New group**.
 
@@ -85,12 +88,12 @@ You will create a security group named `sc500-sql-admins`, add `User2` as a memb
     |---------|-------|
     | **Group type** | Security |
     | **Group name** | `sc500-sql-admins` |
-    | **Group description** | Entra ID administrator group for the Lab 2B SQL server |
+    | **Group description** | `Entra ID administrator group for the Lab 2B SQL server` |
     | **Membership type** | Assigned |
 
 1. Under **Members**, select **No members selected**.
 
-1. Search for and select **User3**, then select **Select**.
+1. Search for and select **User2**, then select **Select**.
 
 1. Select **Create**.
 
@@ -106,7 +109,7 @@ You will create a security group named `sc500-sql-admins`, add `User2` as a memb
 
 1. Select **Set admin**.
 
-1. Search for and select **sc500-sql-admins**, then select **Select**.
+1. Search for and select **`sc500-sql-admins`**, then select **Select**.
 
 1. Select **Save**.
 
@@ -250,6 +253,8 @@ Log Analytics ingestion typically takes 2–5 minutes after an event is generate
 1. In the left menu, select **Logs**.
 
 1. Close the **Queries** dialog if it appears.
+
+   > **Note**: If Agent mode is On, switch the Agent toggle to Off before continuing to the next step.
 
 1. In the upper-right corner of the page, select the mode dropdown and switch from **Simple mode** to **KQL mode**. This opens the KQL query editor.
 
