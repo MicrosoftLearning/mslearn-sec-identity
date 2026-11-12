@@ -77,8 +77,6 @@ PIM role settings control how the activation process works: how long the activat
 
 In this section, you assign the Conditional Access Administrator role to **Adele Vance** as an eligible assignment. An eligible assignment means the user does not hold the role permanently — they must request and activate it each time they need it.
 
-1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` as **MOD Administrator** using the credentials provided (sign-in name `admin@<your-tenant>.onmicrosoft.com`).
-
 1. In the left navigation, expand **ID Governance** and select **Privileged Identity Management**.
 
 1. Under **Manage**, select **Microsoft Entra roles**.
