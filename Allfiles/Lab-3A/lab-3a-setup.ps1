@@ -19,8 +19,13 @@
 .PARAMETER SiteUrl
     The full URL for the site to create (default: /sites/sc500-ai-datastore)
 
+.PARAMETER ClientId
+    The Application (client) ID of an Entra ID app registration that PnP.PowerShell uses to sign in.
+    Since September 2024, PnP.PowerShell requires your own app registration. Create one with:
+    Register-PnPEntraIDAppForInteractiveLogin -ApplicationName "PnP Lab 3A" -Tenant contoso.onmicrosoft.com
+
 .EXAMPLE
-    .\lab-3a-setup.ps1 -TenantUrl "https://contoso.sharepoint.com"
+    .\lab-3a-setup.ps1 -TenantUrl "https://contoso.sharepoint.com" -ClientId "00000000-0000-0000-0000-000000000000"
 #>
 
 [CmdletBinding()]
@@ -29,10 +34,13 @@ param(
     [string]$TenantUrl,
     
     [Parameter(Mandatory = $false)]
-    [string]$SiteUrl = "/sites/sc500-ai-datastore"
+    [string]$SiteUrl = "/sites/sc500-ai-datastore",
+
+    [Parameter(Mandatory = $true)]
+    [string]$ClientId
 )
 
-#Requires -Version 7.0
+#Requires -Version 7.4
 
 # Check if PnP.PowerShell module is installed
 if (-not (Get-Module -ListAvailable -Name PnP.PowerShell)) {
@@ -57,14 +65,30 @@ Write-Host "  3. Upload sample HR and financial documents" -ForegroundColor Whit
 Write-Host "  4. Ensure documents have no sensitivity labels" -ForegroundColor White
 Write-Host ""
 
+# Check that SharePoint Online exists for this tenant
+# SharePoint is only provisioned when the tenant has a licence that includes it (for example Microsoft 365 E5).
+$tenantHost = ([Uri]$TenantUrl).Host
+try {
+    [System.Net.Dns]::GetHostAddresses($tenantHost) | Out-Null
+}
+catch {
+    Write-Error "$tenantHost does not exist, so SharePoint Online is not set up for this tenant."
+    Write-Host "  Check the tenant name in -TenantUrl (the part before .onmicrosoft.com in the tenant's initial domain)." -ForegroundColor Yellow
+    Write-Host "  If the name is correct, the tenant has no licence that includes SharePoint Online." -ForegroundColor Yellow
+    Write-Host "  Add one (for example a Microsoft 365 E5 trial), assign it to your admin account, and wait up to an hour for SharePoint to be set up." -ForegroundColor Yellow
+    exit 1
+}
+
 # Connect to SharePoint Online
 Write-Host "Connecting to SharePoint Online..." -ForegroundColor Yellow
 try {
-    Connect-PnPOnline -Url $TenantUrl -Interactive -ErrorAction Stop
+    Connect-PnPOnline -Url $TenantUrl -ClientId $ClientId -Interactive -ErrorAction Stop
     Write-Host "✓ Connected successfully" -ForegroundColor Green
 }
 catch {
     Write-Error "Failed to connect to SharePoint Online: $_"
+    Write-Host "  Check that -ClientId is the Application (client) ID of an app registration created with Register-PnPEntraIDAppForInteractiveLogin," -ForegroundColor Yellow
+    Write-Host "  and that the tenant has a licence that includes SharePoint Online (for example Microsoft 365 E5)." -ForegroundColor Yellow
     exit 1
 }
 
@@ -103,26 +127,27 @@ catch {
 
 # Connect to the new site
 Write-Host "Connecting to the new site..." -ForegroundColor White
-Connect-PnPOnline -Url $fullSiteUrl -Interactive
+Connect-PnPOnline -Url $fullSiteUrl -ClientId $ClientId -Interactive
 
 # Step 2: Configure oversharing permissions
 Write-Host ""
 Write-Host "Step 2: Configuring oversharing permissions..." -ForegroundColor Yellow
 try {
-    # Break permission inheritance if not already broken
-    Set-PnPWeb -BreakRoleInheritance -CopyRoleAssignments:$false -ErrorAction SilentlyContinue
-    
-    # Get "Everyone except external users" group
-    $everyoneGroup = Get-PnPGroup | Where-Object { $_.Title -like "*Everyone except external*" -or $_.LoginName -like "*spo-grid-all-users*" }
-    
-    if (-not $everyoneGroup) {
-        # If the default group doesn't exist, get it by login name
-        $everyoneGroup = Get-PnPUser | Where-Object { $_.LoginName -like "*spo-grid-all-users*" } | Select-Object -First 1
+    # The root web of a new site already has unique permissions, so inheritance does not need to be broken.
+    # "Everyone except external users" is a claim, not a SharePoint group, so it is usually not in the site yet.
+    $everyoneLogin = Get-PnPUser | Where-Object { $_.LoginName -like "*spo-grid-all-users*" } | Select-Object -First 1 -ExpandProperty LoginName
+
+    if (-not $everyoneLogin) {
+        # Build the claim from the tenant ID
+        $tenantId = Get-PnPTenantId
+        if ($tenantId) {
+            $everyoneLogin = "c:0-.f|rolemanager|spo-grid-all-users/$tenantId"
+        }
     }
-    
-    if ($everyoneGroup) {
+
+    if ($everyoneLogin) {
         # Grant Read permission to Everyone except external users
-        Set-PnPWebPermission -User $everyoneGroup.LoginName -AddRole "Read" -ErrorAction Stop
+        Set-PnPWebPermission -User $everyoneLogin -AddRole "Read" -ErrorAction Stop
         Write-Host "✓ Granted Read permission to 'Everyone except external users'" -ForegroundColor Green
     }
     else {
@@ -151,7 +176,8 @@ if (-not (Test-Path $tempFolder)) {
 
 # Sample HR Document
 $hrDocPath = Join-Path $tempFolder "Employee_Salary_Report_2026.docx"
-$hrContent = @"
+# Single-quoted here-strings keep dollar amounts such as $145,000 from being read as variables
+$hrContent = @'
 CONFIDENTIAL - HUMAN RESOURCES
 
 Employee Salary Report - Q2 2026
@@ -185,11 +211,11 @@ Performance Review Notes:
 - PII: Date of Birth 03/15/1985
 
 This document contains personally identifiable information and financial data.
-"@
+'@
 
 # Sample Financial Document
 $finDocPath = Join-Path $tempFolder "Q2_Financial_Statement_2026.docx"
-$finContent = @"
+$finContent = @'
 CONFIDENTIAL - FINANCIAL REPORT
 
 Quarterly Financial Statement - Q2 2026
@@ -217,11 +243,11 @@ Customer Payment Data:
 Tax ID: 98-7654321
 
 This document contains sensitive financial information and should not be shared externally.
-"@
+'@
 
 # Sample HR Policy Document
 $policyDocPath = Join-Path $tempFolder "HR_Benefits_Guide_2026.docx"
-$policyContent = @"
+$policyContent = @'
 INTERNAL USE ONLY
 
 Employee Benefits Guide 2026
@@ -250,7 +276,7 @@ Salary Ranges by Level:
   Level 5 (Executive): $200,000+
 
 This document contains compensation data and personal information.
-"@
+'@
 
 # Save documents as text files (since we can't create .docx programmatically without Word)
 $hrDocPath = $hrDocPath -replace '\.docx$', '.txt'
@@ -273,13 +299,13 @@ try {
     }
     
     Write-Host "  Uploading Employee_Salary_Report_2026.txt..." -ForegroundColor White
-    Add-PnPFile -Path $hrDocPath -Folder "Documents" -ErrorAction Stop
+    Add-PnPFile -Path $hrDocPath -Folder "Shared Documents" -ErrorAction Stop
     
     Write-Host "  Uploading Q2_Financial_Statement_2026.txt..." -ForegroundColor White
-    Add-PnPFile -Path $finDocPath -Folder "Documents" -ErrorAction Stop
+    Add-PnPFile -Path $finDocPath -Folder "Shared Documents" -ErrorAction Stop
     
     Write-Host "  Uploading HR_Benefits_Guide_2026.txt..." -ForegroundColor White
-    Add-PnPFile -Path $policyDocPath -Folder "Documents" -ErrorAction Stop
+    Add-PnPFile -Path $policyDocPath -Folder "Shared Documents" -ErrorAction Stop
     
     Write-Host "✓ Documents uploaded successfully" -ForegroundColor Green
 }
