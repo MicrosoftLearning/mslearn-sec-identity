@@ -1,7 +1,7 @@
 ---
 lab:
     title: 'Enforce MFA with Conditional Access'
-    description: 'Create a Conditional Access policy that enforces MFA for a named user accessing the Azure portal, validate the policy in Report-only mode using the What If tool, test MFA enforcement at sign-in, and register an application in Entra ID with scoped API permissions.'
+    description: 'Create a Conditional Access policy that enforces MFA for a named user accessing Office 365 apps (such as Microsoft Forms), validate the policy in Report-only mode using the What If tool, test MFA enforcement at sign-in, and register an application in Entra ID with scoped API permissions.'
     level: 300
     duration: 45
     islab: true
@@ -13,22 +13,27 @@ lab:
 
 # Lab Setup
 
-This lab runs on a M365 Tenant with no special configuration needed.
+This lab runs on a M365 Tenant. Security defaults must be turned off before a Conditional Access policy can be set to **On**; the lab includes a step to do this.
+
+If you use your own tenant instead of the hosted lab environment, it needs:
+
+- **Microsoft Entra ID P1 or P2** for Conditional Access.
+- A licence that includes **Microsoft Forms** (for example Microsoft 365 E5 or Microsoft 365 Business Premium) assigned to **Adele Vance**, so she can sign in to `https://forms.microsoft.com` in the MFA test. Entra ID P1 or P2 on its own does not include Forms.
 
 ===
 
 
 # Enforce MFA with Conditional Access
 
-A recent security review of your organization's Entra ID tenant found that access controls rely entirely on Microsoft security defaults — a one-size-fits-all baseline with no targeted policies. At the same time, the AI platform team has registered a new application that accesses sensitive APIs, and one user account was recently flagged as a sign-in risk. Your task is to create a Conditional Access policy that explicitly enforces multifactor authentication (MFA) for a targeted user accessing the Azure portal, validate the policy behavior before enabling it, and register the new AI platform application with appropriately scoped API permissions.
+A recent security review of your organization's Entra ID tenant found that access controls rely entirely on Microsoft security defaults — a one-size-fits-all baseline with no targeted policies. At the same time, the AI platform team has registered a new application that accesses sensitive APIs, and one user account was recently flagged as a sign-in risk. Your task is to create a Conditional Access policy that explicitly enforces multifactor authentication (MFA) for a targeted user accessing Office 365 apps, validate the policy behavior before enabling it, and register the new AI platform application with appropriately scoped API permissions.
 
 Conditional Access policies are the primary enforcement mechanism in Microsoft Entra ID for applying access controls based on identity signals — user, location, device, and risk level. Unlike security defaults, which apply a fixed set of controls across all users, Conditional Access policies give you precise control over who is affected, what conditions trigger the policy, and what access controls are applied.
 
 In this lab, you will:
 
-- Create a Conditional Access policy that requires MFA for a named user accessing the Azure portal
+- Create a Conditional Access policy that requires MFA for a named user accessing Office 365 apps
 - Validate the policy behavior using the What If simulation tool before enforcing it
-- Enable the policy and confirm MFA is enforced at sign-in
+- Turn off security defaults, enable the policy, and confirm MFA is enforced at sign-in
 - Register a new application in Entra ID and configure scoped API permissions
 
 This exercise should take approximately **45** minutes to complete.
@@ -37,9 +42,9 @@ This exercise should take approximately **45** minutes to complete.
 
 ## Create a Conditional Access policy
 
-Conditional Access policies are built from two parts: assignments (who and what the policy applies to) and access controls (what happens when the conditions are met). You will create a policy that targets a specific user and requires MFA when that user accesses the Azure portal.
+Conditional Access policies are built from two parts: assignments (who and what the policy applies to) and access controls (what happens when the conditions are met). You will create a policy that targets a specific user and requires MFA when that user accesses Office 365 apps such as Microsoft Forms.
 
-1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using your **MOD Administrator** credentials.
+1. Sign in to the **Microsoft Entra admin center** at `https://entra.microsoft.com` using your **MOD Administrator** (Global Administrator) credentials.
 
 1. In the left navigation, expand **Entra ID** and select **Conditional Access**.
 
@@ -57,11 +62,13 @@ Conditional Access policies are built from two parts: assignments (who and what 
 
 1. Under **Assignments**, in the **Target resources** select **No target resources selected** item.
 
-1. On the **Target resources** pane, set the target to **All resources (formerly all cloud apps)**, then select **Select resources**.
+1. On the **Target resources** pane, under **Include**, choose **Select resources** (not **All resources**).
 
 1. Under **Select specific resources** select the **None** link.
 
-1. Select **Select**, search for **Office 365**, mark the checkbox, then select **Select** to confirm.
+1. Search for **Office 365**, mark the checkbox, then select **Select** to confirm.
+
+    > **Note**: **Office 365** is a group of apps that includes Microsoft Forms, Exchange Online, SharePoint Online and Teams. Targeting it means the policy applies when Adele signs in to Microsoft Forms later in this lab.
 
 1. Find the **Access controls** section.
 
@@ -69,9 +76,9 @@ Conditional Access policies are built from two parts: assignments (who and what 
 
 1. Select **Require multifactor authentication**, then select **Select**.
 
-3. At the bottom of the policy page, set **Enable policy** to **Report-only**.
+1. At the bottom of the policy page, set **Enable policy** to **Report-only**.
 
-4. Select **Create** to save the policy.
+1. Select **Create** to save the policy.
 
     Confirm that **sc500-require-mfa-portal** now appears on the **Conditional Access | Policies** page with a state of **Report-only**.
 
@@ -88,7 +95,7 @@ Report-only mode records what a policy would do without blocking or requiring an
     | Setting | Value |
     |---------|-------|
     | **Select identity type - Users** | use the **Edit user** to select **Adele Vance** |
-    | **Select target type - Cloud apps** | Microsoft Forms |
+    | **Select target type - Cloud apps** | Office 365 Exchange Online |
     | **Sign-in conditions - Device Platform** | Windows |
     | **Sign-in conditions - Client App** | Browser |
     | All other settings | Leave at defaults |
@@ -99,9 +106,11 @@ Report-only mode records what a policy would do without blocking or requiring an
 
 1. Under **Policies that will apply**, confirm that **sc500-require-mfa-portal** appears with a **Grant** control of **Require multifactor authentication**.
 
-    This confirms the policy is correctly scoped — it would enforce MFA for Adele Vance accessing Microsoft Forms.
+    This confirms the policy is correctly scoped — it would enforce MFA for Adele Vance accessing Office 365 apps.
 
-    > **Note**: If the policy does not appear in the results, verify that Adele Vance is listed under **Included users** in the policy assignments and that **Microsoft Azure Management** is the selected cloud app. Correct any issues before proceeding.
+    > **Note**: The What If tool lists individual enterprise applications, not the **Office 365** app group, and Microsoft Forms is not listed. **Office 365 Exchange Online** is a member of the Office 365 group, so a policy that targets Office 365 applies to it. **Office 365 SharePoint Online** also works. Because the policy is in Report-only mode, it may be listed in a separate report-only section of the results rather than under **Policies that will apply**.
+
+    > **Note**: If the policy does not appear in the results, verify that Adele Vance is listed under **Included users** in the policy assignments and that **Office 365** is the selected target resource. Correct any issues before proceeding.
 
 1. Close the **What If** pane.
 
@@ -109,7 +118,15 @@ Report-only mode records what a policy would do without blocking or requiring an
 
 ## Enable the policy and verify MFA enforcement
 
-The simulation confirmed the policy is correctly configured. You will now switch the policy to **On** and sign in as Adele Vance to confirm the MFA prompt is triggered.
+The simulation confirmed the policy is correctly configured. Before you can switch the policy to **On**, you must turn off security defaults, because Entra ID does not allow Conditional Access policies to be enabled while security defaults are active. You will then enable the policy and sign in as Adele Vance to confirm the MFA prompt is triggered.
+
+1. In the Microsoft Entra admin center, expand **Entra ID** and select **Overview**.
+
+1. Select the **Properties** tab, then select **Manage security defaults** at the bottom of the page.
+
+1. Set **Security defaults** to **Disabled (not recommended)**, choose **My organization plans to use Conditional Access** as the reason, then select **Save**.
+
+    > **Note**: Turning off security defaults removes the baseline MFA requirement for every account in the tenant, including administrators. In production, create Conditional Access policies that cover all users and administrators before you turn security defaults off. In this lab, only Adele Vance is protected by the new policy.
 
 1. On the **Conditional Access | Policies** page, select **sc500-require-mfa-portal** to open it.
 
@@ -175,11 +192,11 @@ The AI platform team needs a registered application identity in Entra ID so thei
 
 1. In the search box, search for **`User.Read`**.
 
-1. Expand **User**, select **User.ReadBasic.All**, then select **Add permissions**.
+1. Expand **User**, select **User.Read**, then select **Add permissions**.
 
     > **Note**: **User.Read** is a delegated permission that allows the application to read the signed-in user's basic profile on their behalf. It is the minimum permission for applications that need to identify who is signed in. Delegated permissions operate in the context of the signed-in user and do not require admin consent for User.Read under standard tenant settings.
 
-1. On the **API permissions** page, confirm that **User.ReadBasic.All** appears under **Configured permissions** with a type of **Delegated**.
+1. On the **API permissions** page, confirm that **User.Read** appears under **Configured permissions** with a type of **Delegated**.
 
     > **Note**: If a **Grant admin consent** button is visible and the status shows **Not granted**, your tenant requires admin consent for all permissions. Select **Grant admin consent for [your tenant]** and confirm. Your instructor will explain this tenant-wide setting if it applies.
 
@@ -189,7 +206,7 @@ The AI platform team needs a registered application identity in Entra ID so thei
 
 ## Summary
 
-In this lab, you replaced a security-defaults baseline with an explicit Conditional Access policy that enforces MFA for a named user accessing the Azure portal. You validated the policy in Report-only mode using the What If simulation tool before enabling enforcement, confirmed the MFA prompt triggered at sign-in, and completed the MFA challenge to verify access was granted. You then registered the AI platform application in Entra ID and configured a scoped delegated API permission using the principle of least privilege.
+In this lab, you turned off security defaults and replaced them with an explicit Conditional Access policy that enforces MFA for a named user accessing Office 365 apps. You validated the policy in Report-only mode using the What If simulation tool before enabling enforcement, confirmed the MFA prompt triggered at sign-in, and completed the MFA challenge to verify access was granted. You then registered the AI platform application in Entra ID and configured a scoped delegated API permission using the principle of least privilege.
 
 You have successfully completed this exercise.
 
@@ -200,7 +217,8 @@ The lab environment is automatically reset at the end of the session. No manual 
 If you want to clean up before the session ends:
 
 1. Sign in to the Entra admin center as your Global Administrator.
-1. Navigate to **Protection** → **Conditional Access** → **Policies**.
+1. Navigate to **Entra ID** → **Conditional Access** → **Policies**.
 1. Select **sc500-require-mfa-portal**, select **Delete**, and confirm.
 1. Navigate to **Applications** → **App registrations**.
 1. Select **sc500-ai-platform-app**, select **Delete**, and confirm.
+1. To restore the tenant baseline, go to **Entra ID** → **Overview** → **Properties** → **Manage security defaults**, set it to **Enabled**, and select **Save**. (Delete or turn off the Conditional Access policy first.)
