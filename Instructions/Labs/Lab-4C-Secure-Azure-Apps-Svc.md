@@ -69,20 +69,17 @@ This exercise should take approximately **60** minutes to complete.
     - **<web-app-name>**
     - **<function-app-name>**
 
-1. Open **sc500-lab4c-agw** and confirm the attached WAF policy is currently in **Detection** mode.
+1. From the resource list, select **sc500-lab4c-waf**.
+
+1. On the Overview page, confirm that Policy mode is set to **Detection**.
 
 ---
 
 ## Validate WAF Detection Mode
 
-1. Sign in to the [Azure portal](https://portal.azure.com) with your **User1** account.
+1. In the **Azure portal**, search for and select **Application gateways**, then select **sc500-lab4c-agw**.
 
-1. Open **Application gateways** and select **sc500-lab4c-agw**.
-
-1. Open the attached WAF policy and confirm:
-
-    - Mode: **Detection**
-    - Rule set: OWASP CRS (current configured version)
+1. On the **Overview** page, copy the **Frontend public IP address**.
 
 1. Open **Cloud Shell** in the Azure portal.
 
@@ -92,7 +89,17 @@ This exercise should take approximately **60** minutes to complete.
     curl -H "X-Scan-Test: 1" "http://<agw-public-ip>/?id=1+UNION+SELECT+NULL,username,password+FROM+users--"
     ```
 
-1. Open **Log Analytics workspaces** and select **sc500-lab4c-log**.
+   > **Note**: Replace <agw-public-ip> with the Frontend public IP address of your Application Gateway before running the command.
+
+1. In the Azure portal search bar, search for and select **Log Analytics workspaces**.
+
+1. Select **sc500-lab4c-log**, then from the left menu, select **Logs**.
+
+1. Close the **Queries** dialog if it appears.
+
+   > **Note:** If **Agent mode** is On, switch the **Agent** toggle to Off before continuing.
+
+1. In the upper-right corner of the page, select the mode dropdown and switch from **Simple mode** to **KQL mode**. This opens the KQL query editor.
 
 1. Run a query similar to the following to confirm WAF logged the request:
 
@@ -105,19 +112,27 @@ This exercise should take approximately **60** minutes to complete.
 
 1. Wait up to **10 minutes** for diagnostic data to arrive. Re-run the query every 1-2 minutes until the request appears.
 
-1. Confirm the request is logged in detection mode.
+1. Confirm that the request was logged while the WAF policy was in **Detection** mode.
 
 ---
 
 ## Switch WAF to Prevention Mode and Re-test
 
-1. Return to the WAF policy for **sc500-lab4c-agw**.
+1. In the Azure portal, search for **Web Application Firewalls**, then select **Web Application Firewall policies (WAF)** from the search results.
 
-1. Change mode from **Detection** to **Prevention**.
+1. Select **sc500-lab4c-waf**.
 
-1. Save the policy.
+1. At the top of the **Overview** page, select **Switch to prevention mode**.
 
-1. Run the same `curl` test again from Cloud Shell.
+1. Confirm that **Policy mode** changes from **Detection** to **Prevention**.
+
+1. Run the same `curl` test again from Cloud Shell:
+
+   ```bash
+    curl -H "X-Scan-Test: 1" "http://<agw-public-ip>/?id=1+UNION+SELECT+NULL,username,password+FROM+users--"
+    ```
+
+   > **Note**: Replace <agw-public-ip> with the Frontend public IP address of your Application Gateway before running the command.
 
 1. Confirm the request is blocked (typically HTTP 403).
 
@@ -126,15 +141,15 @@ This exercise should take approximately **60** minutes to complete.
     | Test | Expected result |
     |------|-----------------|
     | Detection mode request | Logged, not blocked |
-    | Prevention mode request | Blocked |
+    | Prevention mode request | Blocked (HTTP 403) |
 
 ---
 
 ## Enable App Service Authentication
 
-1. Open **App Services** and select **<web-app-name>**.
+1. In the **Azure portal**, search for and select **App Services**, then select **<web-app-name>**.
 
-1. Open **Authentication**, and then select **Add identity provider**.
+1. In the left navigation menu, expand **Settings**, select **Authentication**, and then select **Add identity provider**.
 
 1. For **Identity provider**, select **Microsoft**.
 
@@ -144,6 +159,7 @@ This exercise should take approximately **60** minutes to complete.
     |---------|-------|
     | **Tenant configuration** | Workforce configuration (current tenant) |
     | **App registration type** | Create new app registration |
+    | **Client secret expiration** | 90 days (3 months) |
     | **Supported account types** | Current tenant - Single tenant |
     | **Restrict access** | Require authentication |
     | **Unauthenticated requests** | HTTP 302 Found redirect |
@@ -205,48 +221,89 @@ This exercise should take approximately **60** minutes to complete.
 
 ## Apply Network Restrictions to App Service and Function App
 
-1. In **<web-app-name>**, open **Networking** and then **Access restrictions**.
+1. In **<web-app-name>**, expand **Settings** in the left navigation menu, and then select **Networking**.
 
-1. Add an allow rule for the approved subnet associated with Application Gateway.
+1. Under **Inbound traffic configuration**, select **Enabled with no access restrictions** next to **Public network access**.
 
-1. Set default action to **Deny** for unmatched traffic.
+1. On the **Access Restrictions** page, under **Public network access**, select **Enabled from select virtual networks and IP addresses**.
 
-1. Save changes.
+1. Under **Main site**, select **Add**.
 
-1. Open **Function Apps** and select **<function-app-name>**.
+1. On the **Add rule** pane, configure the following settings:
 
-1. Open **Networking** and configure access restrictions.
+   | **Setting** | **Value** |
+   | --- | --- |
+   | **Name** | `Allow-AppGateway` |
+   | **Action** | **Allow** |
+   | **Priority** | `300` |
+   | **Type** | **Virtual Network** |
+   | **Subscription** | Select the current subscription |
+   | **Virtual Network** | **sc500-lab4c-vnet** |
+   | **Subnet** | **agw-subnet** |
 
-1. Add an allow rule for the approved function subnet only.
+1. Select **Add rule**.
 
-1. Set default action to **Deny**.
+1. For **Unmatched rule action**, select **Deny**.
 
-1. Save changes.
+1. Select **Save**. On the **Access update confirmation**, select the confirmation checkbox, and then select **Continue**.
+
+1. In the Azure portal, search for and select **Function Apps**, and then select **<function-app-name>**.
+
+1. In the left navigation menu, expand **Settings**, and then select **Networking**.
+
+1. Under **Inbound traffic configuration**, select **Enabled with no access restrictions** next to **Public network access**.
+
+1. On the **Access Restrictions** page, under **Public network access**, select **Enabled from select virtual networks and IP addresses**.
+
+1. Under **Main site**, select **Add**, and configure the rule as follows:
+
+   | **Setting** | **Value** |
+   | --- | --- |
+   | **Name** | `Allow-FunctionSubnet` |
+   | **Action** | **Allow** |
+   | **Priority** | `300` |
+   | **Type** | **Virtual Network** |
+   | **Subscription** | Select the current subscription |
+   | **Virtual Network** | **sc500-lab4c-vnet** |
+   | **Subnet** | **func-allowed-subnet** |
+
+1. Select **Add rule**.
+
+1. For **Unmatched rule action**, select **Deny**, and then select **Save**.
+
+1. On the **Access update confirmation** page, select the confirmation checkbox, and then select **Continue**.
 
 ---
 
-## Enforce Subscription Key Protection in API Management
+### Enforce Subscription Key Protection in API Management
 
-1. Open **API Management services** and select **<apim-name>**.
+1. In the **Azure portal**, search for and select **API Management services**, and then select **sc500-lab4c-apim-XXXX**.
 
-1. Open **APIs** and select the pre-configured API.
+1. In the left navigation menu, expand **APIs**, select **APIs**, and then select **Lab 4C API**.
 
-1. In API settings, set **Subscription required** to **Required**.
+1. Select **Settings**, set **Subscription required** to **Required**, and then select **Save**.
 
-1. Save changes.
+1. In the left navigation menu, under **APIs**, select **Subscriptions**. Create a test subscription if needed, or open an existing subscription, and copy one of its subscription keys.
 
-1. Create or open a test subscription and copy a key.
+1. Return to **APIs** > **Lab 4C API**, select the **Test** tab, and then select **Get Status**.
 
-1. Test with a key. Include the `Ocp-Apim-Subscription-Key` header and confirm the mock API returns HTTP **200**.
+1. Under **Headers**, select **+ Add header**, and enter the following:
 
-1. Test without a key. Remove the subscription key header and confirm APIM returns HTTP **401**.
+   | **Setting** | **Value** |
+   | --- | --- |
+   | Name | `Ocp-Apim-Subscription-Key` |
+   | Value | Paste the subscription key copied in the previous step |
 
-1. Record results in your notes:
+1. Select **Send** and confirm that the request returns **HTTP 200**.
 
-    | Request type | Expected result |
-    |--------------|-----------------|
-    | With key | HTTP 200 |
-    | Without key | HTTP 401 |
+1. Test without a valid subscription key. In the **Headers** section, clear the value of the **Ocp-Apim-Subscription-Key** header or replace it with an invalid key, and then select **Send**. Confirm that API Management returns **HTTP 401 Access Denied**.
+   
+1. Record the results in your notes:
+
+   | **Request type** | **Expected result** |
+   | --- | --- |
+   | With key | HTTP 200 |
+   | Without key | HTTP 401 |
 
 ---
 
